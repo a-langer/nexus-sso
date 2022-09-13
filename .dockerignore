@@ -13,3 +13,4 @@ etc/saml/* copy*
 etc/jetty/* copy*
 etc/logback/* copy*
 etc/nginx/* copy*
+etc/sso/* copy*
