@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="10 seconds" packagingData="false" debug="false">
+  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+    <resetJUL>true</resetJUL>
+  </contextListener>
+
+  <jmxConfigurator/>
+
+  <appender name="osgi" class="org.ops4j.pax.logging.logback.internal.bridges.PaxAppenderDelegate">
+    <filter class="org.sonatype.nexus.pax.logging.NexusLogFilter" />
+  </appender>
+
+  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+    <filter class="org.sonatype.nexus.pax.logging.NexusLogFilter" />
+    <encoder>
+      <pattern>%d{"yyyy-MM-dd HH:mm:ss,SSSZ"} %-5p [%thread] %mdc{userId:-*SYSTEM} %c - %m%n</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="logfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <File>${karaf.data}/log/nexus.log</File>
+    <Append>true</Append>
+    <encoder class="org.sonatype.nexus.pax.logging.NexusLayoutEncoder">
+      <pattern>%d{"yyyy-MM-dd HH:mm:ss,SSSZ"} %-5p [%thread] %node %mdc{userId:-*SYSTEM} %c - %m%n</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${karaf.data}/log/nexus-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+      <maxHistory>90</maxHistory>
+    </rollingPolicy>
+    <filter class="org.sonatype.nexus.pax.logging.NexusLogFilter" />
+  </appender>
+
+  <appender name="clusterlogfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <File>${karaf.data}/log/nexus_cluster.log</File>
+    <Append>true</Append>
+    <encoder class="org.sonatype.nexus.pax.logging.NexusLayoutEncoder">
+      <pattern>%d{"yyyy-MM-dd HH:mm:ss,SSSZ"} %-5p [%thread] %node %mdc{userId:-*SYSTEM} %c - %m%n</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${karaf.data}/log/nexus_cluster-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+      <maxHistory>90</maxHistory>
+    </rollingPolicy>
+    <filter class="org.sonatype.nexus.pax.logging.ClusterLogFilter" />
+  </appender>
+
+  <appender name="tasklogfile" class="ch.qos.logback.classic.sift.SiftingAppender">
+    <filter class="org.sonatype.nexus.pax.logging.TaskLogsFilter" />
+    <discriminator>
+      <key>taskIdAndDate</key>
+      <defaultValue>unknown</defaultValue>
+    </discriminator>
+    <sift>
+      <appender name="taskAppender" class="ch.qos.logback.core.FileAppender">
+        <file>${karaf.data}/log/tasks/${taskIdAndDate}.log</file>
+        <encoder class="org.sonatype.nexus.pax.logging.NexusLayoutEncoder">
+          <pattern>%d{"yyyy-MM-dd HH:mm:ss,SSSZ"} %-5p [%thread] %node %mdc{userId:-*SYSTEM} %c - %m%n</pattern>
+        </encoder>
+      </appender>
+    </sift>
+  </appender>
+
+  <appender name="auditlogfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <File>${karaf.data}/log/audit/audit.log</File>
+    <Append>true</Append>
+    <encoder>
+      <pattern>%msg%n</pattern>
+    </encoder>
+    <filter class="org.sonatype.nexus.pax.logging.AuditLogFilter"/>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${karaf.data}/log/audit/audit-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+      <maxHistory>90</maxHistory>
+    </rollingPolicy>
+  </appender>
+
+  <logger name="auditlog" additivity="false">
+    <appender-ref ref="auditlogfile"/>
+  </logger>
+
+  <appender name="blobstore-reconciliation-log-file" class="ch.qos.logback.classic.sift.SiftingAppender">
+    <discriminator>
+      <key>blobstore</key>
+      <defaultValue>unknown</defaultValue>
+    </discriminator>
+    <sift>
+      <appender name="FILE-${blobstore}" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+          <Pattern>%d{"yyyy-MM-dd HH:mm:ss"},%msg%n</Pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+          <fileNamePattern>${karaf.data}/log/blobstore/${blobstore}/%d</fileNamePattern>
+          <maxHistory>90</maxHistory>
+        </rollingPolicy>
+      </appender>
+    </sift>
+  </appender>
+  <logger name="blobstore-reconciliation-log" additivity="false">
+    <appender-ref ref="blobstore-reconciliation-log-file"/>
+  </logger>
+
+  <appender name="metrics" class="org.sonatype.nexus.pax.logging.InstrumentedAppender"/>
+
+  <logger name="org.eclipse.jetty.webapp" level="INFO"/>
+  <logger name="org.eclipse.jetty.webapp.StandardDescriptorProcessor" level="WARN"/>
+
+  <logger name="org.apache.aries" level="WARN"/>
+  <logger name="org.apache.felix" level="WARN"/>
+  <logger name="org.apache.karaf" level="WARN"/>
+
+  <!-- SAML: init log level -->
+  <logger name="org.tuckey.web.filters" level="INFO" />
+  <logger name="com.github.alanger.shiroext.servlets.ScriptProcessedFilter" level="INFO" />
+  <logger name="com.github.alanger.nexus.bootstrap.Main" level="INFO" />
+  <logger name="com.github.alanger.nexus.bootstrap.ReloadCongiguration" level="INFO" />
+  <logger name="com.github.alanger.nexus.bootstrap.Pac4jAuthenticationListener" level="INFO" />
+  <logger name="com.github.alanger.nexus.bootstrap.DockerExtdirectFilter" level="INFO" />
+  <logger name="com.github.alanger.nexus.bootstrap.DebugFilter" level="DEBUG" />
+  <logger name="com.github.alanger.shiroext.realm.jdbc.JdbcRealmName" level="INFO" />
+  <!-- <logger name="io.buji.pac4j.filter.SecurityFilter" level="TRACE" /> -->
+  <!-- <logger name="org.pac4j.saml.client" level="DEBUG" /> -->
+  <!-- <logger name="org.opensaml.saml.metadata.resolver" level="DEBUG" /> -->
+
+  <logger name="org.sonatype.nexus.bootstrap" level="INFO" />
+  <logger name="org.sonatype.nexus.extender.NexusLifecycleManager" level="INFO" />
+  <logger name="org.sonatype.nexus.extender.NexusContextListener" level="INFO" />
+  <!-- <logger name="org.sonatype.nexus.extender.NexusBundleTracker" level="INFO" /> -->
+  <logger name="org.sonatype.nexus.rapture.internal.RaptureWebResourceBundle" level="INFO" />
+  <logger name="com.orientechnologies.orient.core.storage.impl.local.paginated.OLocalPaginatedStorage" level="INFO" />
+
+  <include file="${karaf.data}/etc/logback/logback-overrides.xml" optional="true"/>
+  <include file="${karaf.data}/etc/logback/logback-tasklogfile-appender-override.xml" optional="true"/>
+
+  <root level="${root.level:-ERROR}">
+    <appender-ref ref="osgi"/>
+    <appender-ref ref="console"/>
+    <appender-ref ref="logfile"/>
+    <appender-ref ref="clusterlogfile"/>
+    <appender-ref ref="tasklogfile"/>
+    <appender-ref ref="metrics"/>
+  </root>
+</configuration>

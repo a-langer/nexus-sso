@@ -1,0 +1,26 @@
+*.iml
+.idea
+.settings
+.classpath
+.project
+.vscode
+nexus-public
+old
+target
+etc/orient
+etc/fabric
+etc/karaf
+compose.override.yml
+*_dev
+*_data
+*\.jar
+*\.kar
+*\.tar
+*\.gz
+*\.zip
+*\.log
+*\.png
+* copy*
+* - Copy*
+* — копия*
+*_SAVE*

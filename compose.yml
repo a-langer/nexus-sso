@@ -1,0 +1,64 @@
+version: "3.9"
+
+x-container: &container
+  restart: ${RESTART_POLICY:-unless-stopped}
+  env_file:
+    - .env
+
+x-logging: &logging
+  driver: "json-file"
+  options:
+    max-size: ${LOGGING_MAX_SIZE:-5M}
+    max-file: ${LOGGING_COUNT_FILES:-10}
+
+services:
+  nexus:
+    <<: *container
+    image: ${NEXUS_IMAGE:-ghcr.io/a-langer/nexus3:latest}
+    user: ${NEXUS_USER:-nexus}:${NEXUS_GROUP-nexus}
+    cpuset: ${NEXUS_CPUSET:-}
+    cpus: ${NEXUS_CPUS:-4}
+    mem_limit: ${NEXUS_MEM_LIMIT:-3000m}
+    memswap_limit: ${NEXUS_MEMSWAP_LIMIT:-3100m}
+    mem_reservation: ${NEXUS_MEM_RESERVATION:-512m}
+    volumes:
+      - ${NEXUS_DATA}:/nexus-data
+      - ${NEXUS_ETC}/logback:/opt/sonatype/nexus/etc/logback:ro
+    ports:
+      - "${NEXUS_HTTP_PORT:-8081}:8081" # Nexus: http://localhost:8081/
+      - "${ORIENT_HTTP_PORT:-2480}:2480" # OrientDB: http://localhost:2480/studio/index.html
+    logging:
+      <<: *logging
+    healthcheck:
+      test: curl --fail http://localhost:8081 || exit 1
+      start_period: ${HEAL_START_PERIOD:-60s}
+      interval: ${HEAL_INTERVAL:-15s}
+      timeout: ${HEAL_TIMEOUT:-2s}
+      retries: ${HEAL_RETRIES:-10}
+
+  nginx:
+    <<: *container
+    image: ${NGINX_IMAGE:-nginx:1.21.6}
+    user: ${NGINX_USER:-0}:${NGINX_GROUP:-0}
+    cpuset: ${NGINX_CPUSET:-}
+    cpus: ${NGINX_CPUS:-2}
+    mem_limit: ${NGINX_MEM_LIMIT:-256m}
+    memswap_limit: ${NGINX_MEMSWAP_LIMIT:-300m}
+    mem_reservation: ${NGINX_MEM_RESERVATION:-64m}
+    ports:
+      - ${NGINX_HTTP_PORT:-80}:80
+      - ${NGINX_HTTPS_PORT:-443}:443
+    depends_on:
+      nexus:
+        condition: service_healthy
+    volumes:
+      - ${NEXUS_ETC:-./etc}/nginx:/etc/nginx/:ro
+    logging:
+      <<: *logging
+
+networks:
+  default:
+    driver: ${NETWORK_DRIVER:-bridge}
+    ipam:
+      config:
+        - subnet: ${NETWORK_SUBNET:-172.30.0.0/24}

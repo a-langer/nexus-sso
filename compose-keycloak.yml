@@ -1,0 +1,39 @@
+# https://github.com/keycloak/keycloak-containers/tree/main/docker-compose-examples
+# Keycloak recaptcha on regisration https://www.keycloak.org/docs/latest/server_admin/#_recaptcha
+# Keycloak recaptcha on login https://github.com/raptor-group/keycloak-login-recaptcha
+# docker compose -f compose-keycloak.yml up --remove-orphans
+version: "3.9"
+
+x-container: &container
+  restart: ${RESTART_POLICY:-unless-stopped}
+  env_file:
+    - .env
+
+x-logging: &logging
+  driver: "json-file"
+  options:
+    max-size: ${LOGGING_MAX_SIZE:-5M}
+    max-file: ${LOGGING_COUNT_FILES:-10}
+
+services:
+  postgres:
+    <<: *container
+    image: ${POSTGRES_IMAGE:-postgres:14}
+    volumes:
+      - "postgres_data:/var/lib/postgresql/data"
+    logging:
+      <<: *logging
+
+  keycloak:
+    <<: *container
+    image: ${KEYCLOAK_IMAGE:-jboss/keycloak:16.1.1}
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
+    logging:
+      <<: *logging
+
+volumes:
+  postgres_data:
+#   postgres_data: { driver: local, driver_opts: { type: 'none', o: 'bind', device: '${POSTGRES_DATA}' } }

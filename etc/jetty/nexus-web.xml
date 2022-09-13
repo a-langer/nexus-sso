@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0">
+
+    <display-name>Sonatype Nexus</display-name>
+
+    <listener>
+        <listener-class>org.sonatype.nexus.bootstrap.osgi.BootstrapListener</listener-class>
+    </listener>
+
+    <!-- UrlRewriteFilter for initialization Apache Shiro -->
+    <filter>
+        <filter-name>urlrewrite-filter</filter-name>
+        <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
+        <async-supported>true</async-supported>
+        <!-- <init-param>
+            <param-name>confReloadCheckInterval</param-name>
+            <param-value>6</param-value>
+        </init-param> -->
+        <!-- allow conf file to be set by calling /rewrite-endpoint/?conf=etc/sso/urlrewrite.xml -->
+        <init-param>
+            <param-name>allowConfSwapViaHttp</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>confPath</param-name>
+            <param-value>etc/sso/urlrewrite.xml</param-value>
+        </init-param>
+        <init-param>
+            <param-name>logLevel</param-name>
+            <param-value>ERROR</param-value>
+        </init-param>
+        <init-param>
+            <param-name>statusPath</param-name>
+            <param-value>/rewrite-status</param-value>
+        </init-param>
+        <init-param>
+            <param-name>statusEnabled</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>statusEnabledOnHosts</param-name>
+            <param-value>localhost, 127.0.0.1</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>urlrewrite-filter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>ERROR</dispatcher>
+        <dispatcher>ASYNC</dispatcher>
+    </filter-mapping>
+
+    <!-- Stop executing request if HTTP response is committed -->
+    <filter>
+        <filter-name>response-comitted-filter</filter-name>
+        <filter-class>com.github.alanger.shiroext.servlets.ResponseComittedFilter</filter-class>
+        <async-supported>true</async-supported>
+    </filter>
+    <filter-mapping>
+        <filter-name>response-comitted-filter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>ERROR</dispatcher>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>nexusFilter</filter-name>
+        <filter-class>org.sonatype.nexus.bootstrap.osgi.DelegatingFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>nexusFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>ERROR</dispatcher>
+    </filter-mapping>
+
+    <!-- Moved to UrlRewriteFilter rule
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list> -->
+
+    <context-param>
+        <param-name>org.eclipse.jetty.servlet.Default.dirAllowed</param-name>
+        <param-value>false</param-value>
+    </context-param>
+
+    <!-- Class of default script engine for Shiro-ext -->
+    <context-param>
+        <param-name>shiroext-engine-class</param-name>
+        <param-value>org.codehaus.groovy.jsr223.GroovyScriptEngineImpl</param-value>
+    </context-param>
+
+    <error-page>
+        <location>/error.html</location>
+    </error-page>
+</web-app>

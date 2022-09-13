@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  nexus:
+    dns:
+      - ${NETWORK_DNS_RESOLVER_1:-8.8.8.8}
+      - ${NETWORK_DNS_RESOLVER_2:-4.4.4.4}
+      - ${NETWORK_DNS_RESOLVER_3:-192.168.0.1}
+    volumes:
+      - ${NEXUS_ETC}/jetty/nexus-web.xml:/opt/sonatype/nexus/etc/jetty/nexus-web.xml:ro
+      - ${NEXUS_ETC}/nexus-default.properties:/opt/sonatype/nexus/etc/nexus-default.properties:ro
+      - ${NEXUS_ETC}/sso:/opt/sonatype/nexus/etc/sso:ro
+    ports:
+      - "${NEXUS_HTTP_PORT:-8081}:8081" # Nexus: http://localhost:8081/
+      - "${ORIENT_HTTP_PORT:-2480}:2480" # OrientDB: http://localhost:2480/studio/index.html
+      - "2020-2025:2020-2025" # Docker specified ports

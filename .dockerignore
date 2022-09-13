@@ -1,0 +1,15 @@
+*_dev
+*.jks
+*.tar
+*.gz
+*.zip
+*.log
+*.png
+* copy*
+* - Copy*
+* — копия*
+*_SAVE*
+etc/saml/* copy*
+etc/jetty/* copy*
+etc/logback/* copy*
+etc/nginx/* copy*
