@@ -65,7 +65,7 @@
         <nexus.base.version>3.37.3</nexus.base.version>
         <nexus.base.image>sonatype/nexus3:${nexus.base.version}</nexus.base.image>
         <nexus.bootstrap.version>${nexus.base.version}-02</nexus.bootstrap.version>
-        <docker.image>ghcr.io/a-langer/nexus3:${project.version}</docker.image>
+        <docker.image>ghcr.io/a-langer/${project.artifactId}:${project.version}</docker.image>
     </properties>
 
     <dependencies>

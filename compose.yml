@@ -14,7 +14,7 @@ x-logging: &logging
 services:
   nexus:
     <<: *container
-    image: ${NEXUS_IMAGE:-ghcr.io/a-langer/nexus3:latest}
+    image: ${NEXUS_IMAGE:-ghcr.io/a-langer/nexus-sso:latest}
     user: ${NEXUS_USER:-nexus}:${NEXUS_GROUP-nexus}
     cpuset: ${NEXUS_CPUSET:-}
     cpus: ${NEXUS_CPUS:-4}
