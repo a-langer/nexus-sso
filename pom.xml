@@ -332,7 +332,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.4.1</version>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
                         <id>enforce-bytecode-version</id>
@@ -345,6 +345,7 @@
                                     <maxJdkVersion>1.8</maxJdkVersion>
                                     <excludes>
                                         <exclude>org.bouncycastle:bcprov-jdk15on</exclude>
+                                        <exclude>org.eclipse.jetty:jetty-server</exclude>
                                     </excludes>
                                 </enforceBytecodeVersion>
                             </rules>
@@ -356,7 +357,7 @@
                     <dependency>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>extra-enforcer-rules</artifactId>
-                        <version>1.0-beta-5</version>
+                        <version>1.6.1</version>
                     </dependency>
                 </dependencies>
             </plugin>
