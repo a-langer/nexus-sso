@@ -98,7 +98,7 @@ public class DockerExtdirectFilter implements Filter {
                         String repositoryName = String.valueOf(data.get("repositoryName"));
                         if (repositoryName.equals(dockerRoot) && fullName.startsWith(dockerRoot + "/")) {
                             fullName = fullName.substring((dockerRoot + "/").length(), fullName.length());
-                        } else if (!fullName.startsWith(repositoryName + "/")) {
+                        } else if (!repositoryName.equals(dockerRoot) && !fullName.startsWith(repositoryName + "/")) {
                             fullName = repositoryName + "/" + fullName;
                         }
                         fullName = getHostName(request) + "/" + fullName;
