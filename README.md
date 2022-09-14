@@ -2,7 +2,7 @@
 
 [![license](https://img.shields.io/badge/license-EPL1-brightgreen.svg)](https://github.com/a-langer/nexus-sso/blob/main/LICENSE "License of source code")
 [![image](https://ghcr-badge.herokuapp.com/a-langer/nexus-sso/latest_tag?trim=major&label=latest)][0]
-[![image-size](https://ghcr-badge.herokuapp.com/a-langer/nexus-sso/size)][0]
+[![image-size](https://ghcr-badge.herokuapp.com/a-langer/nexus-sso/size?tag=3.37.3)][0]
 [![JitPack](https://jitpack.io/v/a-langer/nexus-sso.svg)][1]
 
 Patch for [Nexus OSS][2] with authorization via [SSO][9] and [tokens][10]. By default this features available only in PRO version ([see comparison][5]), but this patch provides them an alternative implementation without violating the license.
@@ -81,6 +81,7 @@ mvn clean install -PbuildImage
 ```
 
 [0]: https://github.com/a-langer/nexus-sso/pkgs/container/nexus-sso "Docker image with SSO patch applied"
+<!-- [0]: https://github.com/users/a-langer/packages/container/package/nexus-sso "Docker image with SSO patch applied" -->
 [1]: https://jitpack.io/#a-langer/nexus-sso "Maven repository for builds from source code"
 [2]: https://github.com/sonatype/nexus-public "Source code of Nexus OSS"
 [3]: https://github.com/sonatype/docker-nexus3 "Docker image Nexus OSS"
