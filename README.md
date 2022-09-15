@@ -63,7 +63,7 @@ List of features this patch adds:
 ## Additional settings (tips and tricks)
 
 * [Docker compose](./compose.yml) configuration may be extended with [compose.override.yml](./_compose.override.yml) (for example, pass additional files to the container).
-* SAML/SSO authentication may be configured with environment variables in [.env](./.env) file, for more flexible settings, can make changes directly to [shiro.ini](./etc/sso/shiro.ini) ([variable interpolation][16] supported). However, this also requires that the service provider (ex., [sp-metadata.xml](./etc/sso/sp-metadata.xml)) and identity provider (ex., [metadata-okta.xml](./etc/sso/metadata.xml) or [metadata-keycloak.xml](./etc/sso/metadata-keycloak.xml)) configuration files will be passed to the container. Examples of creating SAML configurations see in "[Keycloak SAML integration with Nexus application][15]".
+* SAML/SSO authentication may be configured with environment variables in [.env](./.env) file, for more flexible settings, can make changes directly to [shiro.ini](./etc/sso/shiro.ini) ([variable interpolation][16] supported). However, this also requires that the configuration files of service provider (ex., [sp-metadata.xml](./etc/sso/sp-metadata.xml)) and identity provider (ex., [metadata-okta.xml](./etc/sso/metadata.xml) or [metadata-keycloak.xml](./etc/sso/metadata-keycloak.xml))  will be passed to the container. Examples of creating SAML configurations see in "[Keycloak SAML integration with Nexus application][15]".
 * Nginx SSL is pre-configured, to enable it, need rename file [_ssl.conf](./etc/nginx/_ssl.conf) to `ssl.conf` and pass to `${NEXUS_ETC}/nginx/tls/` two files:
   * `site.crt` - PEM certificate of domain name.
   * `site.key` - key for certificate.
