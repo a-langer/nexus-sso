@@ -97,7 +97,7 @@
         <dependency>
             <groupId>com.github.a-langer</groupId>
             <artifactId>shiro-ext</artifactId>
-            <version>a85d869cc8</version>
+            <version>5ccd46ffbb</version>
         </dependency>
         <!-- Variable interpolation for shiro.ini, see https://shiro.apache.org/configuration.html -->
         <dependency>
