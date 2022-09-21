@@ -14,12 +14,11 @@ x-logging: &logging
 services:
   nexus:
     <<: *container
-    image: ${NEXUS_IMAGE:-ghcr.io/a-langer/nexus-sso:latest}
+    image: ${NEXUS_IMAGE:-ghcr.io/a-langer/nexus-sso:3.37.3}
     user: ${NEXUS_USER:-nexus}:${NEXUS_GROUP-nexus}
     cpuset: ${NEXUS_CPUSET:-}
     cpus: ${NEXUS_CPUS:-4}
     mem_limit: ${NEXUS_MEM_LIMIT:-3000m}
-    memswap_limit: ${NEXUS_MEMSWAP_LIMIT:-3100m}
     mem_reservation: ${NEXUS_MEM_RESERVATION:-512m}
     volumes:
       - ${NEXUS_DATA}:/nexus-data
@@ -43,7 +42,6 @@ services:
     cpuset: ${NGINX_CPUSET:-}
     cpus: ${NGINX_CPUS:-2}
     mem_limit: ${NGINX_MEM_LIMIT:-256m}
-    memswap_limit: ${NGINX_MEMSWAP_LIMIT:-300m}
     mem_reservation: ${NGINX_MEM_RESERVATION:-64m}
     ports:
       - ${NGINX_HTTP_PORT:-80}:80
