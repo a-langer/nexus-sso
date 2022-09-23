@@ -30,8 +30,8 @@ services:
       <<: *logging
     healthcheck:
       test: curl --fail http://localhost:8081 || exit 1
-      start_period: ${HEAL_START_PERIOD:-60s}
-      interval: ${HEAL_INTERVAL:-15s}
+      start_period: ${HEAL_START_PERIOD:-100s}
+      interval: ${HEAL_INTERVAL:-25s}
       timeout: ${HEAL_TIMEOUT:-2s}
       retries: ${HEAL_RETRIES:-10}
 

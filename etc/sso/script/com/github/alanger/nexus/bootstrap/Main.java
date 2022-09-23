@@ -195,8 +195,10 @@ public class Main {
 
         // Add all Nexus realms
         for (Realm r : securityManager.getRealms()) {
-            logger.trace("Previous realm: {} = {}", r.getName(), r);
-            objects.put(r.getName(), r);
+            if (r != null) {
+                logger.trace("Previous realm: {} = {}", r.getName(), r);
+                objects.put(r.getName(), r);
+            }
         }
 
         // Clear all realms
@@ -280,7 +282,8 @@ public class Main {
 
         // Debugging a current list of realms
         for (Realm r : securityManager.getRealms()) {
-            logger.info("Current realm: {} = {}", r.getName(), r); // TODO
+            if (r != null)
+                logger.info("Current realm: {} = {}", r.getName(), r); // TODO
         }
 
         // Set all filters
