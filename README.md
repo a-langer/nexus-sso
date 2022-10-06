@@ -16,7 +16,7 @@ Available solutions:
 
 List of features this patch adds:
 
-* **SAML/SSO** - authentication via Single Sign-On (SSO) using a SAML identity provider such as [Keycloak][12], [Okta][13], [ADFS][14] and others. Nexus uses access system based on [Apache Shiro][6], this patch extends it with a [Pac4j][8] and [buji-pac4j][7] libraries, which can be configured with "[shiro.ini](./etc/sso/shiro.ini)" (see documentation of Apache Shiro and Pac4j for more detail informations). SSO users are created as internal Nexus accounts the first time they sign-in and are updated every next time. Example of usage SSO:
+* **SAML/SSO** - authentication via Single Sign-On (SSO) using a SAML identity provider such as [Keycloak][12], [Okta][13], [ADFS][14] and others. Nexus uses access system based on [Apache Shiro][6], this patch extends it with a [Pac4j][8] and [buji-pac4j][7] libraries, which can be configured with "[shiro.ini](./etc/sso/config/shiro.ini)" (see documentation of Apache Shiro and Pac4j for more detail informations). SSO users are created as internal Nexus accounts the first time they sign-in and are updated every next time. Example of usage SSO:
   * Go to menu "Sign in", press to button "Sign in with SSO".
   * You will be redirected to the login page of identity provider.
   * Type you credentials (login, password, 2FA, etc.).
@@ -63,11 +63,11 @@ List of features this patch adds:
 ## Additional settings (tips and tricks)
 
 * [Docker compose](./compose.yml) configuration may be extended with [compose.override.yml](./_compose.override.yml) (for example, pass additional files to the container).
-* SAML/SSO authentication may be configured with environment variables in [.env](./.env) file, for more flexible settings, can make changes directly to [shiro.ini](./etc/sso/shiro.ini) ([variable interpolation][16] supported). However, this also requires that the configuration files of service provider (ex., [sp-metadata.xml](./etc/sso/sp-metadata.xml)) and identity provider (ex., [metadata-okta.xml](./etc/sso/metadata.xml) or [metadata-keycloak.xml](./etc/sso/metadata-keycloak.xml))  will be passed to the container. Examples of creating SAML configurations see in "[Keycloak SAML integration with Nexus application][15]".
+* SAML/SSO authentication may be configured with environment variables in [.env](./.env) file, for more flexible settings, can make changes directly to [shiro.ini](./etc/sso/config/shiro.ini) ([variable interpolation][16] supported). However, this also requires that the configuration files of service provider (ex., [sp-metadata.xml](./etc/sso/config/sp-metadata.xml)) and identity provider (ex., [metadata-okta.xml](./etc/sso/config/metadata.xml) or [metadata-keycloak.xml](./etc/sso/config/metadata-keycloak.xml)) will be passed to the container. Examples of creating SAML configurations see in "[Keycloak SAML integration with Nexus application][15]".
 * Nginx SSL is pre-configured, to enable it, need rename file [_ssl.conf](./etc/nginx/_ssl.conf) to `ssl.conf` and pass to `${NEXUS_ETC}/nginx/tls/` two files:
   * `site.crt` - PEM certificate of domain name.
   * `site.key` - key for certificate.
-* [UrlRewriteFilter][17] is used to route HTTP requests within the application and can be further configured using [urlrewrite.xml](./etc/sso/urlrewrite.xml) (for example override or protect API endpoint). Status of UrlRewriteFilter available in http://localhost:8081/rewrite-status.
+* [UrlRewriteFilter][17] is used to route HTTP requests within the application and can be further configured using [urlrewrite.xml](./etc/sso/config/urlrewrite.xml) (for example override or protect API endpoint). Status of UrlRewriteFilter available in http://localhost:8081/rewrite-status.
 
 ## Development environment
 
