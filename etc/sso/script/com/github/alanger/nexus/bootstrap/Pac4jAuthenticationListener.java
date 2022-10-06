@@ -169,7 +169,7 @@ public class Pac4jAuthenticationListener implements AuthenticationListener {
     }
 
     public void onFailure(AuthenticationToken token, AuthenticationException ae) {
-        logger.trace("onFailure token: {} , exception: {}", token, ae);
+        logger.trace("onFailure token: {} , exception:", token, ae);
     }
 
     public void onLogout(PrincipalCollection principals) {

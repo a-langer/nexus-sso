@@ -67,7 +67,7 @@
         <run class="com.github.alanger.shiroext.servlets.ScriptProcessedServlet" method="service">
             <init-param>
                 <param-name>configPath</param-name>
-                <param-value>file:etc/sso/shiro.ini</param-value>
+                <param-value>file:etc/sso/config/shiro.ini</param-value>
             </init-param>
             <init-param>
                 <param-name>init-script</param-name>

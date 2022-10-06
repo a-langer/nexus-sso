@@ -16,14 +16,14 @@
             <param-name>confReloadCheckInterval</param-name>
             <param-value>6</param-value>
         </init-param> -->
-        <!-- allow conf file to be set by calling /rewrite-endpoint/?conf=etc/sso/urlrewrite.xml -->
+        <!-- allow conf file to be set by calling /rewrite-endpoint/?conf=etc/sso/config/urlrewrite.xml -->
         <init-param>
             <param-name>allowConfSwapViaHttp</param-name>
             <param-value>true</param-value>
         </init-param>
         <init-param>
             <param-name>confPath</param-name>
-            <param-value>etc/sso/urlrewrite.xml</param-value>
+            <param-value>etc/sso/config/urlrewrite.xml</param-value>
         </init-param>
         <init-param>
             <param-name>logLevel</param-name>
