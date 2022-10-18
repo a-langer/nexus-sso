@@ -20,6 +20,10 @@ public class EchoRealm extends AuthorizingRealm {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    public EchoRealm() {
+        setAuthenticationTokenClass(UsernamePasswordToken.class);
+    }
+
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
         try {
@@ -28,7 +32,7 @@ public class EchoRealm extends AuthorizingRealm {
             if (subject != null && subject.isAuthenticated()
                     && subject.getPrincipal().toString().equals(t.getUsername())
                     && Pac4jPrincipalName.class.isAssignableFrom(subject.getPrincipal().getClass())) {
-                logger.info("echoRealm doGetAuthenticationInfo token: {}", token);
+                logger.trace("echoRealm doGetAuthenticationInfo token: {}", token);
                 return new SimpleAccount(t.getUsername(), t.getUsername(), this.getName());
             }
         } catch (AuthenticationException e) {

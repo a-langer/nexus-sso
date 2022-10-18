@@ -119,6 +119,10 @@
   <!-- <logger name="org.pac4j.saml.client" level="DEBUG" /> -->
   <!-- <logger name="org.opensaml.saml.metadata.resolver" level="DEBUG" /> -->
 
+  <!-- <logger name="org.sonatype.nexus.security.authc.FirstSuccessfulModularRealmAuthenticator" level="TRACE" /> -->
+  <!-- <logger name="org.sonatype.nexus.security.token.BearerTokenRealm" level="TRACE" /> -->
+  <!-- <logger name="org.sonatype.nexus.repository.docker.internal.security.DockerTokenRealm" level="TRACE" /> -->
+
   <logger name="org.sonatype.nexus.bootstrap" level="INFO" />
   <logger name="org.sonatype.nexus.extender.NexusLifecycleManager" level="INFO" />
   <logger name="org.sonatype.nexus.extender.NexusContextListener" level="INFO" />

@@ -1,44 +1,42 @@
 package com.github.alanger.nexus.bootstrap;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.Filter;
-
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+
+import javax.servlet.Filter;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+
+import org.apache.commons.configuration2.interpol.DefaultLookups;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
+import org.apache.shiro.authz.ModularRealmAuthorizer;
+import org.apache.shiro.config.CommonsInterpolator;
+import org.apache.shiro.config.Ini;
+import org.apache.shiro.config.ReflectionBuilder;
+import org.apache.shiro.realm.Realm;
+import org.apache.shiro.realm.text.IniRealm;
+import org.apache.shiro.session.mgt.SessionManager;
+import org.apache.shiro.web.env.WebEnvironment;
+import org.apache.shiro.web.filter.mgt.DefaultFilterChainManager;
+import org.apache.shiro.web.filter.mgt.NamedFilterList;
+import org.apache.shiro.web.filter.mgt.PathMatchingFilterChainResolver;
+import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.util.WebUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.bootstrap.osgi.DelegatingFilter;
 
 import com.github.alanger.shiroext.http.MockFilterChain;
 import com.github.alanger.shiroext.http.MockHttpServletRequest;
 import com.github.alanger.shiroext.http.MockHttpServletResponse;
 import com.github.alanger.shiroext.realm.jdbc.JdbcRealmName;
 import com.github.alanger.shiroext.realm.pac4j.Pac4jRealmName;
-
-import org.apache.commons.configuration2.interpol.DefaultLookups;
-import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
-import org.apache.shiro.authz.ModularRealmAuthorizer;
-import org.apache.shiro.config.Ini;
-import org.apache.shiro.config.ReflectionBuilder;
-import org.apache.shiro.config.CommonsInterpolator;
-import org.apache.shiro.realm.text.IniRealm;
-import org.apache.shiro.realm.Realm;
-import org.apache.shiro.session.mgt.SessionManager;
-import org.apache.shiro.web.util.WebUtils;
-import org.apache.shiro.web.env.WebEnvironment;
-import org.apache.shiro.web.filter.mgt.PathMatchingFilterChainResolver;
-import org.apache.shiro.web.filter.mgt.DefaultFilterChainManager;
-import org.apache.shiro.web.filter.mgt.NamedFilterList;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
-
-import org.sonatype.nexus.bootstrap.osgi.DelegatingFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Main {
 
@@ -204,35 +202,28 @@ public class Main {
         // Clear all realms
         securityManager.getRealms().clear();
 
-        // New realm list
-        LinkedList<Realm> realms = new LinkedList<>();
-
         // Ini realm
         IniRealm iniRealm = new IniRealm();
         iniRealm.setName("iniRealm");
         iniRealm.setIni(ini);
         objects.put("iniRealm", iniRealm);
-        realms.add(iniRealm);
 
         // Realm for authorization by API token (Basic and Bearer if enabled
         // com.github.alanger.shiroext.web.BearerAuthcFilter)
         JdbcRealmName tokenRealm = new JdbcRealmName();
         tokenRealm.setName("tokenRealm");
         objects.put("tokenRealm", tokenRealm);
-        realms.add(tokenRealm);
 
         // Realm for access to API token from SSO user, see
         // org.sonatype.nexus.rapture.internal.security.SecurityComponent
         EchoRealm echoRealm = new EchoRealm();
         echoRealm.setName("echoRealm");
         objects.put("echoRealm", echoRealm);
-        realms.add(echoRealm);
 
         // Realm for authorization by SAML/SSO
         Pac4jRealmName pac4jRealm = new Pac4jRealmName();
         pac4jRealm.setName("pac4jRealm");
         objects.put("pac4jRealm", pac4jRealm);
-        realms.add(pac4jRealm);
 
         // org.apache.shiro.nexus.NexusWebSessionManager
         SessionManager sessionManager = securityManager.getSessionManager();
@@ -273,17 +264,13 @@ public class Main {
         // Add Nexus default realms to current realms list
         for (String nexusRealmName: orientConnection.getRealmNames()) {
             Realm nexusRealm = (Realm) buildObjects.get(nexusRealmName);
-            realms.add(nexusRealm);
+            securityManager.getRealms().add(nexusRealm);
         }
-
-        // Set realm list if not set in shiro.ini
-        if (securityManager.getRealms() == null || securityManager.getRealms().isEmpty()) 
-            securityManager.setRealms(realms);
 
         // Debugging a current list of realms
         for (Realm r : securityManager.getRealms()) {
             if (r != null)
-                logger.info("Current realm: {} = {}", r.getName(), r); // TODO
+                logger.info("Current realm: {} = {}", r.getName(), r);
         }
 
         // Set all filters
