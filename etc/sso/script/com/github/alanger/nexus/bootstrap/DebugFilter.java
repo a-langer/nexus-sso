@@ -99,6 +99,8 @@ public class DebugFilter implements Filter {
     public static void printResponseHeaders(HttpServletResponse response, Logger log) {
         StringBuilder sb = new StringBuilder("");
         Collection<String> e = response.getHeaderNames();
+        sb.append("\n  status = " + response.getStatus());
+        sb.append("\n  committed = " + response.isCommitted());
         for (String s : e) {
             sb.append("\n  " + s + " = " + response.getHeader(s));
         }
