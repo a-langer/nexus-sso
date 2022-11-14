@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import io.buji.pac4j.filter.SecurityFilter;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.util.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +34,13 @@ public class Pac4jSecurityFilter extends SecurityFilter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
+
         String authorizationHeader = getAuthzHeader(servletRequest);
-        if (authorizationHeader == null || authorizationHeader.length() == 0) {
+
+        Subject subject = SecurityUtils.getSubject();
+        boolean authenticated = subject.getPrincipal() != null && subject.isAuthenticated();
+
+        if ((authorizationHeader == null || authorizationHeader.length() == 0) && !authenticated) {
             try {
                 super.doFilter(servletRequest, servletResponse, filterChain);
             } catch (IOException | ServletException e) {
