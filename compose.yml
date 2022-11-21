@@ -29,11 +29,11 @@ services:
     logging:
       <<: *logging
     healthcheck:
-      test: curl --fail http://localhost:8081 || exit 1
-      start_period: ${HEAL_START_PERIOD:-100s}
-      interval: ${HEAL_INTERVAL:-25s}
+      test: curl --fail http://localhost:8081/service/rest/v1/status || exit 1
+      start_period: ${HEAL_START_PERIOD:-60s}
+      interval: ${HEAL_INTERVAL:-30s}
       timeout: ${HEAL_TIMEOUT:-2s}
-      retries: ${HEAL_RETRIES:-10}
+      retries: ${HEAL_RETRIES:-5}
 
   nginx:
     <<: *container
