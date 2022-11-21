@@ -24,23 +24,50 @@ public class Pac4jSecurityFilter extends SecurityFilter {
 
     protected static Logger log = LoggerFactory.getLogger(Pac4jSecurityFilter.class);
 
-    protected static final String AUTHORIZATION_HEADER = "Authorization";
+    private boolean ifNotAuthenticated = true;
+    private boolean ifNotAuthzHeader = true;
+    private boolean ifNotXMLHttpRequest = true;
+    private boolean ifBrowserRequest = true;
 
-    protected String getAuthzHeader(ServletRequest request) {
-        HttpServletRequest httpRequest = WebUtils.toHttp(request);
-        return httpRequest.getHeader(AUTHORIZATION_HEADER);
+    public boolean isAuthenticated() {
+        Subject subject = SecurityUtils.getSubject();
+        return subject.getPrincipal() != null && subject.isAuthenticated();
+    }
+
+    public boolean isAuthzHeader(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        return header != null && header.length() > 0;
+    }
+
+    public boolean isBrowserRequest(HttpServletRequest request) {
+        String header = request.getHeader("User-Agent");
+        return header != null && header.toLowerCase().startsWith("mozilla");
+    }
+
+    public boolean isXMLHttpRequest(HttpServletRequest request) {
+        String header = request.getHeader("X-Requested-With");
+        return header != null && header.equals("XMLHttpRequest");
     }
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
 
-        String authorizationHeader = getAuthzHeader(servletRequest);
+        boolean need = true;
+        if (ifNotAuthenticated) {
+            need = !isAuthenticated();
+        }
+        if (need && ifNotAuthzHeader) {
+            need = !isAuthzHeader(WebUtils.toHttp(servletRequest));
+        }
+        if (need && ifNotXMLHttpRequest) {
+            need = !isXMLHttpRequest(WebUtils.toHttp(servletRequest));
+        }
+        if (need && ifBrowserRequest) {
+            need = isBrowserRequest(WebUtils.toHttp(servletRequest));
+        }
 
-        Subject subject = SecurityUtils.getSubject();
-        boolean authenticated = subject.getPrincipal() != null && subject.isAuthenticated();
-
-        if ((authorizationHeader == null || authorizationHeader.length() == 0) && !authenticated) {
+        if (need) {
             try {
                 super.doFilter(servletRequest, servletResponse, filterChain);
             } catch (IOException | ServletException e) {
@@ -52,6 +79,38 @@ public class Pac4jSecurityFilter extends SecurityFilter {
         } else {
             filterChain.doFilter(servletRequest, servletResponse);
         }
+    }
+
+    public boolean isIfNotAuthenticated() {
+        return ifNotAuthenticated;
+    }
+
+    public void setIfNotAuthenticated(boolean ifNotAuthenticated) {
+        this.ifNotAuthenticated = ifNotAuthenticated;
+    }
+
+    public boolean isIfNotAuthzHeader() {
+        return ifNotAuthzHeader;
+    }
+
+    public void setIfNotAuthzHeader(boolean ifNotAuthzHeader) {
+        this.ifNotAuthzHeader = ifNotAuthzHeader;
+    }
+
+    public boolean isIfNotXMLHttpRequest() {
+        return ifNotXMLHttpRequest;
+    }
+
+    public void setIfNotXMLHttpRequest(boolean ifNotXMLHttpRequest) {
+        this.ifNotXMLHttpRequest = ifNotXMLHttpRequest;
+    }
+
+    public boolean isIfBrowserRequest() {
+        return ifBrowserRequest;
+    }
+
+    public void setIfBrowserRequest(boolean ifBrowserRequest) {
+        this.ifBrowserRequest = ifBrowserRequest;
     }
 
 }
