@@ -304,7 +304,8 @@ public class Main {
             interpolateIni(ini);
             String scanPeriod = ini.getSectionProperty("", "scanPeriod");
             String urlRewriteStatusPath = ini.getSectionProperty("", "urlRewriteStatusPath");
-            if (configPath.startsWith("file:") && scanPeriod != null && urlRewriteStatusPath != null) {
+            long interval = scanPeriod != null ? Long.parseLong(scanPeriod) : 0;
+            if (configPath.startsWith("file:") && interval > 0 && urlRewriteStatusPath != null) {
                 createReloadThread(urlRewriteStatusPath, configPath, Long.parseLong(scanPeriod));
             } else {
                 removeReloadThread();
