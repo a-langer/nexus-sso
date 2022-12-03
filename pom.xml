@@ -62,7 +62,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.release>8</maven.compiler.release>
-        <nexus.base.version>3.41.1</nexus.base.version>
+        <nexus.base.version>3.42.0</nexus.base.version>
         <nexus.base.image>sonatype/nexus3:${nexus.base.version}</nexus.base.image>
         <nexus.bootstrap.version>${nexus.base.version}-01</nexus.bootstrap.version>
         <docker.image>ghcr.io/a-langer/${project.artifactId}:${project.version}</docker.image>
@@ -302,7 +302,7 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.4.0.v20161208</version>
+            <version>9.4.48.v20220622</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
