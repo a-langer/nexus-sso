@@ -5,11 +5,11 @@
 # docker rmi $(docker images -f "dangling=true" -q)
 # docker run --user=0:0 --rm -it -p 8081:8081/tcp sonatype/nexus3:3.37.3 /bin/bash
 
-ARG NEXUS_BASE_IMAGE="sonatype/nexus3:3.40.0"
+ARG NEXUS_BASE_IMAGE="sonatype/nexus3:3.41.1"
 FROM $NEXUS_BASE_IMAGE
 USER root
 
-ARG BOOTSTRAP_VERSION="3.40.0-03"
+ARG BOOTSTRAP_VERSION="3.41.1-01"
 ENV BOOT_VERSION="${BOOTSTRAP_VERSION}"
 ENV BOOT_PLUGIN="nexus-bootstrap-${BOOT_VERSION}.jar"
 ENV NEXUS_PLUGINS="${NEXUS_HOME}/system"
