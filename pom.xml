@@ -62,9 +62,9 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.release>8</maven.compiler.release>
-        <nexus.base.version>3.39.0</nexus.base.version>
+        <nexus.base.version>3.40.0</nexus.base.version>
         <nexus.base.image>sonatype/nexus3:${nexus.base.version}</nexus.base.image>
-        <nexus.bootstrap.version>${nexus.base.version}-01</nexus.bootstrap.version>
+        <nexus.bootstrap.version>${nexus.base.version}-03</nexus.bootstrap.version>
         <docker.image>ghcr.io/a-langer/${project.artifactId}:${project.version}</docker.image>
     </properties>
 
