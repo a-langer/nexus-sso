@@ -2,7 +2,7 @@
 
 [![license](https://img.shields.io/badge/license-EPL1-brightgreen.svg)](https://github.com/a-langer/nexus-sso/blob/main/LICENSE "License of source code")
 [![image](https://ghcr-badge.herokuapp.com/a-langer/nexus-sso/latest_tag?trim=major&label=latest)][0]
-[![image-size](https://ghcr-badge.herokuapp.com/a-langer/nexus-sso/size?tag=3.37.3)][0]
+[![image-size](https://ghcr-badge.herokuapp.com/a-langer/nexus-sso/size?tag=3.38.1)][0]
 [![JitPack](https://jitpack.io/v/a-langer/nexus-sso.svg)][1]
 
 Patch for [Nexus OSS][2] with authorization via [SSO][9] and [tokens][10]. By default this features available only in PRO version ([see comparison][5]), but this patch provides them an alternative implementation without violating the license.
