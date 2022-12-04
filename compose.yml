@@ -25,7 +25,6 @@ services:
       - ${NEXUS_ETC}/logback:/opt/sonatype/nexus/etc/logback:ro
     ports:
       - "${NEXUS_HTTP_PORT:-8081}:8081" # Nexus: http://localhost:8081/
-      - "${ORIENT_HTTP_PORT:-2480}:2480" # OrientDB: http://localhost:2480/studio/index.html
     logging:
       <<: *logging
     healthcheck:
@@ -51,6 +50,26 @@ services:
         condition: service_healthy
     volumes:
       - ${NEXUS_ETC:-./etc}/nginx:/etc/nginx/:ro
+    logging:
+      <<: *logging
+
+  # docker-compose --profile debug up
+  orientdb:
+    <<: *container
+    image: ${ORIENTDB_IMAGE:-orientdb:2.2.37}
+    cpuset: ${ORIENTDB_CPUSET:-}
+    cpus: ${ORIENTDB_CPUS:-2}
+    mem_limit: ${ORIENTDB_MEM_LIMIT:-512m}
+    mem_reservation: ${ORIENTDB_MEM_RESERVATION:-64m}
+    volumes:
+      - ${NEXUS_ETC}/orientdb:/orientdb/config:rw
+    ports:
+      - "${ORIENTDB_HTTP_PORT:-2480}:2480" # OrientDB: http://localhost:2480/studio/index.html
+    depends_on:
+      nexus:
+        condition: service_healthy
+    profiles:
+      - debug
     logging:
       <<: *logging
 

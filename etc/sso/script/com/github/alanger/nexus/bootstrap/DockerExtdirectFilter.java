@@ -69,6 +69,12 @@ public class DockerExtdirectFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) resp;
 
+        if (request.getAttribute(getClass().getCanonicalName()) != null) {
+            chain.doFilter(request, response);
+            return;
+        }
+        request.setAttribute(getClass().getCanonicalName(), true);
+
         MultiReadRequestWrapper requestWrapper = new MultiReadRequestWrapper(request);
         boolean isJson = (request.getContentType() != null && request.getContentType().contains("json"));
         Map<String, Object> reqMap = isJson ? toMap(jsonSlurper.parse(requestWrapper.getInputStream()))

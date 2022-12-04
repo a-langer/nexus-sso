@@ -5,11 +5,11 @@
 # docker rmi $(docker images -f "dangling=true" -q)
 # docker run --user=0:0 --rm -it -p 8081:8081/tcp sonatype/nexus3:3.37.3 /bin/bash
 
-ARG NEXUS_BASE_IMAGE="sonatype/nexus3:3.42.0"
+ARG NEXUS_BASE_IMAGE="sonatype/nexus3:3.43.0"
 FROM $NEXUS_BASE_IMAGE
 USER root
 
-ARG BOOTSTRAP_VERSION="3.42.0-01"
+ARG BOOTSTRAP_VERSION="3.43.0-01"
 ENV BOOT_VERSION="${BOOTSTRAP_VERSION}"
 ENV BOOT_PLUGIN="nexus-bootstrap-${BOOT_VERSION}.jar"
 ENV NEXUS_PLUGINS="${NEXUS_HOME}/system"
@@ -25,10 +25,7 @@ COPY etc/jetty/nexus-web.xml /opt/sonatype/nexus/etc/jetty/nexus-web.xml
 COPY etc/sso/ /opt/sonatype/nexus/etc/sso/
 RUN chown nexus:nexus -R /opt/sonatype/nexus/etc/sso/
 
-# Add OrientDB studio, need -Dorientdb.www.path=/opt/sonatype/nexus/etc/orient
-COPY target/studio/www/* /opt/sonatype/nexus/etc/orient/studio/
-RUN chown nexus:nexus -R /opt/sonatype/nexus/etc/orient/studio/
-ENV INSTALL4J_ADD_VM_PARAMS="-Xms512m -Xmx2048m -Djava.util.prefs.userRoot=/nexus-data/javaprefs -Dorientdb.www.path=/opt/sonatype/nexus/etc/orient"
+ENV INSTALL4J_ADD_VM_PARAMS="-Xms512m -Xmx2048m -Djava.util.prefs.userRoot=/nexus-data/javaprefs"
 
 # Setup permissions
 RUN chown nexus:nexus -R /opt/sonatype/nexus

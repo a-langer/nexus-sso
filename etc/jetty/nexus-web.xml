@@ -49,7 +49,6 @@
         <dispatcher>FORWARD</dispatcher>
         <dispatcher>INCLUDE</dispatcher>
         <dispatcher>ERROR</dispatcher>
-        <dispatcher>ASYNC</dispatcher>
     </filter-mapping>
 
     <!-- Stop executing request if HTTP response is committed -->

@@ -12,5 +12,4 @@ services:
       - ${NEXUS_ETC}/sso:/opt/sonatype/nexus/etc/sso:ro
     ports:
       - "${NEXUS_HTTP_PORT:-8081}:8081" # Nexus: http://localhost:8081/
-      - "${ORIENT_HTTP_PORT:-2480}:2480" # OrientDB: http://localhost:2480/studio/index.html
-      - "2020-2025:2020-2025" # Docker specified ports
+      - "${ORIENTDB_BINARY_PORT:-2424}:2424" # OrientDB: tcp://localhost:2424
