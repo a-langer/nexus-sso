@@ -1,6 +1,17 @@
 <?xml version="1.0"?>
-<configuration>
+<configuration scan="true" scanPeriod="10 seconds" packagingData="false" debug="true">
   <appender name="request.logfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+      <evaluator class="ch.qos.logback.access.net.URLEvaluator">
+        <URL>/favicon</URL>
+        <URL>/static/</URL>
+        <URL>/service/outreach/</URL>
+        <URL>/service/rest/v1/status</URL>
+        <URL>/service/extdirect/poll/rapture_State_get</URL>
+      </evaluator>
+      <OnMismatch>NEUTRAL</OnMismatch>
+      <OnMatch>DENY</OnMatch>
+    </filter>
     <File>${karaf.data}/log/request.log</File>
     <Append>true</Append>
     <encoder class="org.sonatype.nexus.pax.logging.AccessPatternLayoutEncoder">
