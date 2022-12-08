@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<configuration scan="true" scanPeriod="10 seconds" packagingData="false" debug="true">
+<configuration scan="true" scanPeriod="10 seconds" packagingData="false" debug="false">
   <appender name="request.logfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
       <evaluator class="ch.qos.logback.access.net.URLEvaluator">
