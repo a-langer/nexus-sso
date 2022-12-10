@@ -7,12 +7,12 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import io.buji.pac4j.filter.SecurityFilter;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.web.util.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,26 +50,34 @@ public class Pac4jSecurityFilter extends SecurityFilter {
     }
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
+    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
             throws IOException, ServletException {
+        HttpServletRequest request = (HttpServletRequest) req;
+        HttpServletResponse response = (HttpServletResponse) resp;
+
+        if (request.getAttribute(getClass().getCanonicalName()) != null) {
+            chain.doFilter(request, response);
+            return;
+        }
+        request.setAttribute(getClass().getCanonicalName(), true);
 
         boolean need = true;
         if (ifNotAuthenticated) {
             need = !isAuthenticated();
         }
         if (need && ifNotAuthzHeader) {
-            need = !isAuthzHeader(WebUtils.toHttp(servletRequest));
+            need = !isAuthzHeader(request);
         }
         if (need && ifNotXMLHttpRequest) {
-            need = !isXMLHttpRequest(WebUtils.toHttp(servletRequest));
+            need = !isXMLHttpRequest(request);
         }
         if (need && ifBrowserRequest) {
-            need = isBrowserRequest(WebUtils.toHttp(servletRequest));
+            need = isBrowserRequest(request);
         }
 
         if (need) {
             try {
-                super.doFilter(servletRequest, servletResponse, filterChain);
+                super.doFilter(request, response, chain);
             } catch (IOException | ServletException e) {
                 throw e;
             } catch (Exception e) {
@@ -77,7 +85,7 @@ public class Pac4jSecurityFilter extends SecurityFilter {
                 throw new ServletException(e);
             }
         } else {
-            filterChain.doFilter(servletRequest, servletResponse);
+            chain.doFilter(request, response);
         }
     }
 
