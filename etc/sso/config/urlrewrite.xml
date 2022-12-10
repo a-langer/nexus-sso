@@ -82,7 +82,14 @@
         </note>
         <from>^/service/rapture/session$</from>
         <condition type="method" operator="equal">DELETE</condition>
-        <to encode="true" last="false" qsappend="true">/pac4jLogout</to>
+        <run class="com.github.alanger.shiroext.servlets.ScriptProcessedServlet" method="service">
+            <init-param>
+                <param-name>invoke-script-text</param-name>
+                <param-value>
+                request.setURIPathQuery("/pac4jLogout");
+                </param-value>
+            </init-param>
+        </run>
     </rule>
 
 </urlrewrite>
