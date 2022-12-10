@@ -96,7 +96,7 @@
     <storages>
         <storage loaded-at-startup="false" userPassword="admin" userName="admin" path="remote:nexus/security" name="security" />
         <storage loaded-at-startup="false" userPassword="admin" userName="admin" path="remote:nexus/component" name="component" />
-        <storage loaded-at-startup="false" userPassword="admin" userName="admin" path="remote:nexus/security" name="config" />
+        <storage loaded-at-startup="false" userPassword="admin" userName="admin" path="remote:nexus/config" name="config" />
     </storages>
     <users>
         <user resources="*" password="root" name="root" />
