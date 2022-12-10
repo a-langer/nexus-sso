@@ -114,7 +114,8 @@
   <logger name="com.github.alanger.nexus.bootstrap.Pac4jAuthenticationListener" level="INFO" />
   <logger name="com.github.alanger.nexus.bootstrap.DockerExtdirectFilter" level="INFO" />
   <logger name="com.github.alanger.nexus.bootstrap.DebugFilter" level="DEBUG" />
-  <logger name="com.github.alanger.shiroext.realm.jdbc.JdbcRealmName" level="INFO" />
+  <!-- <logger name="com.github.alanger.nexus.bootstrap.QuotaFilter" level="TRACE" /> -->
+  <!-- <logger name="com.github.alanger.shiroext.realm.jdbc.JdbcRealmName" level="INFO" /> -->
   <!-- <logger name="io.buji.pac4j.filter.SecurityFilter" level="TRACE" /> -->
   <!-- <logger name="org.pac4j.saml.client" level="DEBUG" /> -->
   <!-- <logger name="org.opensaml.saml.metadata.resolver" level="DEBUG" /> -->
