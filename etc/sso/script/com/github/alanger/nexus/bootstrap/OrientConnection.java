@@ -36,7 +36,7 @@ public class OrientConnection {
         securityJdbcInfo.put("password", "admin");
         securityJdbcInfo.put("db.usePool", true);
         securityJdbcInfo.put("db.pool.min", 1);
-        securityJdbcInfo.put("db.pool.max", 10);
+        securityJdbcInfo.put("db.pool.max", 50);
 
         securityDataSource = new OrientDataSource("jdbc:orient:" + CONNECTION_STR, "admin", "admin", securityJdbcInfo);
 
