@@ -5,6 +5,7 @@ import java.net.URL;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.tools.RootLoader;
 import groovy.lang.GroovyClassLoader;
+import java.util.logging.Level;
 
 // JUL to Logback: finest,finer = trace, fine = debug, config,info = info, severe = error, warning = warn
 
@@ -15,7 +16,8 @@ String initMarker = "invoke_done";
 
 GroovyClassLoader getGroovyClassLoader() {
     GroovyClassLoader gcl = servletContext.getAttribute(GroovyClassLoader.class.getCanonicalName());
-    if (gcl == null) {
+    // Creates a new classloader if log level = TRACE
+    if (gcl == null || logger.getLevel() == Level.FINEST) {
         CompilerConfiguration cfg = new CompilerConfiguration();
         cfg.setSourceEncoding("UTF-8");
         cfg.setScriptExtensions(["groovy","java"].toSet());

@@ -108,7 +108,7 @@
 
   <!-- SAML: init log level -->
   <logger name="org.tuckey.web.filters" level="INFO" />
-  <logger name="com.github.alanger.shiroext.servlets.ScriptProcessedFilter" level="INFO" />
+  <logger name="com.github.alanger.shiroext.servlets.ScriptProcessedServlet" level="INFO" />
   <logger name="com.github.alanger.nexus.bootstrap.Main" level="INFO" />
   <logger name="com.github.alanger.nexus.bootstrap.ReloadCongiguration" level="INFO" />
   <logger name="com.github.alanger.nexus.bootstrap.Pac4jAuthenticationListener" level="INFO" />
