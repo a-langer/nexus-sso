@@ -70,6 +70,8 @@ public class QuotaFilter implements Filter {
 
     private String sizeSql = "SELECT sum(size) as size FROM asset where bucket.repository_name = ? GROUP BY bucket";
 
+    private int responseStatus = 507; // Insufficient Storage
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         this.configPool = new OPartitionedDatabasePool(configURL, configUser, configPassword, configMaxPartitionSize,
@@ -133,7 +135,7 @@ public class QuotaFilter implements Filter {
                                     formatStorage(size),
                                     formatStorage(quota));
                             logger.trace(msg);
-                            response.sendError(403, msg);
+                            response.sendError(responseStatus, msg);
                             return;
                         }
                     }
@@ -311,6 +313,14 @@ public class QuotaFilter implements Filter {
 
     public void setSizeSql(String sizeSql) {
         this.sizeSql = sizeSql;
+    }
+
+    public int getResponseStatus() {
+        return responseStatus;
+    }
+
+    public void setResponseStatus(int responseStatus) {
+        this.responseStatus = responseStatus;
     }
 
 }
