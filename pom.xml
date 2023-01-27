@@ -39,10 +39,10 @@
             <id>shibboleth</id>
             <url>https://build.shibboleth.net/nexus/content/repositories/releases/</url>
         </repository>
-		<repository>
-		    <id>jitpack.io</id>
-		    <url>https://jitpack.io</url>
-		</repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <distributionManagement>

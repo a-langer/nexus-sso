@@ -36,7 +36,7 @@ services:
 
   nginx:
     <<: *container
-    image: ${NGINX_IMAGE:-nginx:1.21.6}
+    image: ${NGINX_IMAGE:-nginx:1.23.3}
     user: ${NGINX_USER:-0}:${NGINX_GROUP:-0}
     cpuset: ${NGINX_CPUSET:-}
     cpus: ${NGINX_CPUS:-2}
