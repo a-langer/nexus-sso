@@ -35,6 +35,11 @@
                                 </goals>
                                 <configuration>
                                     <target description="Main target from pom.xml">
+                                        <echo>Set NEXUS_IMAGE="${docker.image}" to .env</echo>
+                                        <replaceregexp file="${maven.multiModuleProjectDirectory}/.env" byline="true"
+                                            match="NEXUS_IMAGE=(.*)"
+                                            replace='NEXUS_IMAGE="${docker.image}"' />
+
                                         <echo>Set NEXUS_BASE_IMAGE="${nexus.base.image}" to Dockerfile</echo>
                                         <replaceregexp file="${maven.multiModuleProjectDirectory}/Dockerfile" byline="true"
                                             match="ARG NEXUS_BASE_IMAGE=(.*)"
