@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.github.a-langer</groupId>
+        <artifactId>nexus-sso</artifactId>
+        <version>3.43.0</version>
+        <relativePath>..</relativePath>
+    </parent>
+    <artifactId>nexus-docker</artifactId>
+    <packaging>pom</packaging>
+
+    <profiles>
+        <!--
+            mvn clean install -PbuildImage
+            mvn -pl nexus-docker -am clean install -PbuildImage
+        -->
+        <profile>
+            <id>buildImage</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <executions>
+                            <!-- Create new docker image using Dockerfile -->
+                            <execution>
+                                <id>docker-build</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>docker</executable>
+                                    <workingDirectory>${project.parent.basedir}</workingDirectory>
+                                    <arguments>
+                                        <argument>build</argument>
+                                        <argument>--build-arg</argument>
+                                        <argument>NEXUS_BASE_IMAGE=${nexus.base.image}</argument>
+                                        <argument>--build-arg</argument>
+                                        <argument>NEXUS_PLUGIN_VERSION=${nexus.plugin.version}</argument>
+                                        <argument>--progress=plain</argument>
+                                        <argument>--no-cache</argument>
+                                        <argument>-t</argument>
+                                        <argument>${docker.image}</argument>
+                                        <argument>.</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <!-- Remove existing image from local repo -->
+                            <execution>
+                                <id>docker-clean</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>docker</executable>
+                                    <workingDirectory>${project.parent.basedir}</workingDirectory>
+                                    <arguments>
+                                        <argument>image</argument>
+                                        <argument>prune</argument>
+                                        <argument>--force</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <!-- Login and Push the image to a docker repo -->
+                            <execution>
+                                <id>docker-login</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>docker</executable>
+                                    <workingDirectory>${project.parent.basedir}</workingDirectory>
+                                    <arguments>
+                                        <argument>login</argument>
+                                        <argument>-u</argument>
+                                        <argument>${docker.user}</argument>
+                                        <argument>-p</argument>
+                                        <argument>${docker.password}</argument>
+                                        <argument>${docker.url}</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>docker-push</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>docker</executable>
+                                    <workingDirectory>${project.parent.basedir}</workingDirectory>
+                                    <arguments>
+                                        <argument>push</argument>
+                                        <argument>${docker.image}</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>

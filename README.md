@@ -21,6 +21,7 @@ List of features this patch adds:
   * You will be redirected to the login page of identity provider.
   * Type you credentials (login, password, 2FA, etc.).
   * You will be redirected to the main page of Nexus, roles and permissions will be mapped with your account as configured.
+
 * **User Auth Tokens** - are applied when security policies do not allow the users password to be used, such as for storing in plain text (in settings Docker, Maven and etc.). Each user can set a personal token that can be used instead of a password. The creation of tokens is implemented through the "NuGet API Key" menu, however, the tokens themselves apply to all types of repositories without exception. Example of usage user token:
   * Go to menu "Nexus -> Manage your user account -> NuGet API Key", press "Access API key".
   * Type your password or username if using SSO login, press "Authenticate".
@@ -63,6 +64,14 @@ List of features this patch adds:
   ```bash
   docker-compose --profile debug up
   ```
+
+* **Non-transitive privileges in group repositories** - by default group repository privileges in Nexus are transitive (all or nothing), this setting enables mode of non-transitive privileges (only what is allowed):
+
+  ```bash
+  nexus.group.permission.enabled=true
+  ```
+
+  Note that it is sufficient for the user to have "browse" or "read" privilege (either of them) to read files from the repository.
 
 ## Additional settings (tips and tricks)
 

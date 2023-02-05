@@ -7,7 +7,6 @@
 *.png
 * copy*
 * - Copy*
-* — копия*
 *_SAVE*
 etc/saml/* copy*
 etc/jetty/* copy*

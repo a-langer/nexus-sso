@@ -9,15 +9,19 @@ ARG NEXUS_BASE_IMAGE="sonatype/nexus3:3.43.0"
 FROM $NEXUS_BASE_IMAGE
 USER root
 
-ARG BOOTSTRAP_VERSION="3.43.0-01"
-ENV BOOT_VERSION="${BOOTSTRAP_VERSION}"
-ENV BOOT_PLUGIN="nexus-bootstrap-${BOOT_VERSION}.jar"
+ARG NEXUS_PLUGIN_VERSION="3.43.0-01"
+ENV PLUG_VERSION="${NEXUS_PLUGIN_VERSION}"
 ENV NEXUS_PLUGINS="${NEXUS_HOME}/system"
 
 # Override nexus-bootstrap.jar
 RUN rm -rf ${NEXUS_PLUGINS}/org/sonatype/nexus/nexus-bootstrap/
-COPY target/nexus-sso*.jar ${NEXUS_PLUGINS}/org/sonatype/nexus/nexus-bootstrap/${BOOT_VERSION}/${BOOT_PLUGIN}
-RUN chmod -R 644 ${NEXUS_PLUGINS}/org/sonatype/nexus/nexus-bootstrap/${BOOT_VERSION}/${BOOT_PLUGIN}
+COPY nexus-bootstrap/target/nexus-bootstrap-*.jar ${NEXUS_PLUGINS}/org/sonatype/nexus/nexus-bootstrap/${PLUG_VERSION}/nexus-bootstrap-${PLUG_VERSION}.jar
+RUN chmod -R 644 ${NEXUS_PLUGINS}/org/sonatype/nexus/nexus-bootstrap/${PLUG_VERSION}/nexus-bootstrap-${PLUG_VERSION}.jar
+
+# Override nexus-repository-services.jar
+RUN rm -rf ${NEXUS_PLUGINS}/org/sonatype/nexus/nexus-repository-services/
+COPY nexus-repository-services/target/nexus-repository-services-*.jar ${NEXUS_PLUGINS}/org/sonatype/nexus/nexus-repository-services/${PLUG_VERSION}/nexus-repository-services-${PLUG_VERSION}.jar
+RUN chmod -R 644 ${NEXUS_PLUGINS}/org/sonatype/nexus/nexus-repository-services/${PLUG_VERSION}/nexus-repository-services-${PLUG_VERSION}.jar
 
 # Add SSO and urlrewrite configs
 COPY etc/nexus-default.properties /opt/sonatype/nexus/etc/nexus-default.properties
