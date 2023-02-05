@@ -68,7 +68,7 @@ List of features this patch adds:
 * **Non-transitive privileges in group repositories** - by default group repository privileges in Nexus are transitive (all or nothing), this setting enables mode of non-transitive privileges (only what is allowed):
 
   ```bash
-  nexus.group.permission.enabled=true
+  nexus.group.nontransitive.privileges.enabled=true
   ```
 
   Note that it is sufficient for the user to have "browse" or "read" privilege (either of them) to read files from the repository.

@@ -92,7 +92,7 @@ public class GroupFacetImpl
   private RepositoryPermissionChecker repositoryPermissionChecker;
 
   @Inject
-  @Named("${nexus.group.permission.enabled:-false}")
+  @Named("${nexus.group.nontransitive.privileges.enabled:-false}")
   private boolean groupPermissionEnabled;
 
   @Inject
