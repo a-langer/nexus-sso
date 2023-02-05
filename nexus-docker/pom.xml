@@ -23,6 +23,38 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <id>docker-prepare</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target description="Main target from pom.xml">
+                                        <echo>Set NEXUS_BASE_IMAGE="${nexus.base.image}" to Dockerfile</echo>
+                                        <replaceregexp file="${maven.multiModuleProjectDirectory}/Dockerfile" byline="true"
+                                            match="ARG NEXUS_BASE_IMAGE=(.*)"
+                                            replace='ARG NEXUS_BASE_IMAGE="${nexus.base.image}"' />
+
+                                        <echo>Set NEXUS_PLUGIN_VERSION="${nexus.plugin.version}" to Dockerfile</echo>
+                                        <replaceregexp file="${maven.multiModuleProjectDirectory}/Dockerfile" byline="true"
+                                            match="ARG NEXUS_PLUGIN_VERSION=(.*)"
+                                            replace='ARG NEXUS_PLUGIN_VERSION="${nexus.plugin.version}"' />
+
+                                        <echo>Set size?tag=${project.version} to README.md</echo>
+                                        <replaceregexp file="${maven.multiModuleProjectDirectory}/README.md" byline="true"
+                                            match=".*/a-langer/nexus-sso/size\?tag=(.*)"
+                                            replace='[![image-size](https://ghcr-badge.deta.dev/a-langer/nexus-sso/size?tag=${project.version})][0]' />
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
                         <version>3.0.0</version>
