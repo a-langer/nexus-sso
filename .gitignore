@@ -25,3 +25,4 @@ compose.override.yml
 * - Copy*
 * — копия*
 *_SAVE*
+*.versionsBackup
