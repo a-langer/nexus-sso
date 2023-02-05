@@ -106,6 +106,12 @@ Need installed Maven and Docker:
     mvn clean install -PbuildImage
     ```
 
+3. Run docker container:
+
+    ```bash
+    docker compose down && docker compose up
+    ```
+
 [0]: https://github.com/a-langer/nexus-sso/pkgs/container/nexus-sso "Docker image with SSO patch applied"
 [1]: https://jitpack.io/#a-langer/nexus-sso "Maven repository for builds from source code"
 [2]: https://github.com/sonatype/nexus-public "Source code of Nexus OSS"
