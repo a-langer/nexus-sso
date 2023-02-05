@@ -86,15 +86,27 @@ List of features this patch adds:
 
 Need installed Maven and Docker:
 
-```bash
-# Build jar bundle:
-mvn clean package
-# Build docker image:
-mvn clean install -PbuildImage
-```
+1. Change Nexus version if update required (see [Release Notes][19] for more information), ex.:
+
+    ```bash
+    # Set version of the current project and any child modules
+    mvn versions:set -DnewVersion=3.46.0
+    # Accept modifications to the pom.xml files
+    mvn versions:commit
+    # Or revert modifications to the pom.xml files
+    mvn versions:revert
+    ```
+
+2. Execute assembly commands:
+
+    ```bash
+    # Build jar bundles:
+    mvn clean package
+    # Build docker image:
+    mvn clean install -PbuildImage
+    ```
 
 [0]: https://github.com/a-langer/nexus-sso/pkgs/container/nexus-sso "Docker image with SSO patch applied"
-<!-- [0]: https://github.com/users/a-langer/packages/container/package/nexus-sso "Docker image with SSO patch applied" -->
 [1]: https://jitpack.io/#a-langer/nexus-sso "Maven repository for builds from source code"
 [2]: https://github.com/sonatype/nexus-public "Source code of Nexus OSS"
 [3]: https://github.com/sonatype/docker-nexus3 "Docker image Nexus OSS"
@@ -113,3 +125,4 @@ mvn clean install -PbuildImage
 [16]: https://commons.apache.org/proper/commons-configuration/userguide/howto_basicfeatures.html "Variable interpolation"
 [17]: https://tuckey.org/urlrewrite/manual/4.0/index.html "Url Rewrite Filter"
 [18]: https://gist.github.com/abdennour/74c5de79e57a47f3351217d674238da8?permalink_comment_id=4188452#gistcomment-4188452 "Nginx for Docker registry"
+[19]: https://help.sonatype.com/repomanager3/product-information/release-notes "Nexus release notes"
