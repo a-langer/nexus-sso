@@ -23,6 +23,7 @@ import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.JdbcUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.subject.support.WebDelegatingSubject;
@@ -210,7 +211,7 @@ public class Pac4jAuthenticationListener implements AuthenticationListener {
         } else if (val instanceof Set) {
             val = ((Set<?>) val).iterator().next();
         }
-        return val.toString();
+        return StringUtils.normalizeSpace(val.toString());
     }
 
     public DataSource getDataSource() {
