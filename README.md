@@ -71,7 +71,9 @@ List of features this patch adds:
   nexus.group.nontransitive.privileges.enabled=true
   ```
 
-  Note that it is sufficient for the user to have "browse" or "read" privilege (either of them) to read files from the repository.
+  Note that it is:
+  * Sufficient for the user to have "browse" or "read" privilege (either of them) to read files from the repository.
+  * Privileges must be granted to the repository itself and to the group repository in which it is a member.
 
 ## Additional settings (tips and tricks)
 
