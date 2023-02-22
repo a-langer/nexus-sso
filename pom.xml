@@ -154,7 +154,7 @@
         <dependency>
             <groupId>org.pac4j</groupId>
             <artifactId>pac4j-saml</artifactId>
-            <version>3.9.0</version>
+            <version>5.7.0</version>
             <exclusions>
                 <!-- Shared libraries will be loaded from OSGI bundles -->
                 <exclusion>
@@ -285,14 +285,14 @@
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-web</artifactId>
-            <version>1.10.0</version>
+            <version>1.11.0</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.4.48.v20220622</version>
+            <version>9.4.50.v20221201</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
