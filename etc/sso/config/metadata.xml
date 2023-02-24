@@ -1,37 +1,38 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- 
-    Okta example user:
-        nxuser@mail.ru WDYuBHVVfd4gMi7
--->
-<md:EntityDescriptor entityID="http://www.okta.com/exk48eakqdPN5Ci2A5d7" xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata">
-    <md:IDPSSODescriptor WantAuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+<md:EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
+    xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
+    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+    entityID="https://sso.hometogo.rocks/auth/realms/hometogo">
+    <md:IDPSSODescriptor WantAuthnRequestsSigned="true"
+        protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
         <md:KeyDescriptor use="signing">
-            <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+            <ds:KeyInfo>
+                <ds:KeyName>GMFkKazkrqgZeVwiHgGaNqmD3h9Cf4eXFHW2sxjkVoo</ds:KeyName>
                 <ds:X509Data>
                     <ds:X509Certificate>
-                        MIIDqDCCApCgAwIBAgIGAX+Uod4qMA0GCSqGSIb3DQEBCwUAMIGUMQswCQYDVQQGEwJVUzETMBEG
-                        A1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsGA1UECgwET2t0YTEU
-                        MBIGA1UECwwLU1NPUHJvdmlkZXIxFTATBgNVBAMMDGRldi0yNDk2MzM4NDEcMBoGCSqGSIb3DQEJ
-                        ARYNaW5mb0Bva3RhLmNvbTAeFw0yMjAzMTYyMTI3MzBaFw0zMjAzMTYyMTI4MzBaMIGUMQswCQYD
-                        VQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNU2FuIEZyYW5jaXNjbzENMAsG
-                        A1UECgwET2t0YTEUMBIGA1UECwwLU1NPUHJvdmlkZXIxFTATBgNVBAMMDGRldi0yNDk2MzM4NDEc
-                        MBoGCSqGSIb3DQEJARYNaW5mb0Bva3RhLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
-                        ggEBAL/oEryhfQu5Qr9+RKlYOqcsFrOEwCILV5p5bvujFmgRy4K3Cjv4OowMsMQF1Oln/lq6XZzX
-                        wjl0G+JzYzPfqvrE6zpzQsNIcLjBwBRSA670meh3z1ZrGVNoT/nVWcIegHO5EAjElSHi1eZsKvMZ
-                        YLy59fEXzJ759r00kVMv9vir2Dp3Q0Gx39/eFGH0hVNN42saqFGUR8IJesBFptUZyUQSdi1E6Qoq
-                        qzvSlO8L3z1qrjAUtWi2f7mPcK70IkW+/rgnZ5NZJxK8rFet1nuJIs9yee4trHMRRtezM2YMuR7q
-                        4ZtOHYhUgwyvHnFsnovszJkM9/e3eHz+6iMKuCts+LcCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEA
-                        Y2pC/66Ha4m/lNx+IP3Ena171s2qIpYMADubNsyK5ZPHi2VBTVN8mGd+DrUMKNAtfYTecOmsaXEo
-                        2zdhg8IM3RuWZPiP2fRxnLQHHUTWg5S/ATQ9gPPfKEAV+xrcLn2Z0JW4Tj4IMzMgQ444mKqwSJxz
-                        BpVIcbUAkDifkYDULM4tDMpOC2OmCyXfpv4f3XfXCc4yPi2h5QOFvHcSo9auIxQeosdddqlo2iOo
-                        bfLAmqaqKQhKlHyN9CFHwokDOd6lSt95g9EsJ4x6s4M2KqJWmFzq96vZJRzsWIj4XXVqoBZaeQur
-                        mpV2TI55uqdIrPgNXAjCUSGk+UfUVsj1XZWcWw==
-                    </ds:X509Certificate>
+                        MIICnzCCAYcCBgF9M2VDzTANBgkqhkiG9w0BAQsFADATMREwDwYDVQQDDAhob21ldG9nbzAeFw0yMTExMTgxNDExNTRaFw0zMTExMTgxNDEzMzRaMBMxETAPBgNVBAMMCGhvbWV0b2dvMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuOMYQJzbD4Z15FAo3k5X1E4XTDQjSxC/AL2iWgpGC8gTSDgyXGXN3g2V0S6Sf6D/LKT7XIPOBaO/Dal/V5SUwYzyMm1S5Vt3xzvyOu+S/G9FB9glDJqqYQS2dbXfb4/FHiljAeKDGvAh68PGuMa32Anb9a7yqD3aQ3b0V3v4bDJeAVK9mk3kJLAKdbXVAZOPQLi/t5r5JU+AWv6Rt+gEiDncpG5yRaqxIEC2adWFeqhe2W8BYQiWX1nAfKxaT6VvKTHZDjIZQ9gp42/XWm6iSF42yY1181GrcJQAVMbbp+srAmFYbZQA9UfSK+EJi/2AxKe6evjuTPuNYxrn8pffeQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQBp+JCpFREiw7OSpikELiy3uDiSe+AZj/siSlbQ5tu6GPukrygqWLb0XSlJ9Ts2QipPibz5u9Lq4jTyCcGY6g5Ag9Rw1bcyvPUZyW2iopjLs5btNVq0fXRlct6aNqQ+MHeCjV5clQacV9VHXtjCW5EbeFBkGZWezTE+2VPn59/6RXR+JkUN8+7CFJJ9hJD7aYD1EzLeMVCW9FSkaZMs6t3nQNsdv4LIpQ+TqNqP8/SGqY4alQ8+b9gj7yKhvlfVEBmSgK3lyqesl4jrA1bFjU+vwKRC5cMCydYZLH8+BhCGxraefWcZ3/5TYQXjDr/oUTsB61VIsVGLgc0SfqXYAQOj</ds:X509Certificate>
                 </ds:X509Data>
             </ds:KeyInfo>
         </md:KeyDescriptor>
+        <md:ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+            Location="https://sso.hometogo.rocks/auth/realms/hometogo/protocol/saml/resolve"
+            index="0" />
+        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+            Location="https://sso.hometogo.rocks/auth/realms/hometogo/protocol/saml" />
+        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+            Location="https://sso.hometogo.rocks/auth/realms/hometogo/protocol/saml" />
+        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact"
+            Location="https://sso.hometogo.rocks/auth/realms/hometogo/protocol/saml" />
+        <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</md:NameIDFormat>
+        <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat>
+        <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>
         <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat>
-        <md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://dev-24963384.okta.com/app/dev-24963384_nexussaml_1/exk48eakqdPN5Ci2A5d7/sso/saml"/>
-        <md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://dev-24963384.okta.com/app/dev-24963384_nexussaml_1/exk48eakqdPN5Ci2A5d7/sso/saml"/>
+        <md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+            Location="https://sso.hometogo.rocks/auth/realms/hometogo/protocol/saml" />
+        <md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+            Location="https://sso.hometogo.rocks/auth/realms/hometogo/protocol/saml" />
+        <md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+            Location="https://sso.hometogo.rocks/auth/realms/hometogo/protocol/saml" />
+        <md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact"
+            Location="https://sso.hometogo.rocks/auth/realms/hometogo/protocol/saml" />
     </md:IDPSSODescriptor>
 </md:EntityDescriptor>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" ID="_84f5d7fa7c4d42a6b1be2ad565c324fdfcb01f9" entityID="http://localhost/callback?client_name=SAML2Client" validUntil="2042-03-17T05:02:50.999Z">
+<?xml version="1.0" encoding="UTF-8"?><md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" ID="_84f5d7fa7c4d42a6b1be2ad565c324fdfcb01f9" entityID="https://nexus.hometogo.rocks/callback?client_name=SAML2Client" validUntil="2042-03-17T05:02:50.999Z">
     <md:Extensions xmlns:alg="urn:oasis:names:tc:SAML:metadata:algsupport">
         <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
         <alg:SigningMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha384"/>
@@ -19,7 +19,7 @@
     </md:Extensions>
     <md:SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.0:protocol urn:oasis:names:tc:SAML:1.1:protocol">
         <md:Extensions xmlns:init="urn:oasis:names:tc:SAML:profiles:SSO:request-init">
-            <init:RequestInitiator Binding="urn:oasis:names:tc:SAML:profiles:SSO:request-init" Location="http://localhost/callback?client_name=SAML2Client"/>
+            <init:RequestInitiator Binding="urn:oasis:names:tc:SAML:profiles:SSO:request-init" Location="https://nexus.hometogo.rocks/callback?client_name=SAML2Client"/>
         </md:Extensions>
         <md:KeyDescriptor use="signing">
             <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
@@ -65,14 +65,14 @@ CtUfZL67og==</ds:X509Certificate>
                 </ds:X509Data>
             </ds:KeyInfo>
         </md:KeyDescriptor>
-        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://localhost/callback?client_name=SAML2Client&amp;logoutendpoint=true"/>
-        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign" Location="http://localhost/callback?client_name=SAML2Client&amp;logoutendpoint=true"/>
-        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://localhost/callback?client_name=SAML2Client&amp;logoutendpoint=true"/>
-        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="http://localhost/callback?client_name=SAML2Client&amp;logoutendpoint=true"/>
+        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://nexus.hometogo.rocks/callback?client_name=SAML2Client&amp;logoutendpoint=true"/>
+        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign" Location="https://nexus.hometogo.rocks/callback?client_name=SAML2Client&amp;logoutendpoint=true"/>
+        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://nexus.hometogo.rocks/callback?client_name=SAML2Client&amp;logoutendpoint=true"/>
+        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://nexus.hometogo.rocks/callback?client_name=SAML2Client&amp;logoutendpoint=true"/>
         <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat>
         <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</md:NameIDFormat>
         <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat>
         <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>
-        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://localhost/callback?client_name=SAML2Client" index="0"/>
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://nexus.hometogo.rocks/callback?client_name=SAML2Client" index="0"/>
     </md:SPSSODescriptor>
 </md:EntityDescriptor>
