@@ -3,7 +3,9 @@ package com.github.alanger.nexus.bootstrap;
 import static com.github.alanger.shiroext.realm.RealmUtils.asList;
 import static org.sonatype.nexus.common.text.UnitFormatter.formatStorage;
 import static java.lang.String.format;
+import static javax.servlet.RequestDispatcher.ERROR_MESSAGE;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -53,9 +55,6 @@ public class QuotaFilter implements Filter {
     // Example: nexus:repository-view:docker:myrepo-docker-hosted:add
     private String permission = "nexus:repository-view:%s:%s:add";
 
-    private String repositorySplitBy = "/";
-    private int repositorySplitIndex = 2;
-
     private boolean formatFromRepositoryName = false;
     private String formatSplitBy = "-";
     private int formatSplitIndex = 1;
@@ -86,7 +85,9 @@ public class QuotaFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) resp;
 
-        if (request.getAttribute(getClass().getCanonicalName()) != null) {
+        boolean isPush = methods.contains(request.getMethod());
+
+        if (request.getAttribute(getClass().getCanonicalName()) != null || !isPush) {
             chain.doFilter(request, response);
             return;
         }
@@ -95,7 +96,8 @@ public class QuotaFilter implements Filter {
         String repoName = (String) request.getAttribute(REPO_NAME_ATTR);
         if (repoName == null) {
             // From URI /repository/<name>-<format>-<type>
-            repoName = request.getRequestURI().split(repositorySplitBy)[repositorySplitIndex];
+            // or /service/rest/internal/ui/upload/<name>-<format>-<type>
+            repoName = new File(request.getRequestURI()).getName();
         }
 
         boolean pushAllowed = SecurityUtils.getSubject().isAuthenticated();
@@ -106,8 +108,6 @@ public class QuotaFilter implements Filter {
             repoFormat = repoName.split(formatSplitBy)[formatSplitIndex];
             pushAllowed = SecurityUtils.getSubject().isPermitted(format(permission, repoFormat, repoName));
         }
-
-        boolean isPush = methods.contains(request.getMethod());
 
         logger.trace("repoName: {}, pushAllowed: {}, isPush: {}, repoFormat: {}", repoName, pushAllowed, isPush,
                 repoFormat);
@@ -135,7 +135,11 @@ public class QuotaFilter implements Filter {
                                     formatStorage(size),
                                     formatStorage(quota));
                             logger.trace(msg);
-                            response.sendError(responseStatus, msg);
+                            response.setStatus(responseStatus);
+                            response.setHeader(ERROR_MESSAGE, msg);
+                            request.setAttribute(ERROR_MESSAGE, msg);
+                            if (!response.isCommitted())
+                                response.getWriter().close();
                             return;
                         }
                     }
@@ -245,22 +249,6 @@ public class QuotaFilter implements Filter {
 
     public void setPermission(String permission) {
         this.permission = permission;
-    }
-
-    public String getRepositorySplitBy() {
-        return repositorySplitBy;
-    }
-
-    public void setRepositorySplitBy(String repositorySplitBy) {
-        this.repositorySplitBy = repositorySplitBy;
-    }
-
-    public int getRepositorySplitIndex() {
-        return repositorySplitIndex;
-    }
-
-    public void setRepositorySplitIndex(int repositorySplitIndex) {
-        this.repositorySplitIndex = repositorySplitIndex;
     }
 
     public boolean isFormatFromRepositoryName() {

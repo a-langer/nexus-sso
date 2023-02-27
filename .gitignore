@@ -20,9 +20,12 @@ compose.override.yml
 *\.zip
 *\.log
 *\.png
+*\.crt
+*\.key
 *Debug\.java
 * copy*
 * - Copy*
 * — копия*
 *_SAVE*
+*_TEST*
 *.versionsBackup
