@@ -62,7 +62,7 @@ List of features this patch adds:
 * **OrientDB studio** - web interface to interact with an embedded database, will available at the URL "http://localhost:2480/studio/index.html" if run service with profile "debug":
 
   ```bash
-  docker-compose --profile debug up
+  docker compose --profile debug up
   ```
 
 * **Non-transitive privileges in group repositories** - by default group repository privileges in Nexus are transitive (all or nothing), this setting enables mode of non-transitive privileges (only what is allowed):
