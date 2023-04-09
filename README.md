@@ -16,7 +16,7 @@ Available solutions:
 
 List of features this patch adds:
 
-* **SAML/SSO** - authentication via Single Sign-On (SSO) using a SAML identity provider such as [Keycloak][12], [Okta][13], [ADFS][14] and others. Nexus uses access system based on [Apache Shiro][6], this patch extends it with a [Pac4j][8] and [buji-pac4j][7] libraries, which can be configured with "[shiro.ini](./etc/sso/config/shiro.ini)" (see documentation of Apache Shiro and Pac4j for more detail informations). SSO users are created as internal Nexus accounts the first time they sign-in and are updated every next time. Example of usage SSO:
+* **SAML/SSO** - authentication via Single Sign-On (SSO) using a SAML identity provider such as [Keycloak][12], [Okta][13], [ADFS][14] and others. Nexus uses access system based on [Apache Shiro][6], this patch extends it with a [Pac4j][8] and [buji-pac4j][7] libraries, which can be configured with "[shiro.ini](./etc/sso/config/shiro.ini)" (see [SAML.md](./docs/SAML.md) and documentation of Apache Shiro and Pac4j for more detail informations). SSO users are created as internal Nexus accounts the first time they sign-in and are updated every next time. Example of usage SSO:
   * Go to menu "Sign in", press to button "Sign in with SSO".
   * You will be redirected to the login page of identity provider.
   * Type you credentials (login, password, 2FA, etc.).
@@ -31,9 +31,7 @@ List of features this patch adds:
 
     ```bash
     # Authorization header for basic:
-    Basic <login:token in base64> 
-    # Authorization header for bearer:
-    Bearer <token>
+    Basic <login:token in base64>
     ```
 
 * **Docker Repository Reverse Proxy** - this [Nginx configuration](./etc/nginx/docker_location.conf) implements a proxy strategy to use Docker registries without additional ports or hostnames (while the [official documentation][11] only suggests two proxy strategies: "Port Mapping" and "Host Mapping"). To apply the proxy strategy, required pre-configuration of Nexus (see [gistcomment-4188452][18]):
@@ -65,9 +63,9 @@ List of features this patch adds:
   docker compose --profile debug up
   ```
 
-* **Non-transitive privileges in group repositories** - by default group repository privileges in Nexus are transitive (all or nothing), this setting enables mode of non-transitive privileges (only what is allowed):
+* **Non-transitive privileges in group repositories** - by default group repository privileges in Nexus are transitive (all or nothing), this [property](./etc/nexus-default.properties) enables mode of non-transitive privileges (only what is allowed):
 
-  ```bash
+  ```properties
   nexus.group.nontransitive.privileges.enabled=true
   ```
 
