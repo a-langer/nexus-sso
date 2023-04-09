@@ -16,7 +16,7 @@ Available solutions:
 
 List of features this patch adds:
 
-* **SAML/SSO** - authentication via Single Sign-On (SSO) using a SAML identity provider such as [Keycloak][12], [Okta][13], [ADFS][14] and others. Nexus uses access system based on [Apache Shiro][6], this patch extends it with a [Pac4j][8] and [buji-pac4j][7] libraries, which can be configured with "[shiro.ini](./etc/sso/config/shiro.ini)" (see [SAML.md](./docs/SAML.md) and documentation of Apache Shiro and Pac4j for more detail informations). SSO users are created as internal Nexus accounts the first time they sign-in and are updated every next time. Example of usage SSO:
+* **SAML/SSO** - authentication via Single Sign-On (SSO) using a SAML identity provider such as [Keycloak][12], [Okta][13], [ADFS][14] and others. Nexus uses access system based on [Apache Shiro][6], this patch extends it with a [Pac4j][8] and [buji-pac4j][7] libraries, which can be configured with [shiro.ini](./etc/sso/config/shiro.ini) (see [SAML.md](./docs/SAML.md) and documentation of Apache Shiro and Pac4j for more detail informations). SSO users are created as internal Nexus accounts the first time they sign-in and are updated every next time. Example of usage SSO:
   * Go to menu "Sign in", press to button "Sign in with SSO".
   * You will be redirected to the login page of identity provider.
   * Type you credentials (login, password, 2FA, etc.).
@@ -57,7 +57,7 @@ List of features this patch adds:
     docker pull nexus_host/my-hosted-registry/alpine:latest
     ```
 
-* **OrientDB studio** - web interface to interact with an embedded database, will available at the URL "http://localhost:2480/studio/index.html" if run service with profile "debug":
+* **OrientDB studio** - web interface to interact with an embedded database, will available at the URL `http://localhost:2480/studio/index.html` if run service with profile "debug" (does not start by default):
 
   ```bash
   docker compose --profile debug up
@@ -69,18 +69,19 @@ List of features this patch adds:
   nexus.group.nontransitive.privileges.enabled=true
   ```
 
-  Note that it is:
-  * Sufficient for the user to have "browse" or "read" privilege (either of them) to read files from the repository.
-  * Privileges must be granted to the repository itself and to the group repository in which it is a member.
+  > **_Note that_**:
+  >
+  > * It is sufficient for a user to have the "browse" or "read" privilege (either one) to read files from the repository.
+  > * Privileges must be granted to the repository itself and to the group repository in which it is a member.
 
 ## Additional settings (tips and tricks)
 
 * [Docker compose](./compose.yml) configuration may be extended with [compose.override.yml](./_compose.override.yml) (for example, pass additional files to the container).
-* SAML/SSO authentication may be configured with environment variables in [.env](./.env) file, for more flexible settings, can make changes directly to [shiro.ini](./etc/sso/config/shiro.ini) ([variable interpolation][16] supported). However, this also requires that the configuration files of service provider (ex., [sp-metadata.xml](./etc/sso/config/sp-metadata.xml)) and identity provider (ex., [metadata-okta.xml](./etc/sso/config/metadata.xml) or [metadata-keycloak.xml](./etc/sso/config/metadata-keycloak.xml)) will be passed to the container. Examples of creating SAML configurations see in "[Keycloak SAML integration with Nexus application][15]".
+* SAML/SSO authentication may be configured with environment variables in [.env](./.env) file, for more flexible settings, can make changes directly to [shiro.ini](./etc/sso/config/shiro.ini) ([variable interpolation][16] supported). However, this also requires that the configuration files of service provider (ex., [sp-metadata.xml](./etc/sso/config/sp-metadata.xml)) and identity provider (ex., [metadata-okta.xml](./etc/sso/config/metadata.xml) or [metadata-keycloak.xml](./etc/sso/config/metadata-keycloak.xml)) will be passed to the container. Examples of creating SAML configurations see in "[Keycloak SAML integration with Nexus application][15]" (except "Configure Nexus Applications").
 * Nginx SSL is pre-configured, to enable it, need rename file [_ssl.conf](./etc/nginx/_ssl.conf) to `ssl.conf` and pass to `${NEXUS_ETC}/nginx/tls/` two files:
   * `site.crt` - PEM certificate of domain name.
   * `site.key` - key for certificate.
-* [UrlRewriteFilter][17] is used to route HTTP requests within the application and can be further configured using [urlrewrite.xml](./etc/sso/config/urlrewrite.xml) (for example override or protect API endpoint). Status of UrlRewriteFilter available in http://localhost:8081/rewrite-status.
+* [UrlRewriteFilter][17] is used to route HTTP requests within the application and can be further configured using [urlrewrite.xml](./etc/sso/config/urlrewrite.xml) (for example override or protect API endpoint). Status of UrlRewriteFilter available in `http://localhost:8081/rewrite-status`.
 
 ## Development environment
 
