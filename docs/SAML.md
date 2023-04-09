@@ -56,11 +56,3 @@ To enable debugging, add the following lines to the [logback.xml](../etc/logback
 <logger name="org.pac4j.saml.client" level="TRACE" />
 <logger name="org.opensaml.saml.metadata.resolver" level="TRACE" />
 ```
-
-To apply the any settings without restarting the container, run the command:
-
-```bash
-docker compose exec -- nexus curl -sSfkI http://localhost:8081/rewrite-status/?conf=etc/sso/config/urlrewrite.xml
-```
-
-> **_NOTE:_** Hot-reload not working for environment variables defined in [.env](../.env), this changes take effect only after the container is restarted.

@@ -81,7 +81,13 @@ List of features this patch adds:
 * Nginx SSL is pre-configured, to enable it, need rename file [_ssl.conf](./etc/nginx/_ssl.conf) to `ssl.conf` and pass to `${NEXUS_ETC}/nginx/tls/` two files:
   * `site.crt` - PEM certificate of domain name.
   * `site.key` - key for certificate.
-* [UrlRewriteFilter][17] is used to route HTTP requests within the application and can be further configured using [urlrewrite.xml](./etc/sso/config/urlrewrite.xml) (for example override or protect API endpoint). Status of UrlRewriteFilter available in `http://localhost:8081/rewrite-status`.
+* [UrlRewriteFilter][17] is used to route HTTP requests within the application and can be further configured using [urlrewrite.xml](./etc/sso/config/urlrewrite.xml) (for example override or protect API endpoint). Status of UrlRewriteFilter available in `http://localhost:8081/rewrite-status`. Also it supports hot-reload, to apply the any settings without restarting the container, run the command:
+
+  ```bash
+  docker compose exec -- nexus curl -sSfkI http://localhost:8081/rewrite-status/?conf=etc/sso/config/urlrewrite.xml
+  ```
+
+  > **_NOTE:_** Hot-reload not working for environment variables defined in [.env](./.env), this changes take effect only after the container is restarted.
 
 ## Development environment
 
