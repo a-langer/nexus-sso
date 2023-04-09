@@ -16,7 +16,6 @@ services:
     <<: *container
     image: ${NEXUS_IMAGE}
     user: ${NEXUS_USER:-nexus}:${NEXUS_GROUP:-nexus}
-    cpuset: ${NEXUS_CPUSET:-}
     cpus: ${NEXUS_CPUS:-4}
     mem_limit: ${NEXUS_MEM_LIMIT:-3000m}
     mem_reservation: ${NEXUS_MEM_RESERVATION:-512m}
@@ -38,7 +37,6 @@ services:
     <<: *container
     image: ${NGINX_IMAGE:-nginx:1.23.3}
     user: ${NGINX_USER:-0}:${NGINX_GROUP:-0}
-    cpuset: ${NGINX_CPUSET:-}
     cpus: ${NGINX_CPUS:-2}
     mem_limit: ${NGINX_MEM_LIMIT:-256m}
     mem_reservation: ${NGINX_MEM_RESERVATION:-64m}
@@ -53,11 +51,10 @@ services:
     logging:
       <<: *logging
 
-  # docker-compose --profile debug up
+  # docker compose --profile debug up
   orientdb:
     <<: *container
     image: ${ORIENTDB_IMAGE:-orientdb:2.2.37}
-    cpuset: ${ORIENTDB_CPUSET:-}
     cpus: ${ORIENTDB_CPUS:-2}
     mem_limit: ${ORIENTDB_MEM_LIMIT:-512m}
     mem_reservation: ${ORIENTDB_MEM_RESERVATION:-64m}
