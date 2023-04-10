@@ -4,7 +4,7 @@
     <groupId>com.github.a-langer</groupId>
     <artifactId>nexus-sso</artifactId>
     <packaging>pom</packaging>
-    <version>3.47.1</version>
+    <version>3.51.0</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Single sign-on patch for Nexus OSS</description>
 

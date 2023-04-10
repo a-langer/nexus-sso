@@ -2,7 +2,7 @@ package com.github.alanger.nexus.bootstrap;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -77,9 +77,8 @@ public class DockerExtdirectFilter implements Filter {
 
         MultiReadRequestWrapper requestWrapper = new MultiReadRequestWrapper(request);
         boolean isJson = (request.getContentType() != null && request.getContentType().contains("json"));
-        Map<String, Object> reqMap = isJson ? toMap(jsonSlurper.parse(requestWrapper.getInputStream()))
-                : new HashMap<>();
-        logger.trace("Request as Map: {}", reqMap);
+        Map<String, Object> reqMap = toMap(isJson ? jsonSlurper.parse(requestWrapper.getInputStream()) : null);
+        logger.trace("Request isJson: {}, map: {}", isJson, reqMap);
 
         if (COREUI_COMPONENT.equals(reqMap.get("action")) && READ_COMPONENT.equals(reqMap.get("method"))) {
 
@@ -136,7 +135,9 @@ public class DockerExtdirectFilter implements Filter {
 
     @SuppressWarnings("unchecked")
     private Map<String, Object> toMap(Object obj) {
-        return (Map<String, Object>) obj;
+        if (obj instanceof Map)
+            return (Map<String, Object>) obj;
+        return Collections.emptyMap();
     }
 
     private String getHostName(HttpServletRequest request) {
