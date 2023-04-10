@@ -1,4 +1,4 @@
-# Single sign-on patch for Nexus OSS
+# Single Sign-On patch for Nexus OSS
 
 [![license](https://img.shields.io/badge/license-EPL1-brightgreen.svg)](https://github.com/a-langer/nexus-sso/blob/main/LICENSE "License of source code")
 [![image](https://ghcr-badge.deta.dev/a-langer/nexus-sso/latest_tag?trim=major&label=latest)][0]

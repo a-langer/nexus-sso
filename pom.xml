@@ -6,55 +6,7 @@
     <packaging>pom</packaging>
     <version>3.51.0</version>
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>Single sign-on patch for Nexus OSS</description>
-
-    <licenses>
-        <license>
-            <name>EPL-1.0</name>
-            <url>https://www.eclipse.org/legal/epl-v10.html</url>
-        </license>
-    </licenses>
-
-    <developers>
-        <developer>
-            <id>a-langer</id>
-            <name>Alexey Langer</name>
-            <email>langeress@gmail.com</email>
-            <url>https://www.linkedin.com/in/a-langer</url>
-        </developer>
-    </developers>
-
-    <scm>
-        <connection>scm:git@github.com:a-langer/nexus-sso.git</connection>
-        <developerConnection>git@github.com:a-langer/nexus-sso.git</developerConnection>
-        <url>https://github.com/a-langer/nexus-sso</url>
-    </scm>
-
-    <repositories>
-        <repository>
-            <id>central</id>
-            <url>https://repo1.maven.org/maven2/</url>
-        </repository>
-        <repository>
-            <id>shibboleth</id>
-            <url>https://build.shibboleth.net/nexus/content/repositories/releases/</url>
-        </repository>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
+    <description>Single Sign-On patch for Nexus OSS</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -476,5 +428,53 @@
             </resource>
         </resources>
     </build>
+
+    <licenses>
+        <license>
+            <name>EPL-1.0</name>
+            <url>https://www.eclipse.org/legal/epl-v10.html</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>a-langer</id>
+            <name>Alexey Langer</name>
+            <email>langeress@gmail.com</email>
+            <url>https://www.linkedin.com/in/a-langer</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git@github.com:a-langer/nexus-sso.git</connection>
+        <developerConnection>git@github.com:a-langer/nexus-sso.git</developerConnection>
+        <url>https://github.com/a-langer/nexus-sso</url>
+    </scm>
+
+    <repositories>
+        <repository>
+            <id>central</id>
+            <url>https://repo1.maven.org/maven2/</url>
+        </repository>
+        <repository>
+            <id>shibboleth</id>
+            <url>https://build.shibboleth.net/nexus/content/repositories/releases/</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
 </project>
