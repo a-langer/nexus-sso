@@ -103,10 +103,15 @@ public class QuotaFilter implements Filter {
         boolean pushAllowed = SecurityUtils.getSubject().isAuthenticated();
 
         String repoFormat = (String) request.getAttribute(REPO_FORMAT_ATTR);
-        if (repoFormat == null && formatFromRepositoryName) {
+        if (repoName != null && repoFormat == null && formatFromRepositoryName) {
             // From repository name <name>-<format>-<type>
-            repoFormat = repoName.split(formatSplitBy)[formatSplitIndex];
-            pushAllowed = SecurityUtils.getSubject().isPermitted(format(permission, repoFormat, repoName));
+            String[] arr = repoName.split(formatSplitBy);
+            if (arr.length > formatSplitIndex) {
+                repoFormat = arr[formatSplitIndex];
+                pushAllowed = SecurityUtils.getSubject().isPermitted(format(permission, repoFormat, repoName));
+            } else {
+                pushAllowed = false;
+            }  
         }
 
         logger.trace("repoName: {}, pushAllowed: {}, isPush: {}, repoFormat: {}", repoName, pushAllowed, isPush,
