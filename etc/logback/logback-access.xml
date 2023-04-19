@@ -8,6 +8,7 @@
         <URL>/service/outreach/</URL>
         <URL>/service/rest/v1/status</URL>
         <URL>/service/extdirect/poll/rapture_State_get</URL>
+        <URL>/service/extdirect/poll/coreui_Repository_readStatus</URL>
       </evaluator>
       <OnMismatch>NEUTRAL</OnMismatch>
       <OnMatch>DENY</OnMatch>
