@@ -7,10 +7,16 @@
 
 Patch for [Nexus OSS][2] with authorization via [SSO][9] and [tokens][10]. By default this features available only in PRO version ([see comparison][5]), but this patch provides them an alternative implementation without violating the license.
 
-Available solutions:
+Solution implement as Docker [container][0] (based on [official image][3] with SSO patch applied) and [compose.yml](./compose.yml) config with Nginx. Example of usage:
 
-* Docker [container][0] (based on [official image][3] with SSO patch applied) and [compose.yml](./compose.yml) config with Nginx.
-* Library [nexus-bootstrap.jar][1] (for integration to any [Nexus instance][4]).
+  ```bash
+  git clone https://github.com/a-langer/nexus-sso.git
+  cd ./nexus-sso
+  cp _compose.override.yml compose.override.yml
+  export NEXUS_USER=$(id -u)
+  export NEXUS_GROUP=$(id -g)
+  docker compose up -d
+  ```
 
 ## Supported features and examples of usage
 
