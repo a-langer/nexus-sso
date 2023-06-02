@@ -38,7 +38,7 @@
                                         <echo>Set NEXUS_IMAGE="${docker.image}" to .env</echo>
                                         <replaceregexp file="${maven.multiModuleProjectDirectory}/.env" byline="true"
                                             match="NEXUS_IMAGE=(.*)"
-                                            replace='NEXUS_IMAGE="${docker.image}"' />
+                                            replace='NEXUS_IMAGE="$${NEXUS_IMAGE:-${docker.image}}"' />
 
                                         <echo>Set NEXUS_BASE_IMAGE="${nexus.base.image}" to Dockerfile</echo>
                                         <replaceregexp file="${maven.multiModuleProjectDirectory}/Dockerfile" byline="true"

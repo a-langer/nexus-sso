@@ -21,9 +21,6 @@ services:
     mem_reservation: ${NEXUS_MEM_RESERVATION:-512m}
     volumes:
       - ${NEXUS_DATA}:/nexus-data
-      - ${NEXUS_ETC}/logback:/opt/sonatype/nexus/etc/logback:ro
-    ports:
-      - "${NEXUS_HTTP_PORT:-8081}:8081" # Nexus: http://localhost:8081/
     logging:
       <<: *logging
     healthcheck:
