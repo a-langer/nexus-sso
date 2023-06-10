@@ -10,11 +10,14 @@ Patch for [Nexus OSS][2] with authorization via [SSO][9] and [tokens][10]. By de
 Solution implement as Docker [container][0] (based on [official image][3] with SSO patch applied) and [compose.yml](./compose.yml) config with Nginx. Example of usage:
 
   ```bash
+  # Clone configuration and change to working directory
   git clone https://github.com/a-langer/nexus-sso.git
   cd ./nexus-sso
+  # Copy compose.override.yml from template for you settings
   cp _compose.override.yml compose.override.yml
-  export NEXUS_USER=$(id -u)
-  export NEXUS_GROUP=$(id -g)
+  # Set environment variables for container user
+  export NEXUS_USER=$(id -u) NEXUS_GROUP=$(id -g)
+  # Run service and open http://localhost in web browser
   docker compose up -d
   ```
 
