@@ -1,5 +1,6 @@
 version: "3.9"
 
+# Change these settings for your production environment
 services:
   nexus:
     dns:
@@ -12,5 +13,5 @@ services:
       - ${NEXUS_ETC}/nexus-default.properties:/opt/sonatype/nexus/etc/nexus-default.properties:ro
       - ${NEXUS_ETC}/sso:/opt/sonatype/nexus/etc/sso:ro
     ports:
-      - "${NEXUS_HTTP_PORT:-8081}:8081" # Nexus: http://localhost:8081/
-      - "${ORIENTDB_BINARY_PORT:-2424}:2424" # OrientDB: tcp://localhost:2424
+      - "${NEXUS_HTTP_PORT:-8081}:8081" # Nexus: http://localhost:8081/ (remove it from production environment)
+      - "${ORIENTDB_BINARY_PORT:-2424}:2424" # OrientDB: tcp://localhost:2424 (remove it from production environment)

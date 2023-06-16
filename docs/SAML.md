@@ -19,8 +19,8 @@ Description of configuration:
 - [metadata.xml](../etc/sso/config/metadata.xml) - this is the configuration of the identity provider (hereinafter **IdP**), it needs to be downloaded from Okta/Keycloak/ADFS/Etc and passed into the Nexus container. Additionally, you must specify the "**SP Entity ID**/**Client ID**" and "**Single sign-on URL**/**Client SAML endpoint**" attributes in the IdP settings, whose value must match the "**entityID**" from sp-metadata.xml.
 - By default, "Nexus SSO" is already pre-configured for authorization through [Okta](https://www.okta.com/) with HTTP protocol on localhost (the endpoint `http://localhost/callback?client_name=SAML2Client`, see [IdP settings](https://user-images.githubusercontent.com/15138089/230576296-f064501e-7c0d-4838-9ace-e522d9c8f100.png)). To configure authorization through another IdP-server is required:
     1. Configure new SAML client in the IdP server with DNS name for your Nexus instance.
-    2. Download metadata.xml from IdP server and pass his to the Nexus container.
-    3. Replace the protocol and DNS name in sp-metadata.xml and shiro.ini.
+    2. Download **metadata.xml** from IdP server and pass his to the Nexus container.
+    3. Replace the protocol and DNS name in **sp-metadata.xml** and **shiro.ini** (as shown in the first paragraph).
 
 ## Attributes mapping
 
@@ -41,7 +41,7 @@ pac4jAuthenticationListener.attrs[lastName] = myIdpLastName
 pac4jAuthenticationListener.attrs[email] = myIdpEmailaddress
 ```
 
-> **_NOTE:_** If variable interpolation is used, such as `${PAC4J_PRINCIPAL_NAME_ATTR:-username}`, then the value of the variables must be changed in the [.env](../.env) file.
+> **_NOTE:_** If variable interpolation is used, such as `${PAC4J_PRINCIPAL_NAME_ATTR:-username}`, then the value of the variables must be changed in the [.env](../.env) file. To quickly apply changes, can use hot-reload, see [Additional settings (tips and tricks)](../README.md#additional-settings-tips-and-tricks).
 
 ## Group and role mapping
 
