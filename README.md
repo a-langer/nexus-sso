@@ -85,9 +85,9 @@ List of features this patch adds:
 
 ## Additional settings (tips and tricks)
 
-* [Docker compose](./compose.yml) configuration may be extended with [compose.override.yml](./_compose.override.yml) (for example, pass additional files to the container).
+* [Docker compose](./compose.yml) configuration may be extended with [compose.override.yml](./_compose.override_prod.yml) (for example, pass additional files to the container).
 * SAML/SSO authentication may be configured with environment variables in [.env](./.env) file, for more flexible settings, can make changes directly to [shiro.ini](./etc/sso/config/shiro.ini) ([variable interpolation][16] supported). However, this also requires that the configuration files of service provider (ex., [sp-metadata.xml](./etc/sso/config/sp-metadata.xml)) and identity provider (ex., [metadata-okta.xml](./etc/sso/config/metadata.xml) or [metadata-keycloak.xml](./etc/sso/config/metadata-keycloak.xml)) will be passed to the container. Examples of creating SAML configurations see in "[Keycloak SAML integration with Nexus application][15]" (except "Configure Nexus Applications").
-* Nginx SSL is pre-configured, to enable it, need rename file [_ssl.conf](./etc/nginx/_ssl.conf) to `ssl.conf` and pass to `${NEXUS_ETC}/nginx/tls/` two files:
+* Nginx SSL is pre-configured, to enable it, need copy file [_ssl.conf](./etc/nginx/_ssl.conf) to `ssl.conf` and pass to directory `${NEXUS_ETC}/nginx/tls/` two files:
   * `site.crt` - PEM certificate of domain name.
   * `site.key` - key for certificate.
 * [UrlRewriteFilter][17] is used to route HTTP requests within the application and can be further configured using [urlrewrite.xml](./etc/sso/config/urlrewrite.xml) (for example override or protect API endpoint). Status of UrlRewriteFilter available in `http://localhost:8081/rewrite-status`. Also it supports hot-reload, to apply the any settings without restarting the container, run the command:

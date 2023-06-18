@@ -1,0 +1,21 @@
+version: "3.9"
+
+# Change these settings for your production environment
+services:
+  nexus:
+    volumes:
+      # All file volumes from compose.yml are inherited here, the following are added to them
+      - ${NEXUS_ETC}/sso/config/shiro.ini:/opt/sonatype/nexus/etc/sso/config/shiro.ini:ro
+      - ${NEXUS_ETC}/sso/config/metadata.xml:/opt/sonatype/nexus/etc/sso/config/metadata.xml:ro
+      - ${NEXUS_ETC}/sso/config/sp-metadata.xml:/opt/sonatype/nexus/etc/sso/config/sp-metadata.xml:ro
+    # Example, if need using own environment file
+    env_file:
+      - .env_prod
+
+  nginx:
+    volumes:
+      # Enable SSL encryption on port 443
+      - ${NEXUS_ETC}/nginx/_ssl.conf:/etc/nginx/ssl.conf:ro
+      # Pass the site certificate and key to container
+      - ${NEXUS_ETC}/nginx/tls/mysite.crt:/etc/nginx/tls/site.crt:ro
+      - ${NEXUS_ETC}/nginx/tls/mysite.key:/etc/nginx/tls/site.key:ro

@@ -1,6 +1,6 @@
 version: "3.9"
 
-# Change these settings for your production environment
+# This is development environment, for production see _compose.override_prod.yml
 services:
   nexus:
     dns:
