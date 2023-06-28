@@ -107,25 +107,31 @@ Need installed Maven and Docker:
     ```bash
     # Set version of the current project and any child modules
     mvn versions:set -DnewVersion=3.46.0
-    # Accept modifications to the pom.xml files
-    mvn versions:commit
-    # Or revert modifications to the pom.xml files
-    mvn versions:revert
     ```
 
 2. Execute assembly commands:
 
     ```bash
-    # Build jar bundles:
-    mvn clean package
-    # Build docker image:
+    # Build docker image
     mvn clean install -PbuildImage
+    # Or build only jar bundle if needed
+    mvn clean package
     ```
 
-3. Run docker container:
+3. Run docker container and test it:
 
     ```bash
+    # Run service and open http://localhost in web browser
     docker compose down && docker compose up
+    ```
+
+4. Accept or revert modifications to the pom.xml files:
+
+    ```bash
+    # Accept modifications
+    mvn versions:commit
+    # Or revert modifications and rebuild docker image
+    mvn versions:revert && mvn clean install -PbuildImage
     ```
 
 [0]: https://github.com/a-langer/nexus-sso/pkgs/container/nexus-sso "Docker image with SSO patch applied"
