@@ -17,10 +17,10 @@ Description of configuration:
     > **_NOTE:_** ADFS does not support URI parameter in entityID, remove "_?client_name=SAML2Client_" from **Client ID** in the ADFS settings, from **serviceProviderEntityId** in shiro.ini and from **entityID** in sp-metadata.xml.
 
 - [metadata.xml](../etc/sso/config/metadata.xml) - this is the configuration of the identity provider (hereinafter **IdP**), it needs to be downloaded from Okta/Keycloak/ADFS/Etc and passed into the Nexus container. Additionally, you must specify the "**SP Entity ID**/**Client ID**" and "**Single sign-on URL**/**Client SAML endpoint**" attributes in the IdP settings, whose value must match the "**entityID**" from sp-metadata.xml.
-- By default, "Nexus SSO" is already pre-configured for authorization through [Okta](https://www.okta.com/) with HTTP protocol on localhost (the endpoint `http://localhost/callback?client_name=SAML2Client`, see [IdP settings](https://user-images.githubusercontent.com/15138089/230576296-f064501e-7c0d-4838-9ace-e522d9c8f100.png)). To configure authorization through another IdP-server is required:
-    1. Configure new SAML client in the IdP server with DNS name for your Nexus instance.
-    2. Download **metadata.xml** from IdP server and pass his to the Nexus container.
-    3. Replace the protocol and DNS name in **sp-metadata.xml** and **shiro.ini** (as shown in the first paragraph).
+- By default, "Nexus SSO" is already pre-configured for authorization through [Okta](https://www.okta.com/) with HTTP protocol on localhost (the endpoint `http://localhost/callback?client_name=SAML2Client`, see [Okta settings](./Okta-Nexus-SAML.png)). To configure authorization through another IdP-server is required:
+    1. Configure new SAML client in the IdP server with DNS name for your Nexus instance and download **metadata.xml**.
+    2. Replace the protocol and DNS name in **sp-metadata.xml** and **shiro.ini** (as show above).
+    3. Pass **metadata.xml**, **sp-metadata.xml** and **shiro.ini** to the Nexus container, see [_compose.override_prod.yml](../_compose.override_prod.yml) for an example.
 
 ## Attributes mapping
 
@@ -56,3 +56,5 @@ To enable debugging, add the following lines to the [logback.xml](../etc/logback
 <logger name="org.pac4j.saml.client" level="TRACE" />
 <logger name="org.opensaml.saml.metadata.resolver" level="TRACE" />
 ```
+
+It is better to perform each check in a new private browser window (or delete cookies for Nexus and IdP sites, which is quite difficult), otherwise the browser may remember invalid cookies and will not go to the login page, which in turn confuses and complicates diagnostics.
