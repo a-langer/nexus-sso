@@ -64,7 +64,7 @@ pac4jAuthenticationListener.attrs[email] = myIdpEmailaddress
 
 ## Group and role mapping
 
-In UX will need to create a roles with type "**Nexus role**" instead of external mapping. Roles from Nexus and groups from IdP will be mapped together by name (ex.: role "samltestgroup" in Nexus = group "samltestgroup" in IdP).
+Roles from Nexus and groups from IdP are mapped to each other by name, for example the role "samltestgroup" in Nexus will be equal to the group "samltestgroup" in IdP. There is no specific way to map specific groups to roles at this time. For mapping, you need to create Nexus roles with the same names as the groups in IdP. In administrative UX will need to create a roles with type "**Nexus role**" instead of external mapping. After logging in, only those groups that correspond to the roles in Nexus with the same names will be applied to the user, other groups will be ignored.
 
 ## Debug
 
