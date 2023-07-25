@@ -4,14 +4,33 @@
 
 Description of configuration:
 
-- [sp-metadata.xml](../etc/sso/config/sp-metadata.xml) - this is the configuration of service provider (hereinafter **SP**), made specifically for the Nexus application. The only thing that may be required is to correct "**entityID**" and "**Location**" depending on the DNS name you use, ex.: `http(s)://myDomainName/callback?client_name=SAML2Client`. Endpoint will always be "**/callback?client_name=SAML2Client**".
+- [sp-metadata.xml](../etc/sso/config/sp-metadata.xml) - this is the configuration of service provider (hereinafter **SP**), made specifically for the Nexus application. The only thing that may be required is to correct "**entityID**" and "**Location**" depending on the DNS name and protocol you use, endpoint will always be "**/callback?client_name=SAML2Client**". Example for DNS `myNexusDomain`:
+
+    ```xml
+    <md:EntityDescriptor ... entityID="http(s)://myNexusDomain/callback?client_name=SAML2Client" validUntil="2042-03-17T05:02:50.999Z">
+            ...
+        <md:SPSSODescriptor ...>
+            <md:Extensions xmlns:init="urn:oasis:names:tc:SAML:profiles:SSO:request-init">
+                <init:RequestInitiator ... Location="http(s)://myNexusDomain/callback?client_name=SAML2Client"/>
+            </md:Extensions>
+            ...
+            <md:SingleLogoutService ... Location="http(s)://myNexusDomain/callback?client_name=SAML2Client&amp;logoutendpoint=true"/>
+            <md:SingleLogoutService ... Location="http(s)://myNexusDomain/callback?client_name=SAML2Client&amp;logoutendpoint=true"/>
+            <md:SingleLogoutService ... Location="http(s)://myNexusDomain/callback?client_name=SAML2Client&amp;logoutendpoint=true"/>
+            <md:SingleLogoutService ... Location="http(s)://myNexusDomain/callback?client_name=SAML2Client&amp;logoutendpoint=true"/>
+            ...
+            <md:AssertionConsumerService ... Location="http(s)://myNexusDomain/callback?client_name=SAML2Client" index="0"/>
+        </md:SPSSODescriptor>
+    </md:EntityDescriptor>
+    ```
+
 - The value of the attribute "**entityID**" in sp-metadata.xml should be the same as the attribute "**serviceProviderEntityId**" and "**callbackUrl**" in [shiro.ini](../etc/sso/config/shiro.ini) (also depending on the DNS name you use), ex:
 
     ```ini
     # Same as the attribute entityID
-    saml2Config.serviceProviderEntityId = http://localhost/callback?client_name=SAML2Client
+    saml2Config.serviceProviderEntityId = http(s)://myNexusDomain/callback?client_name=SAML2Client
     # Same as the attribute entityID without URI parameter
-    clients.callbackUrl = http://localhost/callback
+    clients.callbackUrl = http(s)://myNexusDomain/callback
     ```
 
     > **_NOTE:_** ADFS does not support URI parameter in entityID, remove "_?client_name=SAML2Client_" from **Client ID** in the ADFS settings, from **serviceProviderEntityId** in shiro.ini and from **entityID** in sp-metadata.xml.
