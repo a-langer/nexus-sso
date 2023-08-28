@@ -31,17 +31,21 @@ List of features this patch adds:
   * Type you credentials (login, password, 2FA, etc.).
   * You will be redirected to the main page of Nexus, roles and permissions will be mapped with your account as configured.
 
-* **User Auth Tokens** - are applied when security policies do not allow the users password to be used, such as for storing in plain text (in settings Docker, Maven and etc.). Each user can set a personal token that can be used instead of a password. The creation of tokens is implemented through the "NuGet API Key" menu, however, the tokens themselves apply to all types of repositories without exception. Example of usage user token:
-  * Go to menu "Nexus -> Manage your user account -> NuGet API Key", press "Access API key".
-  * Type your password or username if using SSO login, press "Authenticate".
-  * Copy "Your NuGet API Key", press "Close" and "Sign out".
-  * Press "Sign in", type your username and token instead of password - done.
-  * Also can be use HTTP api:
+* **User Auth Tokens** - are applied when security policies do not allow the users password to be used, such as for storing in plain text (in settings Docker, Maven and etc.) or combined with **SAML/SSO**. Each user can set a personal token that can be used instead of a password. The creation of tokens is implemented through the "NuGet API Key" menu (privilegies `nx-apikey-all` required), however, the tokens themselves apply to all types of repositories.
 
-    ```bash
-    # Authorization header for basic:
-    Basic <login:token in base64>
-    ```
+  > **_NOTE:_** For SSO and user tokens, it is enough to have two realms: "Local Authenticating Realm" and "Local Authorizing Realm". Other realms are not required and may lead to conflicts.
+
+  Example of usage user token:
+  * Go to menu "Nexus -> Manage your user account -> NuGet API Key", press "Access API key".
+  * Type your **username** if using SSO login, otherwise type password, then press "Authenticate".
+  * Copy "Your NuGet API Key", press "Close" and "Sign out".
+  * To validate a token: press "Sign in", type your username and token instead of password.
+  * Also, a pair of username+token can be used for authorization in Maven, Docker, Pip, etc., example for HTTP api:
+
+      ```bash
+      # Authorization header for basic:
+      Basic <login:token in base64>
+      ```
 
 * **Docker Repository Reverse Proxy** - this [Nginx configuration](./etc/nginx/docker_location.conf) implements a proxy strategy to use Docker registries without additional ports or hostnames (while the [official documentation][11] only suggests two proxy strategies: "Port Mapping" and "Host Mapping"). To apply the proxy strategy, required pre-configuration of Nexus (see [gistcomment-4188452][18]):
   * After deployment, three Docker registries need to be created:
