@@ -26,7 +26,9 @@ RUN chmod -R 644 ${NEXUS_PLUGINS}/org/sonatype/nexus/nexus-repository-services/$
 # Add SSO and urlrewrite configs
 COPY etc/nexus-default.properties /opt/sonatype/nexus/etc/nexus-default.properties
 COPY etc/jetty/nexus-web.xml /opt/sonatype/nexus/etc/jetty/nexus-web.xml
-COPY etc/sso/ /opt/sonatype/nexus/etc/sso/
+COPY nexus-bootstrap/src/main/config/ /opt/sonatype/nexus/etc/sso/config/
+COPY nexus-bootstrap/src/main/groovy/ /opt/sonatype/nexus/etc/sso/script/
+COPY nexus-bootstrap/src/main/static/ /opt/sonatype/nexus/etc/sso/static/
 RUN chown nexus:nexus -R /opt/sonatype/nexus/etc/sso/
 
 ENV INSTALL4J_ADD_VM_PARAMS="-Xms512m -Xmx2048m -Djava.util.prefs.userRoot=/nexus-data/javaprefs"

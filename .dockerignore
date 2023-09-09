@@ -1,3 +1,4 @@
+# See https://docs.docker.com/engine/reference/builder/#dockerignore-file
 *_dev
 *.jks
 *.tar
@@ -8,8 +9,14 @@
 * copy*
 * - Copy*
 *_SAVE*
-etc/saml/* copy*
-etc/jetty/* copy*
-etc/logback/* copy*
-etc/nginx/* copy*
-etc/sso/* copy*
+etc/*/*_SAVE*
+etc/*/*_TEST*
+etc/*/* copy*
+etc/*/*.crt
+nexus-bootstrap/src/main/*/*_SAVE*
+nexus-bootstrap/src/main/*/*_TEST*
+nexus-bootstrap/src/main/*/* copy*
+nexus-bootstrap/src/main/*/*.crt
+nexus-bootstrap/src/main/groovy/com/github/alanger/nexus/bootstrap/*_SAVE*
+nexus-bootstrap/src/main/groovy/com/github/alanger/nexus/bootstrap/*_TEST*
+nexus-bootstrap/src/main/groovy/com/github/alanger/nexus/bootstrap/* copy*
