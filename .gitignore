@@ -13,6 +13,7 @@ etc/karaf
 compose.override.yml
 *_dev
 *_data
+*_prod
 *\.jar
 *\.kar
 *\.tar

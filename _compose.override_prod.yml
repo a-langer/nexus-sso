@@ -1,6 +1,18 @@
 version: "3.9"
 
-# Change these settings for your production environment
+## 1. Set variables for your production environment, ex.:
+# export NEXUS_USER=$(id -u) NEXUS_GROUP=$(id -g)
+# export NEXUS_ETC="./etc_prod" NEXUS_DATA="./data_prod"
+
+## 2. Prepare directories and config templates, ex.:
+# mkdir ${NEXUS_ETC} ${NEXUS_DATA}
+# cp -rf ./etc/* ${NEXUS_ETC}/
+# cp -rf ./nexus-bootstrap/src/main/config/* ${NEXUS_ETC}/sso/config/
+# mkdir -p ${NEXUS_ETC}/sso/config/ && cp ./nexus-bootstrap/src/main/config/* "$_"
+
+## 3. Modify shiro.ini, metadata.xml and sp-metadata.xml, see docs/SAML.md.
+
+## 4. Change these settings for your production environment, ex.:
 services:
   nexus:
     volumes:
@@ -8,9 +20,6 @@ services:
       - ${NEXUS_ETC}/sso/config/shiro.ini:/opt/sonatype/nexus/etc/sso/config/shiro.ini:ro
       - ${NEXUS_ETC}/sso/config/metadata.xml:/opt/sonatype/nexus/etc/sso/config/metadata.xml:ro
       - ${NEXUS_ETC}/sso/config/sp-metadata.xml:/opt/sonatype/nexus/etc/sso/config/sp-metadata.xml:ro
-    # Example, if need using own environment file
-    env_file:
-      - .env_prod
 
   nginx:
     volumes:
