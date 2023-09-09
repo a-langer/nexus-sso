@@ -80,7 +80,6 @@
                                         <argument>NEXUS_BASE_IMAGE=${nexus.base.image}</argument>
                                         <argument>--build-arg</argument>
                                         <argument>NEXUS_PLUGIN_VERSION=${nexus.plugin.version}</argument>
-                                        <argument>--progress=plain</argument>
                                         <argument>--no-cache</argument>
                                         <argument>-t</argument>
                                         <argument>${docker.image}</argument>
