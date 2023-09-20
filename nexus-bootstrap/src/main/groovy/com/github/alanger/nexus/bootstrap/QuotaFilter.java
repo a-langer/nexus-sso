@@ -53,7 +53,7 @@ public class QuotaFilter implements Filter {
     private int componentMaxPoolSize = 50;
 
     // Example: nexus:repository-view:docker:myrepo-docker-hosted:add
-    private String permission = "nexus:repository-view:%s:%s:add";
+    protected String permission = "nexus:repository-view:%s:%s:add";
 
     private boolean formatFromRepositoryName = false;
     private String formatSplitBy = "-";

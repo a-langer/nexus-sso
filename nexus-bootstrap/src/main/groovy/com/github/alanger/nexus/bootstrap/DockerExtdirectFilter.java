@@ -1,5 +1,7 @@
 package com.github.alanger.nexus.bootstrap;
 
+import static java.lang.String.format;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
@@ -7,7 +9,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
@@ -18,13 +19,14 @@ import javax.servlet.ServletResponse;
 import groovy.json.JsonSlurper;
 import groovy.json.JsonOutput;
 
+import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.alanger.shiroext.servlets.MultiReadRequestWrapper;
 import com.github.alanger.shiroext.servlets.MutableResponseWrapper;
 
-public class DockerExtdirectFilter implements Filter {
+public class DockerExtdirectFilter extends QuotaFilter {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -35,6 +37,8 @@ public class DockerExtdirectFilter implements Filter {
     private static final String COREUI_COMPONENT = "coreui_Component";
 
     private static final String READ_COMPONENT = "readComponent";
+
+    private static final String READ_ASSET = "readAsset";
 
     private static final String DOCKER_FORMAT = "docker";
 
@@ -47,21 +51,48 @@ public class DockerExtdirectFilter implements Filter {
         this.servletContext = filterConfig.getServletContext();
     }
 
-    /*
-     * Request docker:
+    /**
+     * Request readAsset:
+     * <pre>
+     * {"action":"coreui_Component","method":"readAsset","data":[
+     * "XXXXX","test-raw-hosted"],"type":"rpc","tid":17}
+     * </pre>
+     * 
+     * Response readAsset:
+     * <pre>
+     * {"tid":17,"action":"coreui_Component","method":"readAsset","result":{
+     * "success":true,"data":{"id":"XXXXX","name":
+     * "example.text","format":"raw","contentType":
+     * "application/text","size":100,"repositoryName":"test-raw-hosted",
+     * "containingRepositoryName":"test-raw-hosted","blobCreated":
+     * "XXXX","blobUpdated":"XXXX"
+     * ,"lastDownloaded":null,"blobRef":"test-raw-hosted@XXXX","componentId":
+     * "XXXX","createdBy":"admin","createdByIp":"127.0.0.1","attributes":{
+     * "checksum":{"sha1":"XXXX","sha512":"XXXX","sha256":"XXXX","md5":"XXXX"},
+     * "content":{"last_modified":"XXXX"},
+     * "provenance":{"hashes_not_verified":false}}}},"type":"rpc"}
+     * </pre>
+     * 
+     * Request readComponent docker:
+     * <pre>
      * {"action":"coreui_Component","method":"readComponent","data":["XXXXX",
      * "my-repo-name"],"type":"rpc","tid":41}
+     * </pre>
      * 
-     * Response docker:
+     * Response readComponent docker:
+     * <pre>
      * {"tid":41,"action":"coreui_Component","method":"readComponent","result":{
      * "success":true,"data":{"id":"XXXXX","repositoryName":"my-repo-name","group":
      * null,"name":"library/alpine","version":"latest","format":"docker"}},"type":
      * "rpc"}
+     * </pre>
      * 
-     * Request realm settings:
+     * Request for update realm settings:
+     * <pre>
      * {"action":"coreui_RealmSettings","method":"update","data":[{"realms":[
      * "NexusAuthenticatingRealm","NexusAuthorizingRealm","DockerToken",
      * "rutauth-realm"]}],"type":"rpc","tid":36}
+     * </pre>
      */
     @Override
     public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
@@ -80,7 +111,8 @@ public class DockerExtdirectFilter implements Filter {
         Map<String, Object> reqMap = toMap(isJson ? jsonSlurper.parse(requestWrapper.getInputStream()) : null);
         logger.trace("Request isJson: {}, map: {}", isJson, reqMap);
 
-        if (COREUI_COMPONENT.equals(reqMap.get("action")) && READ_COMPONENT.equals(reqMap.get("method"))) {
+        if (COREUI_COMPONENT.equals(reqMap.get("action")) &&
+                (READ_COMPONENT.equals(reqMap.get("method")) || READ_ASSET.equals(reqMap.get("method")))) {
 
             MutableResponseWrapper responseWrapper = new MutableResponseWrapper(response);
             chain.doFilter(requestWrapper, responseWrapper);
@@ -89,37 +121,57 @@ public class DockerExtdirectFilter implements Filter {
             Map<String, Object> resMap = toMap(jsonSlurper.parseText(respContent));
             logger.trace("Response as Map: {}", resMap);
 
-            if (COREUI_COMPONENT.equals(resMap.get("action")) && READ_COMPONENT.equals(resMap.get("method"))) {
-                Map<String, Object> result = toMap(resMap.get("result"));
-                logger.trace("Response result: {}", result);
+            Map<String, Object> result = toMap(resMap.get("result"));
+            boolean success = result != null && Boolean.TRUE.equals(result.get("success"));
+            Map<String, Object> data = toMap(result.get("data"));
 
-                if (result != null && Boolean.TRUE.equals(result.get("success"))) {
-                    Map<String, Object> data = toMap(result.get("data"));
-                    if (DOCKER_FORMAT.equals(data.get("format"))) {
-                        String fullName = String.valueOf(data.get("name"));
-                        if (fullName.startsWith(this.prefix)) {
-                            fullName = fullName.substring(this.prefix.length(), fullName.length());
-                        }
-                        String repositoryName = String.valueOf(data.get("repositoryName"));
-                        if (repositoryName.equals(dockerRoot) && fullName.startsWith(dockerRoot + "/")) {
-                            fullName = fullName.substring((dockerRoot + "/").length(), fullName.length());
-                        } else if (!repositoryName.equals(dockerRoot) && !fullName.startsWith(repositoryName + "/")) {
-                            fullName = repositoryName + "/" + fullName;
-                        }
-                        fullName = getHostName(request) + "/" + fullName;
-                        logger.trace("Image fullName: {}", fullName);
-                        data.put("name", fullName);
-                        respContent = JsonOutput.toJson(resMap);
+            String repoName = String.valueOf(data.get("repositoryName"));
+            String repoFormat = String.valueOf(data.get("format"));
+            logger.trace("repoName: {}, repoFormat: {}", repoName, repoFormat);
 
-                        response.setContentType(responseWrapper.getContentType());
-                        response.setCharacterEncoding(responseWrapper.getCharacterEncoding());
-                        response.setContentLength(respContent.length());
-                        PrintWriter out = response.getWriter();
-                        out.print(respContent);
-                        out.flush();
-                        return;
-                    }
+            boolean changed = false;
+
+            // Hide private properties of an asset
+            if (success && COREUI_COMPONENT.equals(resMap.get("action")) && "readAsset".equals(resMap.get("method"))) {
+                // Check push permission
+                boolean pushAllowed = SecurityUtils.getSubject().isPermitted(format(permission, repoFormat, repoName));
+                if (!pushAllowed) {
+                    data.put("createdBy", "***");
+                    data.put("createdByIp", "***");
+                    changed = true;
                 }
+            }
+
+            // Change Docker image name
+            if (success && COREUI_COMPONENT.equals(resMap.get("action"))
+                    && READ_COMPONENT.equals(resMap.get("method")) && DOCKER_FORMAT.equals(repoFormat)) {
+                String fullName = String.valueOf(data.get("name"));
+                if (fullName.startsWith(this.prefix)) {
+                    fullName = fullName.substring(this.prefix.length(), fullName.length());
+                }
+                // String repositoryName = String.valueOf(data.get("repositoryName"));
+                if (repoName.equals(dockerRoot) && fullName.startsWith(dockerRoot + "/")) {
+                    fullName = fullName.substring((dockerRoot + "/").length(), fullName.length());
+                } else if (!repoName.equals(dockerRoot) && !fullName.startsWith(repoName + "/")) {
+                    fullName = repoName + "/" + fullName;
+                }
+                fullName = getHostName(request) + "/" + fullName;
+                logger.trace("Image fullName: {}", fullName);
+                data.put("name", fullName);
+                changed = true;
+            }
+
+            // Write changed response
+            if (changed) {
+                respContent = JsonOutput.toJson(resMap);
+                response.setStatus(responseWrapper.getStatus());
+                response.setContentType(responseWrapper.getContentType());
+                response.setCharacterEncoding(responseWrapper.getCharacterEncoding());
+                response.setContentLength(respContent.length());
+                PrintWriter out = response.getWriter();
+                out.print(respContent);
+                out.flush();
+                return;
             }
         }
 
