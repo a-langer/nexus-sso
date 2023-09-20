@@ -17,7 +17,7 @@ String initMarker = "invoke_done";
 GroovyClassLoader getGroovyClassLoader() {
     GroovyClassLoader gcl = servletContext.getAttribute(GroovyClassLoader.class.getCanonicalName());
     // Creates a new classloader if log level = TRACE
-    if (gcl == null || logger.getLevel() == Level.FINEST) {
+    if (gcl == null || logger?.getLevel() == Level.FINEST) {
         CompilerConfiguration cfg = new CompilerConfiguration();
         cfg.setSourceEncoding("UTF-8");
         cfg.setScriptExtensions(["groovy","java"].toSet());
