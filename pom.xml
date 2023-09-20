@@ -326,6 +326,14 @@
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
+        <!-- https://github.com/sonatype/nexus-public/blob/main/buildsupport/commons/pom.xml -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.12.0</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
     <build>
@@ -342,11 +350,6 @@
                         <goals>
                             <goal>compile</goal>
                         </goals>
-                        <configuration>
-                            <excludes>
-                                <exclude>com/github/alanger/nexus/bootstrap/**</exclude>
-                            </excludes>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
