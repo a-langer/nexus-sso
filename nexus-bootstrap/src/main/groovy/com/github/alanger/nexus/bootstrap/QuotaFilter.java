@@ -33,7 +33,7 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 // https://orientdb.com/docs/2.2.x/Document-Database.html
 public class QuotaFilter implements Filter {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public static final String REPO_NAME_ATTR = QuotaFilter.class.getCanonicalName() + ".REPO_NAME";
     public static final String REPO_FORMAT_ATTR = QuotaFilter.class.getCanonicalName() + ".REPO_FORMAT";
@@ -59,7 +59,7 @@ public class QuotaFilter implements Filter {
     private String formatSplitBy = "-";
     private int formatSplitIndex = 1;
 
-    private List<String> methods = asList("PUT,POST");
+    protected List<String> methods = asList("PUT,POST");
 
     private String quotaSql = new StringBuilder()
             .append("select name, attributes.blobStoreQuotaConfig.quotaLimitBytes as quota from repository_blobstore")
@@ -93,29 +93,8 @@ public class QuotaFilter implements Filter {
         }
         request.setAttribute(getClass().getCanonicalName(), true);
 
-        String repoName = (String) request.getAttribute(REPO_NAME_ATTR);
-        if (repoName == null) {
-            // From URI /repository/<name>-<format>-<type>
-            // or /service/rest/internal/ui/upload/<name>-<format>-<type>
-            repoName = new File(request.getRequestURI()).getName();
-        }
-
-        boolean pushAllowed = SecurityUtils.getSubject().isAuthenticated();
-
-        String repoFormat = (String) request.getAttribute(REPO_FORMAT_ATTR);
-        if (repoName != null && repoFormat == null && formatFromRepositoryName) {
-            // From repository name <name>-<format>-<type>
-            String[] arr = repoName.split(formatSplitBy);
-            if (arr.length > formatSplitIndex) {
-                repoFormat = arr[formatSplitIndex];
-                pushAllowed = SecurityUtils.getSubject().isPermitted(format(permission, repoFormat, repoName));
-            } else {
-                pushAllowed = false;
-            }  
-        }
-
-        logger.trace("repoName: {}, pushAllowed: {}, isPush: {}, repoFormat: {}", repoName, pushAllowed, isPush,
-                repoFormat);
+        String repoName = getRepoName(request);
+        boolean pushAllowed = isPushAllowed(request, repoName);
 
         if (repoName != null && pushAllowed && isPush) {
             ODatabaseDocumentTx component = null;
@@ -143,8 +122,7 @@ public class QuotaFilter implements Filter {
                             response.setStatus(responseStatus);
                             response.setHeader(ERROR_MESSAGE, msg);
                             request.setAttribute(ERROR_MESSAGE, msg);
-                            if (!response.isCommitted())
-                                response.getWriter().close();
+                            writeJsonMessage(response, msg);
                             return;
                         }
                     }
@@ -158,6 +136,55 @@ public class QuotaFilter implements Filter {
         }
 
         chain.doFilter(request, response);
+    }
+
+    protected void writeJsonMessage(HttpServletResponse response, String msg) throws IOException {
+        if (!response.isCommitted()) {
+            response.setContentType("text/json");
+            String data = new StringBuilder()
+                    .append("[{'message':'")
+                    .append(msg)
+                    .append("','success':false,'tid':1,'action':'upload','method':'upload','type':'rpc'}]")
+                    .toString().replace("'", "\"");
+            response.getWriter().write(data);
+            response.getWriter().close();
+        }
+    }
+
+    protected String getRepoName(HttpServletRequest request) {
+        String repoName = (String) request.getAttribute(REPO_NAME_ATTR);
+        if (repoName == null) {
+            // From URI /repository/<name>-<format>-<type>
+            // or /service/rest/internal/ui/upload/<name>-<format>-<type>
+            repoName = new File(request.getRequestURI()).getName();
+        }
+        return repoName;
+    }
+
+    protected boolean isPushAllowed(HttpServletRequest request, String repoName) {
+        boolean pushAllowed = SecurityUtils.getSubject().isAuthenticated();
+        if (!pushAllowed) {
+            logger.trace("repoName: {}, pushAllowed: {}", repoName, pushAllowed);
+            return false;
+        }
+
+        // Format from request attribute
+        String repoFormat = (String) request.getAttribute(REPO_FORMAT_ATTR);
+
+        // Format from repository name
+        if (repoFormat == null && formatFromRepositoryName) {
+            // Split repository name, ex.: <name>-<format>-<type>
+            String[] arr = repoName.split(formatSplitBy);
+            repoFormat = (arr.length > formatSplitIndex) ? arr[formatSplitIndex] : "*";
+        } else {
+            repoFormat = "*"; // Require permission for all formats
+        }
+
+        pushAllowed = SecurityUtils.getSubject().isPermitted(format(permission, repoFormat, repoName));
+
+        logger.trace("repoName: {}, pushAllowed: {}, repoFormat: {}", repoName, pushAllowed, repoFormat);
+
+        return pushAllowed;
     }
 
     @Override
