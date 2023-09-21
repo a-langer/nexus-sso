@@ -1,6 +1,7 @@
 package com.github.alanger.nexus.bootstrap;
 
 import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static javax.servlet.RequestDispatcher.ERROR_MESSAGE;
 
 import java.io.IOException;
@@ -46,6 +47,8 @@ public class SubjectFilter extends QuotaFilter {
             return;
         }
         request.setAttribute(getClass().getCanonicalName(), true);
+        request.setCharacterEncoding(UTF_8.name());
+        response.setCharacterEncoding(UTF_8.name());
 
         Subject subject = SecurityUtils.getSubject();
         String userName = String.valueOf(subject.getPrincipal());

@@ -1,10 +1,13 @@
 package com.github.alanger.nexus.bootstrap;
 
 import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,6 +40,8 @@ public class DockerExtdirectFilter extends QuotaFilter {
     private static final String COREUI_COMPONENT = "coreui_Component";
 
     private static final String READ_COMPONENT = "readComponent";
+
+    private static final String READ_COMPONENT_ASSETS = "readComponentAssets";
 
     private static final String READ_ASSET = "readAsset";
 
@@ -105,14 +110,20 @@ public class DockerExtdirectFilter extends QuotaFilter {
             return;
         }
         request.setAttribute(getClass().getCanonicalName(), true);
+        request.setCharacterEncoding(UTF_8.name());
+        response.setCharacterEncoding(UTF_8.name());
 
         MultiReadRequestWrapper requestWrapper = new MultiReadRequestWrapper(request);
+
         boolean isJson = (request.getContentType() != null && request.getContentType().contains("json"));
         Map<String, Object> reqMap = toMap(isJson ? jsonSlurper.parse(requestWrapper.getInputStream()) : null);
         logger.trace("Request isJson: {}, map: {}", isJson, reqMap);
 
-        if (COREUI_COMPONENT.equals(reqMap.get("action")) &&
-                (READ_COMPONENT.equals(reqMap.get("method")) || READ_ASSET.equals(reqMap.get("method")))) {
+        String reqAction = String.valueOf(reqMap.get("action"));
+        String reqMethod = String.valueOf(reqMap.get("method"));
+
+        if (COREUI_COMPONENT.equals(reqAction) && (READ_COMPONENT.equals(reqMethod) ||
+                READ_ASSET.equals(reqMethod)) || READ_COMPONENT_ASSETS.equals(reqMethod)) {
 
             MutableResponseWrapper responseWrapper = new MutableResponseWrapper(response);
             chain.doFilter(requestWrapper, responseWrapper);
@@ -123,42 +134,52 @@ public class DockerExtdirectFilter extends QuotaFilter {
 
             Map<String, Object> result = toMap(resMap.get("result"));
             boolean success = result != null && Boolean.TRUE.equals(result.get("success"));
-            Map<String, Object> data = toMap(result.get("data"));
+            String action = String.valueOf(resMap.get("action"));
+            String method = String.valueOf(resMap.get("method"));
 
-            String repoName = String.valueOf(data.get("repositoryName"));
-            String repoFormat = String.valueOf(data.get("format"));
-            logger.trace("repoName: {}, repoFormat: {}", repoName, repoFormat);
+            @SuppressWarnings("null")
+            List<Object> datas = toList(result.get("data")); // List if readComponentAssets
 
             boolean changed = false;
 
-            // Hide private properties of an asset
-            if (success && COREUI_COMPONENT.equals(resMap.get("action")) && "readAsset".equals(resMap.get("method"))) {
-                // Check push permission
-                boolean pushAllowed = SecurityUtils.getSubject().isPermitted(format(permission, repoFormat, repoName));
-                if (!pushAllowed) {
-                    data.put("createdBy", "***");
-                    data.put("createdByIp", "***");
+            for (Object d : datas) {
+                Map<String, Object> data = toMap(d);
+
+                String repoName = String.valueOf(data.get("repositoryName"));
+                String repoFormat = String.valueOf(data.get("format"));
+                logger.trace("repoName: {}, repoFormat: {}, action: {}, method: {}", repoName, repoFormat, action,
+                        method);
+
+                // Hide private properties of an asset
+                if (success && COREUI_COMPONENT.equals(action)
+                        && (READ_ASSET.equals(method) || READ_COMPONENT_ASSETS.equals(method))) {
+                    // Check push permission
+                    boolean pushAllowed = SecurityUtils.getSubject()
+                            .isPermitted(format(permission, repoFormat, repoName));
+                    if (!pushAllowed) {
+                        data.put("createdBy", "***");
+                        data.put("createdByIp", "***");
+                        changed = true;
+                    }
+                }
+
+                // Change Docker image name
+                if (success && COREUI_COMPONENT.equals(action) && DOCKER_FORMAT.equals(repoFormat)
+                        && (READ_COMPONENT.equals(method) || READ_COMPONENT_ASSETS.equals(method))) {
+                    String fullName = String.valueOf(data.get("name"));
+                    if (fullName.startsWith(this.prefix)) {
+                        fullName = fullName.substring(this.prefix.length(), fullName.length());
+                    }
+                    if (repoName.equals(dockerRoot) && fullName.startsWith(dockerRoot + "/")) {
+                        fullName = fullName.substring((dockerRoot + "/").length(), fullName.length());
+                    } else if (!repoName.equals(dockerRoot) && !fullName.startsWith(repoName + "/")) {
+                        fullName = repoName + "/" + fullName;
+                    }
+                    fullName = getHostName(request) + "/" + fullName;
+                    logger.trace("Image fullName: {}", fullName);
+                    data.put("name", fullName);
                     changed = true;
                 }
-            }
-
-            // Change Docker image name
-            if (success && COREUI_COMPONENT.equals(resMap.get("action"))
-                    && READ_COMPONENT.equals(resMap.get("method")) && DOCKER_FORMAT.equals(repoFormat)) {
-                String fullName = String.valueOf(data.get("name"));
-                if (fullName.startsWith(this.prefix)) {
-                    fullName = fullName.substring(this.prefix.length(), fullName.length());
-                }
-                // String repositoryName = String.valueOf(data.get("repositoryName"));
-                if (repoName.equals(dockerRoot) && fullName.startsWith(dockerRoot + "/")) {
-                    fullName = fullName.substring((dockerRoot + "/").length(), fullName.length());
-                } else if (!repoName.equals(dockerRoot) && !fullName.startsWith(repoName + "/")) {
-                    fullName = repoName + "/" + fullName;
-                }
-                fullName = getHostName(request) + "/" + fullName;
-                logger.trace("Image fullName: {}", fullName);
-                data.put("name", fullName);
-                changed = true;
             }
 
             // Write changed response
@@ -190,6 +211,13 @@ public class DockerExtdirectFilter extends QuotaFilter {
         if (obj instanceof Map)
             return (Map<String, Object>) obj;
         return Collections.emptyMap();
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Object> toList(Object obj) {
+        if (obj instanceof List)
+            return (List<Object>) obj;
+        return Arrays.asList(obj);
     }
 
     private String getHostName(HttpServletRequest request) {

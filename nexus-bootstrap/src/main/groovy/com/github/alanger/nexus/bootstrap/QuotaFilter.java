@@ -3,6 +3,7 @@ package com.github.alanger.nexus.bootstrap;
 import static com.github.alanger.shiroext.realm.RealmUtils.asList;
 import static org.sonatype.nexus.common.text.UnitFormatter.formatStorage;
 import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static javax.servlet.RequestDispatcher.ERROR_MESSAGE;
 
 import java.io.File;
@@ -92,6 +93,8 @@ public class QuotaFilter implements Filter {
             return;
         }
         request.setAttribute(getClass().getCanonicalName(), true);
+        request.setCharacterEncoding(UTF_8.name());
+        response.setCharacterEncoding(UTF_8.name());
 
         String repoName = getRepoName(request);
         boolean pushAllowed = isPushAllowed(request, repoName);
