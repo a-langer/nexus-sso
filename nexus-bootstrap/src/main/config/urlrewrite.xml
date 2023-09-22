@@ -80,8 +80,8 @@
         <note>
             SAML logout
         </note>
-        <from>^/service/rapture/session$</from>
         <condition type="method" operator="equal">DELETE</condition>
+        <from>^/service/rapture/session$</from>
         <run class="com.github.alanger.shiroext.servlets.ScriptProcessedServlet" method="service">
             <init-param>
                 <param-name>invoke-script-text</param-name>
