@@ -15,7 +15,12 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <nexus.base.version>${project.version}</nexus.base.version>
         <nexus.base.image>sonatype/nexus3:${nexus.base.version}</nexus.base.image>
-        <nexus.plugin.version>${nexus.base.version}-01</nexus.plugin.version>
+        <!-- 
+            nexus plugin versions can have different revisions
+            version needs to be: ${nexus.base.version}-01 <= x <= ${nexus.base.version}-09
+            usually they do not go above 9 revisions
+        -->
+        <nexus.plugin.version>[${nexus.base.version}-01,${nexus.base.version}-09]</nexus.plugin.version>
         <docker.image>ghcr.io/a-langer/nexus-sso:${project.version}</docker.image>
     </properties>
 
