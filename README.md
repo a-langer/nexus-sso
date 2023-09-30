@@ -33,7 +33,7 @@ List of features this patch adds:
 
 * **User Auth Tokens** - are applied when security policies do not allow the users password to be used, such as for storing in plain text (in settings Docker, Maven and etc.) or combined with **SAML/SSO**. Each user can set a personal token that can be used instead of a password. The creation of tokens is implemented through the "NuGet API Key" menu (privilegies `nx-apikey-all` required), however, the tokens themselves apply to all types of repositories.
 
-  > **_NOTE:_** For SSO and user tokens, it is enough to have two realms: "Local Authenticating Realm" and "Local Authorizing Realm". Other realms are not required and may lead to conflicts.
+  > **Note**: For SSO and user tokens, it is enough to have two realms: "Local Authenticating Realm" and "Local Authorizing Realm". Other realms are not required and may lead to conflicts.
 
   Example of usage user token:
   * Go to menu "Nexus -> Manage your user account -> NuGet API Key", press "Access API key".
@@ -82,7 +82,7 @@ List of features this patch adds:
   nexus.group.nontransitive.privileges.enabled=true
   ```
 
-  > **_Note that_**:
+  > **Note**:
   >
   > * It is sufficient for a user to have the "browse" or "read" privilege (either one) to read files from the repository.
   > * Privileges must be granted to the repository itself and to the group repository in which it is a member.
@@ -100,7 +100,7 @@ List of features this patch adds:
   docker compose exec -- nexus curl -sSfkI http://localhost:8081/rewrite-status/?conf=etc/sso/config/urlrewrite.xml
   ```
 
-  > **_NOTE:_** Hot-reload not working for environment variables defined in [.env](./.env), this changes take effect only after the container is restarted.
+  > **Note**: Hot-reload not working for environment variables defined in [.env](./.env), this changes take effect only after the container is restarted.
 
 ## Development environment
 
