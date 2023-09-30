@@ -14,8 +14,9 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <nexus.base.version>${project.version}</nexus.base.version>
+        <nexus.extension.version>01</nexus.extension.version>
+        <nexus.plugin.version>${nexus.base.version}-${nexus.extension.version}</nexus.plugin.version>
         <nexus.base.image>sonatype/nexus3:${nexus.base.version}</nexus.base.image>
-        <nexus.plugin.version>${nexus.base.version}-01</nexus.plugin.version>
         <docker.image>ghcr.io/a-langer/nexus-sso:${project.version}</docker.image>
     </properties>
 

@@ -111,6 +111,8 @@ Need installed Maven and Docker:
     ```bash
     # Set version of the current project and any child modules
     mvn versions:set -DnewVersion=3.46.0
+    # Optional can set revision number of the Nexus plugins
+    mvn versions:set-property -Dproperty=nexus.extension.version -DnewVersion=02
     ```
 
 2. Execute assembly commands:
