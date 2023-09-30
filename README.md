@@ -104,7 +104,7 @@ List of features this patch adds:
 
 ## Development environment
 
-Need installed Maven and Docker:
+Need installed Maven and Docker with [Compose][4] and [BuildKit][4.1] plugins:
 
 1. Change Nexus version if update required (see [Release Notes][19] for more information), ex.:
 
@@ -144,7 +144,8 @@ Need installed Maven and Docker:
 [1]: https://jitpack.io/#a-langer/nexus-sso "Maven repository for builds from source code"
 [2]: https://github.com/sonatype/nexus-public "Source code of Nexus OSS"
 [3]: https://github.com/sonatype/docker-nexus3 "Docker image Nexus OSS"
-[4]: https://help.sonatype.com/repomanager3/product-information/download "Download Nexus OSS"
+[4]: https://docs.docker.com/compose/install/ "Docker plugin for defining and running multi-container Docker applications"
+[4.1]: https://github.com/docker/buildx "Docker plugin for capabilities with BuildKit"
 [5]: https://www.sonatype.com/products/repository-oss-vs-pro-features "Nexus OSS vs Nexus PRO"
 [6]: https://shiro.apache.org/web.html "Shiro security framework"
 [7]: https://github.com/bujiio/buji-pac4j "Bridge from Pac4j to Shiro"
