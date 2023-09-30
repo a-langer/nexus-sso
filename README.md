@@ -159,4 +159,4 @@ Need installed Maven and Docker:
 [16]: https://commons.apache.org/proper/commons-configuration/userguide/howto_basicfeatures.html "Variable interpolation"
 [17]: https://tuckey.org/urlrewrite/manual/4.0/index.html "Url Rewrite Filter"
 [18]: https://gist.github.com/abdennour/74c5de79e57a47f3351217d674238da8?permalink_comment_id=4188452#gistcomment-4188452 "Nginx for Docker registry"
-[19]: https://help.sonatype.com/repomanager3/product-information/release-notes "Nexus release notes"
+[19]: https://github.com/sonatype/nexus-public/releases "Nexus release notes"
