@@ -54,6 +54,7 @@ import static org.sonatype.nexus.validation.ConstraintViolations.maybePropagate;
  * Default {@link GroupFacet} implementation.
  *
  * @since 3.0
+ * @see https://github.com/sonatype/nexus-public/blob/main/components/nexus-repository-services/src/main/java/org/sonatype/nexus/repository/group/GroupFacetImpl.java
  */
 @Named("default")
 public class GroupFacetImpl
@@ -88,10 +89,10 @@ public class GroupFacetImpl
 
   protected CacheController cacheController;
 
-  @Inject
+  @Inject // SSO patch
   private RepositoryPermissionChecker repositoryPermissionChecker;
 
-  @Inject
+  @Inject // SSO patch
   @Named("${nexus.group.nontransitive.privileges.enabled:-false}")
   private boolean groupPermissionEnabled;
 
@@ -202,6 +203,7 @@ public class GroupFacetImpl
         members.add(member);
       }
     }
+    // SSO patch
     if (groupPermissionEnabled) {
       return repositoryPermissionChecker.userCanBrowseRepositories(members);
     }
