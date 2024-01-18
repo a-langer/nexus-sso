@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Collections;
 import java.util.Properties;
@@ -60,6 +61,7 @@ public class Pac4jAuthenticationListener implements AuthenticationListener {
     private Class<?> principalClass = Pac4jPrincipalName.class;
     private Class<?> realmClass = Pac4jRealmName.class;
 
+    // @formatter:off
     private String userQuery = "SELECT * FROM user WHERE id = ''{0}''";
     private String userUpdate = "UPDATE user SET firstName = ''{1}'', lastName = ''{2}'', email = ''{3}'', status = ''{4}'', password = ''{5}'' WHERE id = ''{0}''";
     private String userInsert = "INSERT INTO user (id, firstName, lastName, email, status, password) VALUES (''{0}'', ''{1}'', ''{2}'', ''{3}'', ''{4}'', ''{5}'')";
@@ -67,6 +69,7 @@ public class Pac4jAuthenticationListener implements AuthenticationListener {
     private String roleQuery = "SELECT * FROM user_role_mapping WHERE userId = ''{0}''";
     private String roleUpdate = "UPDATE user_role_mapping SET source = ''{1}'', roles = ''{2}'' WHERE userId = ''{0}''";
     private String roleInsert = "INSERT INTO user_role_mapping (userId, source, roles) VALUES (''{0}'', ''{1}'', ''{2}'')";
+    // @formatter:on
 
     public Pac4jAuthenticationListener() {
         this.securityManager = (DefaultWebSecurityManager) SecurityUtils.getSecurityManager();
@@ -93,78 +96,87 @@ public class Pac4jAuthenticationListener implements AuthenticationListener {
     public void onSuccess(AuthenticationToken token, AuthenticationInfo ai) {
         PrincipalCollection principals = ai.getPrincipals();
         logger.trace("token: {}, info: {}, principals: {}", token, ai, principals);
+
         if (principals != null) {
-            Pac4jPrincipalName principal = (Pac4jPrincipalName) principals.oneByType(principalClass);
-            if (principal != null) {
-                UserProfile profile = principal.getProfile();
+            try {
+                Pac4jPrincipalName principal = (Pac4jPrincipalName) principals.oneByType(principalClass);
+                logger.trace("principal: {} = {}", principal, principal != null ? principal.getClass() : null);
 
-                String id = this.getValue(profile, USER_ID, principal.toString());
-                String password = this.getValue(profile, PASSWORD_ID, principals.getRealmNames().toString());
-                String firstName = this.getValue(profile, FIRST_NAME_ID, id);
-                String lastName = this.getValue(profile, LAST_NAME_ID, id);
-                String realmName = principals.getRealmNames().iterator().next();
-                String email = this.getValue(profile, EMAIL_ID, format("{0}@{1}.local", id, realmName));
-                String status = this.getValue(profile, STATUS_ID, DEFAULT_STATUS);
-                LinkedHashSet<String> roleSet = new LinkedHashSet<>(
-                        profile != null ? profile.getRoles() : Collections.emptyList());
-                for (Realm r : securityManager.getRealms()) {
-                    if (principals.getRealmNames().contains(r.getName()) && realmClass.isAssignableFrom(r.getClass())
-                            && (r instanceof ICommonRole)) {
-                        roleSet.addAll(RealmUtils.asList(((ICommonRole) r).getCommonRole()));
-                    }
-                }
-                String roles = String.join(",", roleSet);
-                String source = this.getValue(profile, SOURCE_ID, DEFAULT_SOURCE);
+                if (principal != null) {
+                    UserProfile profile = principal.getProfile();
+                    logger.info("profile: {}", profile);
 
-                logger.trace("principal: {} = {}", principal, principal.getClass());
-                logger.info("profile: {}", profile);
-                logger.trace("attrs: firstName = {}, lastName = {}, email = {}, status = {}, source = {}, roles = '{}'",
-                        firstName, lastName, email, status, source, roles);
+                    String id = this.getValue(profile, USER_ID, principal.toString());
+                    String password = this.getValue(profile, PASSWORD_ID, principals.getRealmNames().toString());
+                    String firstName = this.getValue(profile, FIRST_NAME_ID, id);
+                    String lastName = this.getValue(profile, LAST_NAME_ID, id);
+                    String realmName = principals.getRealmNames().iterator().next();
+                    String email = this.getValue(profile, EMAIL_ID, format("{0}@{1}.local", id, realmName));
+                    String status = this.getValue(profile, STATUS_ID, DEFAULT_STATUS);
 
-                Connection conn = null;
-                Statement stmt = null;
-                ResultSet rs = null;
-                try {
-                    conn = dataSource.getConnection();
-                    stmt = conn.createStatement();
+                    LinkedHashSet<String> roleSet = new LinkedHashSet<>(profile != null ? profile.getRoles() : Collections.emptyList());
 
-                    // Set user profile
-                    String sql = format(this.userUpdate, id, firstName, lastName, email, status, password);
-                    String query = format(this.userQuery, id, firstName, lastName, email, status, password);
-                    logger.trace("userQuery sql: {}", query);
-                    rs = stmt.executeQuery(query);
-                    if (rs.next()) {
-                        String currentStatus = rs.getString(STATUS_ID);
-                        if (!DEFAULT_STATUS.equals(currentStatus)) {
-                            String tmpl = "Account '%s' must have '%s' status, current status is %s";
-                            sendError(403, tmpl, id, DEFAULT_STATUS, currentStatus);
-                            return;
+                    for (Realm r : securityManager.getRealms()) {
+                        if (r != null && principals.getRealmNames().contains(r.getName()) && realmClass.isAssignableFrom(r.getClass())
+                                && (r instanceof ICommonRole)) {
+                            roleSet.addAll(RealmUtils.asList(((ICommonRole) r).getCommonRole()));
                         }
-                    } else {
-                        sql = format(this.userInsert, id, firstName, lastName, email, status, password);
                     }
-                    logger.trace("userUpdate/userInsert sql: {}", sql);
-                    stmt.execute(sql);
-                    rs.close();
 
-                    // Set roles
-                    sql = format(this.roleUpdate, id, source, roles);
-                    query = format(this.roleQuery, id, source, roles);
-                    logger.trace("roleQuery sql: {}", query);
-                    rs = stmt.executeQuery(query);
-                    if (!rs.next()) {
-                        sql = format(this.roleInsert, id, source, roles);
+                    String roles = String.join(",", roleSet);
+                    String source = this.getValue(profile, SOURCE_ID, DEFAULT_SOURCE);
+
+                    logger.trace("attrs: firstName = {}, lastName = {}, email = {}, status = {}, source = {}, roles = '{}'", firstName,
+                            lastName, email, status, source, roles);
+
+                    Connection conn = null;
+                    Statement stmt = null;
+                    ResultSet rs = null;
+                    try {
+                        conn = dataSource.getConnection();
+                        stmt = conn.createStatement();
+
+                        // Set user profile
+                        String sql = format(this.userUpdate, id, firstName, lastName, email, status, password);
+                        String query = format(this.userQuery, id, firstName, lastName, email, status, password);
+                        logger.trace("userQuery sql: {}", query);
+                        rs = stmt.executeQuery(query);
+                        if (rs.next()) {
+                            String currentStatus = rs.getString(STATUS_ID);
+                            if (!DEFAULT_STATUS.equals(currentStatus)) {
+                                String tmpl = "Account '%s' must have '%s' status, current status is %s";
+                                sendError(403, tmpl, id, DEFAULT_STATUS, currentStatus);
+                                return;
+                            }
+                        } else {
+                            sql = format(this.userInsert, id, firstName, lastName, email, status, password);
+                        }
+                        logger.trace("userUpdate/userInsert sql: {}", sql);
+                        stmt.execute(sql);
+                        rs.close();
+
+                        // Set roles
+                        sql = format(this.roleUpdate, id, source, roles);
+                        query = format(this.roleQuery, id, source, roles);
+                        logger.trace("roleQuery sql: {}", query);
+                        rs = stmt.executeQuery(query);
+                        if (!rs.next()) {
+                            sql = format(this.roleInsert, id, source, roles);
+                        }
+                        logger.trace("roleUpdate/roleInsert sql: {}", sql);
+                        stmt.execute(sql);
+                    } catch (SQLException e) {
+                        logger.error("onSuccess method SQL error", e);
+                        sendError(500, "Pac4jAuthenticationListener: %s", e.toString());
+                    } finally {
+                        JdbcUtils.closeResultSet(rs);
+                        JdbcUtils.closeStatement(stmt);
+                        JdbcUtils.closeConnection(conn);
                     }
-                    logger.trace("roleUpdate/roleInsert sql: {}", sql);
-                    stmt.execute(sql);
-                } catch (SQLException e) {
-                    logger.trace("onSuccess method error", e);
-                    sendError(500, "Pac4jAuthenticationListener: %s", e.toString());
-                } finally {
-                    JdbcUtils.closeResultSet(rs);
-                    JdbcUtils.closeStatement(stmt);
-                    JdbcUtils.closeConnection(conn);
                 }
+            } catch (Exception e) {
+                logger.error("onSuccess method error", e);
+                sendError(500, "Pac4jAuthenticationListener: %s", e.toString());
             }
         }
     }
@@ -188,12 +200,12 @@ public class Pac4jAuthenticationListener implements AuthenticationListener {
     }
 
     // pac4jAuthenticationListener.attrs[firstName] = FirstName
-    public Properties getAttrs() {
-        return (Properties) this.mapper.get(ATTR_ID);
+    @SuppressWarnings("unchecked")
+    public Map<Object, Object> getAttrs() {
+        return (Map<Object, Object>) this.mapper.get(ATTR_ID);
     }
 
-    // pac4jAuthenticationListener.map(attrs) = firstName:FirstName,
-    // lastName:LastName, email:Email
+    // pac4jAuthenticationListener.map(attrs) = firstName:FirstName, lastName:LastName, email:Email
     public Properties getMap() {
         return mapper;
     }
