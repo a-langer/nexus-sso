@@ -5,18 +5,19 @@
 # docker rmi $(docker images -f "dangling=true" -q)
 # docker run --user=0:0 --rm -it -p 8081:8081/tcp sonatype/nexus3:3.37.3 /bin/bash
 
-ARG NEXUS_BASE_IMAGE="sonatype/nexus3:3.58.1"
+ARG NEXUS_BASE_IMAGE="sonatype/nexus3:3.61.0"
 FROM $NEXUS_BASE_IMAGE
 USER root
 
-ARG NEXUS_PLUGIN_VERSION="3.58.1-02"
+ARG NEXUS_PLUGIN_VERSION="3.61.0-02"
 ENV PLUG_VERSION="${NEXUS_PLUGIN_VERSION}"
 ENV NEXUS_PLUGINS="${NEXUS_HOME}/system"
 
-# Override nexus-bootstrap.jar
-RUN rm -rf ${NEXUS_PLUGINS}/org/sonatype/nexus/nexus-bootstrap/
-COPY nexus-bootstrap/target/nexus-bootstrap-*.jar ${NEXUS_PLUGINS}/org/sonatype/nexus/nexus-bootstrap/${PLUG_VERSION}/nexus-bootstrap-${PLUG_VERSION}.jar
-RUN chmod -R 644 ${NEXUS_PLUGINS}/org/sonatype/nexus/nexus-bootstrap/${PLUG_VERSION}/nexus-bootstrap-${PLUG_VERSION}.jar
+# Add nexus-pac4j-plugin.jar
+RUN rm -rf ${NEXUS_PLUGINS}/com/github/alanger/nexus/plugin/nexus-pac4j-plugin/
+COPY nexus-pac4j-plugin/target/nexus-pac4j-plugin-*.jar ${NEXUS_PLUGINS}/com/github/alanger/nexus/plugin/nexus-pac4j-plugin/${PLUG_VERSION}/nexus-pac4j-plugin-${PLUG_VERSION}.jar
+RUN chmod -R 644 ${NEXUS_PLUGINS}/com/github/alanger/nexus/plugin/nexus-pac4j-plugin/${PLUG_VERSION}/nexus-pac4j-plugin-${PLUG_VERSION}.jar
+RUN echo "reference\:file\:com/github/alanger/nexus/plugin/nexus-pac4j-plugin/${PLUG_VERSION}/nexus-pac4j-plugin-${PLUG_VERSION}.jar = 200" >> /opt/sonatype/nexus/etc/karaf/startup.properties
 
 # Override nexus-repository-services.jar
 RUN rm -rf ${NEXUS_PLUGINS}/org/sonatype/nexus/nexus-repository-services/
@@ -26,9 +27,9 @@ RUN chmod -R 644 ${NEXUS_PLUGINS}/org/sonatype/nexus/nexus-repository-services/$
 # Add SSO and urlrewrite configs
 COPY etc/nexus-default.properties /opt/sonatype/nexus/etc/nexus-default.properties
 COPY etc/jetty/nexus-web.xml /opt/sonatype/nexus/etc/jetty/nexus-web.xml
-COPY nexus-bootstrap/src/main/config/ /opt/sonatype/nexus/etc/sso/config/
-COPY nexus-bootstrap/src/main/groovy/ /opt/sonatype/nexus/etc/sso/script/
-COPY nexus-bootstrap/src/main/static/ /opt/sonatype/nexus/etc/sso/static/
+COPY etc/jetty/jetty-sso.xml /opt/sonatype/nexus/etc/jetty/jetty-sso.xml
+COPY nexus-pac4j-plugin/src/main/config/ /opt/sonatype/nexus/etc/sso/config/
+COPY nexus-pac4j-plugin/src/main/groovy/ /opt/sonatype/nexus/etc/sso/script/
 RUN chown nexus:nexus -R /opt/sonatype/nexus/etc/sso/
 
 ENV INSTALL4J_ADD_VM_PARAMS="-Xms512m -Xmx2048m -Djava.util.prefs.userRoot=/nexus-data/javaprefs"

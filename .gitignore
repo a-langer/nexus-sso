@@ -7,6 +7,7 @@
 nexus-public
 old
 target
+bin
 etc/orient
 etc/fabric
 etc/karaf

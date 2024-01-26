@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC '-//Jetty//Configure//EN' 'http://www.eclipse.org/jetty/configure_9_0.dtd'>
+<!-- 
+    https://support.sonatype.com/hc/en-us/articles/360014161874-How-to-Restrict-Access-to-Nexus-Repository-3-by-IP-Address 
+    https://eclipse.dev/jetty/documentation/jetty-9/index.html
+    https://eclipse.dev/jetty/javadoc/jetty-9/org/eclipse/jetty/rewrite/handler/RewriteHandler.html
+    https://eclipse.dev/jetty/javadoc/jetty-9/org/eclipse/jetty/server/handler/IPAccessHandler.html
+-->
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+
+    <!-- ======================================================================= -->
+    <!-- Configure rewrite handler https://stackoverflow.com/a/38919633/19707292 -->
+    <!-- ======================================================================= -->
+    <Call name="insertHandler">
+        <Arg>
+            <New class="org.eclipse.jetty.rewrite.handler.RewriteHandler">
+                <Set name="rewriteRequestURI">
+                    <Property name="jetty.rewrite.rewriteRequestURI" default="true" />
+                </Set>
+                <Set name="rewritePathInfo">
+                    <Property name="jetty.rewrite.rewritePathInfo" default="false" />
+                </Set>
+                <Set name="originalPathAttribute">
+                    <Property name="jetty.rewrite.originalPathAttribute" default="requestedPath" />
+                </Set>
+                <!-- Set DispatcherTypes  -->
+                <Set name="dispatcherTypes">
+                    <Array type="javax.servlet.DispatcherType">
+                        <Item>
+                            <Call class="javax.servlet.DispatcherType" name="valueOf">
+                                <Arg>REQUEST</Arg>
+                            </Call>
+                        </Item>
+                        <Item>
+                            <Call class="javax.servlet.DispatcherType" name="valueOf">
+                                <Arg>ASYNC</Arg>
+                            </Call>
+                        </Item>
+                    </Array>
+                </Set>
+                <Get id="Rewrite" name="ruleContainer" />
+                <!-- SSO logout endpoint, required only for DELETE method -->
+                <!-- <Call name="addRule">
+                    <Arg>
+                        <New class="org.eclipse.jetty.rewrite.handler.RewritePatternRule">
+                            <Set name="pattern">/service/rapture/session</Set>
+                            <Set name="replacement">/pac4jLogout</Set>
+                        </New>
+                    </Arg>
+                </Call> -->
+                <!-- SSO reload endpoint for compatibility with UrlRewriteFilter -->
+                <Call name="addRule">
+                    <Arg>
+                        <New class="org.eclipse.jetty.rewrite.handler.RewriteRegexRule">
+                            <Set name="regex">/rewrite-status.*</Set>
+                            <Set name="replacement">/service/rest/rewrite-status</Set>
+                        </New>
+                    </Arg>
+                </Call>
+            </New>
+        </Arg>
+    </Call>
+
+    <!-- Access reload endpoint https://github.com/jetty/jetty.project/issues/1072#issuecomment-258478908 -->
+    <Call name="insertHandler">
+        <Arg>
+            <New id="IPAccessHandler" class="org.eclipse.jetty.server.handler.IPAccessHandler">
+                <Set name="white">
+                    <Array type="String">
+                        <Item>127.0.0.1|/service/rest/rewrite-status</Item>
+                        <Item>127.0.0.1|/rewrite-status</Item>
+                        <Item>127.0.0.1|/service/rest/rewrite-status/*</Item>
+                        <Item>127.0.0.1|/rewrite-status/*</Item>
+                    </Array>
+                </Set>
+                <Set name="whiteListByPath">true</Set>
+            </New>
+        </Arg>
+    </Call>
+
+</Configure>

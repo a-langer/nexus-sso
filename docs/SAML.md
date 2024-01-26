@@ -4,7 +4,7 @@
 
 Description of configuration:
 
-- [sp-metadata.xml](../etc/sso/config/sp-metadata.xml) - this is the configuration of service provider (hereinafter **SP**), made specifically for the Nexus application. The only thing that may be required is to correct "**entityID**" and "**Location**" depending on the DNS name and protocol you use, endpoint will always be "**/callback?client_name=SAML2Client**". Example for DNS `myNexusDomain`:
+- [sp-metadata.xml](../nexus-pac4j-plugin/src/main/config/sp-metadata.xml) - this is the configuration of service provider (hereinafter **SP**), made specifically for the Nexus application. The only thing that may be required is to correct "**entityID**" and "**Location**" depending on the DNS name and protocol you use, endpoint will always be "**/callback?client_name=SAML2Client**". Example for DNS `myNexusDomain`:
 
     ```xml
     <md:EntityDescriptor ... entityID="http(s)://myNexusDomain/callback?client_name=SAML2Client" validUntil="2042-03-17T05:02:50.999Z">
@@ -24,7 +24,7 @@ Description of configuration:
     </md:EntityDescriptor>
     ```
 
-- The value of the attribute "**entityID**" in sp-metadata.xml should be the same as the attribute "**serviceProviderEntityId**" and "**callbackUrl**" in [shiro.ini](../etc/sso/config/shiro.ini) (also depending on the DNS name you use), ex:
+- The value of the attribute "**entityID**" in sp-metadata.xml should be the same as the attribute "**serviceProviderEntityId**" and "**callbackUrl**" in [shiro.ini](../nexus-pac4j-plugin/src/main/config/shiro.ini) (also depending on the DNS name you use), ex:
 
     ```ini
     # Same as the attribute entityID
@@ -35,7 +35,7 @@ Description of configuration:
 
     > **_NOTE:_** ADFS does not support URI parameter in entityID, remove "_?client_name=SAML2Client_" from **Client ID** in the ADFS settings, from **serviceProviderEntityId** in shiro.ini and from **entityID** in sp-metadata.xml.
 
-- [metadata.xml](../etc/sso/config/metadata.xml) - this is the configuration of the identity provider (hereinafter **IdP**), it needs to be downloaded from Okta/Keycloak/ADFS/Etc and passed into the Nexus container. Additionally, you must specify the "**SP Entity ID**/**Client ID**" and "**Single sign-on URL**/**Client SAML endpoint**" attributes in the IdP settings, whose value must match the "**entityID**" from sp-metadata.xml.
+- [metadata.xml](../nexus-pac4j-plugin/src/main/config/metadata.xml) - this is the configuration of the identity provider (hereinafter **IdP**), it needs to be downloaded from Okta/Keycloak/ADFS/Etc and passed into the Nexus container. Additionally, you must specify the "**SP Entity ID**/**Client ID**" and "**Single sign-on URL**/**Client SAML endpoint**" attributes in the IdP settings, whose value must match the "**entityID**" from sp-metadata.xml.
 - By default, "Nexus SSO" is already pre-configured for authorization through [Okta](https://www.okta.com/) with HTTP protocol on localhost (the endpoint `http://localhost/callback?client_name=SAML2Client`, see [Okta settings](./Okta-Nexus-SAML.png)). To configure authorization through another IdP-server is required:
     1. Configure new SAML client in the IdP server with DNS name for your Nexus instance and download **metadata.xml**.
     2. Replace the protocol and DNS name in **sp-metadata.xml** and **shiro.ini** (as show above).
@@ -43,7 +43,7 @@ Description of configuration:
 
 ## Attributes mapping
 
-The names of user attributes depend on the structure of the profile in IdP. User attribute mapping can be configured in [shiro.ini](../etc/sso/config/shiro.ini):
+The names of user attributes depend on the structure of the profile in IdP. User attribute mapping can be configured in [shiro.ini](../nexus-pac4j-plugin/src/main/config/shiro.ini):
 
 ```properties
 # User roles attribute (list of roles)

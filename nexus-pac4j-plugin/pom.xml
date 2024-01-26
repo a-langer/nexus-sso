@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.github.a-langer</groupId>
+        <artifactId>nexus-sso</artifactId>
+        <version>3.61.0</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <artifactId>nexus-pac4j-plugin</artifactId>
+    <packaging>bundle</packaging>
+
+    <dependencies>
+        <!-- Extention for Apache Shiro https://jitpack.io/#a-langer/shiro-ext -->
+        <dependency>
+            <groupId>com.github.a-langer</groupId>
+            <artifactId>shiro-ext</artifactId>
+            <version>e0b5923e39</version>
+        </dependency>
+        <!-- Variable interpolation for shiro.ini, see https://shiro.apache.org/configuration.html -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-configuration2</artifactId>
+            <version>2.8.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- Newer version requires JDK 11, Nexus 3 supports only JDK 8 -->
+        <dependency>
+            <groupId>io.buji</groupId>
+            <artifactId>buji-pac4j</artifactId>
+            <version>4.1.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.shiro</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- Fix NoClassDefFoundError: org/pac4j/core/redirect/RedirectActionBuilder -->
+        <dependency>
+            <groupId>org.pac4j</groupId>
+            <artifactId>pac4j-core</artifactId>
+            <version>3.9.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- Newer version requires JDK 11, Nexus 3 supports only JDK 8 -->
+        <dependency>
+            <groupId>org.pac4j</groupId>
+            <artifactId>pac4j-saml</artifactId>
+            <version>3.9.0</version>
+            <exclusions>
+                <!-- Shared libraries will be loaded from OSGI bundles -->
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-io</groupId>
+                    <artifactId>commons-io</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-collections</groupId>
+                    <artifactId>commons-collections</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-lang</groupId>
+                    <artifactId>commons-lang</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.json</groupId>
+                    <artifactId>javax.json-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.glassfish</groupId>
+                    <artifactId>javax.json</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.annotation</groupId>
+                    <artifactId>javax.annotation-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>jsr305</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>joda-time</groupId>
+                    <artifactId>joda-time</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.dropwizard.metrics</groupId>
+                    <artifactId>metrics-core</artifactId>
+                </exclusion>
+                <!-- java.lang.NoClassDefFoundError: org/apache/velocity/runtime/log/LogChute -->
+                <!-- <exclusion>
+                    <groupId>org.apache.velocity</groupId>
+                    <artifactId>velocity</artifactId>
+                </exclusion> -->
+                <!-- Provider org.opensaml.xmlsec.signature.support.impl.provider.ApacheSantuarioSignatureValidationProviderImpl could not be instantiated -->
+                <!-- <exclusion>
+                    <groupId>org.apache.santuario</groupId>
+                    <artifactId>xmlsec</artifactId>
+                </exclusion> -->
+                <!-- Not required -->
+                <exclusion>
+                    <groupId>org.ldaptive</groupId>
+                    <artifactId>ldaptive</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-entitymanager</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.hibernate.javax.persistence</groupId>
+                    <artifactId>hibernate-jpa-2.1-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-orm</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-jcl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.shibboleth.tool</groupId>
+                    <artifactId>xmlsectool</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.woodstox</groupId>
+                    <artifactId>woodstox-core</artifactId>
+                </exclusion>
+                <!-- Fix FactoryConfigurationError: Provider org.apache.xerces.jaxp.DocumentBuilderFactoryImpl not found -->
+                <exclusion>
+                    <groupId>xalan</groupId>
+                    <artifactId>xalan</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <plugins>
+            <!-- Prevent compilation of Groovy scripts -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <generatedSourcesDirectory>src/main/groovy</generatedSourcesDirectory>
+                    <excludes>
+                        <exclude>groovy/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <excludeDependencies>*;scope=provided|runtime,*;optional=true</excludeDependencies>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Embed-Transitive>true</Embed-Transitive>
+                        <Embed-Dependency>*</Embed-Dependency>
+                        <Import-Package>
+                            org.xml.sax.*,org.w3c.dom.*,javax.lang.*,javax.xml.*,javax.sql.*,javax.script.*,javax.crypto.*
+                            ,javax.security.*,javax.ws.rs.*,javax.inject.*,javax.servlet.*,javax.annotation.*
+                        </Import-Package>
+                        <DynamicImport-Package>*</DynamicImport-Package>
+                        <Export-Package>
+                            <!-- Plugin packages -->
+                            com.github.alanger.nexus.plugin.*,com.github.alanger.nexus.bootstrap.*
+                            <!-- SAML dependencies for Nexus runtime -->
+                            ,com.github.alanger.shiroext.*,org.pac4j.*,io.buji.*,org.opensaml.*
+                            ,org.apache.commons.configuration2.*,org.apache.commons.text.*
+                        </Export-Package>
+                        <Private-Package>
+                            <!-- Extract only plugin packages -->
+                            com.github.alanger.nexus.plugin.*,!*
+                        </Private-Package>
+                        <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.8))"</Require-Capability>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

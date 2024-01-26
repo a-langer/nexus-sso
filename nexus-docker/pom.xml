@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.github.a-langer</groupId>
         <artifactId>nexus-sso</artifactId>
-        <version>3.58.1</version>
+        <version>3.61.0</version>
         <relativePath>..</relativePath>
     </parent>
     <artifactId>nexus-docker</artifactId>
@@ -101,6 +101,25 @@
                                         <argument>image</argument>
                                         <argument>prune</argument>
                                         <argument>--force</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <!-- Remove build cache, use "docker system df" -->
+                            <execution>
+                                <id>docker-clean-cache</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>docker</executable>
+                                    <workingDirectory>${project.parent.basedir}</workingDirectory>
+                                    <arguments>
+                                        <argument>builder</argument>
+                                        <argument>prune</argument>
+                                        <argument>--force</argument>
+                                        <argument>--filter</argument>
+                                        <argument>"until=24"</argument>
                                     </arguments>
                                 </configuration>
                             </execution>

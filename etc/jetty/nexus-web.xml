@@ -7,65 +7,6 @@
         <listener-class>org.sonatype.nexus.bootstrap.osgi.BootstrapListener</listener-class>
     </listener>
 
-    <!-- UrlRewriteFilter for initialization Apache Shiro -->
-    <filter>
-        <filter-name>urlrewrite-filter</filter-name>
-        <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
-        <async-supported>true</async-supported>
-        <!-- <init-param>
-            <param-name>confReloadCheckInterval</param-name>
-            <param-value>6</param-value>
-        </init-param> -->
-        <!-- allow conf file to be set by calling /rewrite-endpoint/?conf=etc/sso/config/urlrewrite.xml -->
-        <init-param>
-            <param-name>allowConfSwapViaHttp</param-name>
-            <param-value>true</param-value>
-        </init-param>
-        <init-param>
-            <param-name>confPath</param-name>
-            <param-value>etc/sso/config/urlrewrite.xml</param-value>
-        </init-param>
-        <init-param>
-            <param-name>logLevel</param-name>
-            <param-value>ERROR</param-value>
-        </init-param>
-        <init-param>
-            <param-name>statusPath</param-name>
-            <param-value>/rewrite-status</param-value>
-        </init-param>
-        <init-param>
-            <param-name>statusEnabled</param-name>
-            <param-value>true</param-value>
-        </init-param>
-        <init-param>
-            <param-name>statusEnabledOnHosts</param-name>
-            <param-value>localhost, 127.0.0.1</param-value>
-        </init-param>
-    </filter>
-    <filter-mapping>
-        <filter-name>urlrewrite-filter</filter-name>
-        <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>
-        <dispatcher>FORWARD</dispatcher>
-        <dispatcher>INCLUDE</dispatcher>
-        <dispatcher>ERROR</dispatcher>
-    </filter-mapping>
-
-    <!-- Stop executing request if HTTP response is committed -->
-    <filter>
-        <filter-name>response-comitted-filter</filter-name>
-        <filter-class>com.github.alanger.shiroext.servlets.ResponseComittedFilter</filter-class>
-        <async-supported>true</async-supported>
-    </filter>
-    <filter-mapping>
-        <filter-name>response-comitted-filter</filter-name>
-        <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>
-        <dispatcher>FORWARD</dispatcher>
-        <dispatcher>INCLUDE</dispatcher>
-        <dispatcher>ERROR</dispatcher>
-    </filter-mapping>
-
     <filter>
         <filter-name>nexusFilter</filter-name>
         <filter-class>org.sonatype.nexus.bootstrap.osgi.DelegatingFilter</filter-class>
@@ -77,7 +18,7 @@
         <dispatcher>ERROR</dispatcher>
     </filter-mapping>
 
-    <!-- Moved to UrlRewriteFilter rule
+    <!-- Moved to Shiro filter
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list> -->

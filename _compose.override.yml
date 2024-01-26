@@ -10,10 +10,10 @@ services:
     volumes:
       - ${NEXUS_ETC}/logback:/opt/sonatype/nexus/etc/logback:ro
       - ${NEXUS_ETC}/jetty/nexus-web.xml:/opt/sonatype/nexus/etc/jetty/nexus-web.xml:ro
+      - ${NEXUS_ETC}/jetty/jetty-sso.xml:/opt/sonatype/nexus/etc/jetty/jetty-sso.xml:ro
       - ${NEXUS_ETC}/nexus-default.properties:/opt/sonatype/nexus/etc/nexus-default.properties:ro
-      - ./nexus-bootstrap/src/main/config:/opt/sonatype/nexus/etc/sso/config:ro
-      - ./nexus-bootstrap/src/main/static:/opt/sonatype/nexus/etc/sso/static:ro
-      - ./nexus-bootstrap/src/main/groovy:/opt/sonatype/nexus/etc/sso/script:ro
+      - ./nexus-pac4j-plugin/src/main/config:/opt/sonatype/nexus/etc/sso/config:ro
+      - ./nexus-pac4j-plugin/src/main/groovy:/opt/sonatype/nexus/etc/sso/script:ro
     ports:
       - "${NEXUS_HTTP_PORT:-8081}:8081" # Nexus: http://localhost:8081/ (remove it from production environment)
       - "${ORIENTDB_BINARY_PORT:-2424}:2424" # OrientDB: tcp://localhost:2424 (remove it from production environment)

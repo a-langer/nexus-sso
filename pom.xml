@@ -4,7 +4,7 @@
     <groupId>com.github.a-langer</groupId>
     <artifactId>nexus-sso</artifactId>
     <packaging>pom</packaging>
-    <version>3.58.1</version>
+    <version>3.61.0</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Single Sign-On patch for Nexus OSS</description>
 
@@ -22,21 +22,23 @@
 
     <!--
         mvn clean install -DskipTests
-        mvn -pl nexus-bootstrap -am clean package -DskipTests
+        mvn -pl nexus-pac4j-plugin -am clean package -DskipTests
         mvn -pl nexus-repository-services -am clean package -DskipTests
     -->
     <modules>
-        <module>nexus-bootstrap</module>
+        <module>nexus-pac4j-plugin</module>
         <module>nexus-repository-services</module>
         <module>nexus-docker</module>
     </modules>
 
     <dependencies>
-        <!-- https://github.com/sonatype/nexus-public/blob/master/components/nexus-bootstrap/pom.xml -->
+        <!-- Dependencies for code validation -->
         <dependency>
             <groupId>org.sonatype.nexus</groupId>
             <artifactId>nexus-bootstrap</artifactId>
             <version>${nexus.plugin.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
             <exclusions>
                 <exclusion>
                     <groupId>*</groupId>
@@ -44,156 +46,19 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- https://jitpack.io/#paultuckey/urlrewritefilter -->
         <dependency>
-            <groupId>com.github.paultuckey</groupId>
-            <artifactId>urlrewritefilter</artifactId>
-            <version>ae3b449c04</version>
+            <groupId>org.sonatype.nexus</groupId>
+            <artifactId>nexus-rapture</artifactId>
+            <version>${nexus.plugin.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
             <exclusions>
                 <exclusion>
-                    <groupId>*</groupId>
+                    <groupId>io.dropwizard.metrics</groupId>
                     <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- Extention for Apache Shiro https://jitpack.io/#a-langer/shiro-ext -->
-        <dependency>
-            <groupId>com.github.a-langer</groupId>
-            <artifactId>shiro-ext</artifactId>
-            <version>e0b5923e39</version>
-        </dependency>
-        <!-- Variable interpolation for shiro.ini, see https://shiro.apache.org/configuration.html -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-configuration2</artifactId>
-            <version>2.8.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-lang3</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!-- Newer version requires JDK 11, Nexus 3 supports only JDK 8 -->
-        <dependency>
-            <groupId>io.buji</groupId>
-            <artifactId>buji-pac4j</artifactId>
-            <version>4.1.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.shiro</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!-- Fix NoClassDefFoundError: org/pac4j/core/redirect/RedirectActionBuilder -->
-        <dependency>
-            <groupId>org.pac4j</groupId>
-            <artifactId>pac4j-core</artifactId>
-            <version>3.9.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!-- Newer version requires JDK 11, Nexus 3 supports only JDK 8 -->
-        <dependency>
-            <groupId>org.pac4j</groupId>
-            <artifactId>pac4j-saml</artifactId>
-            <version>3.9.0</version>
-            <exclusions>
-                <!-- Shared libraries will be loaded from OSGI bundles -->
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>commons-io</groupId>
-                    <artifactId>commons-io</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>commons-collections</groupId>
-                    <artifactId>commons-collections</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>commons-codec</groupId>
-                    <artifactId>commons-codec</artifactId>
-                </exclusion>
-                 <exclusion>
-                    <groupId>commons-lang</groupId>
-                    <artifactId>commons-lang</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.json</groupId>
-                    <artifactId>javax.json-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.glassfish</groupId>
-                    <artifactId>javax.json</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.annotation</groupId>
-                    <artifactId>javax.annotation-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.code.findbugs</groupId>
-                    <artifactId>jsr305</artifactId>
-                </exclusion>
-               <exclusion>
-                    <groupId>joda-time</groupId>
-                    <artifactId>joda-time</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.httpcomponents</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-                <!-- Not required -->
-                <exclusion>
-                    <groupId>org.ldaptive</groupId>
-                    <artifactId>ldaptive</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-entitymanager</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.hibernate.javax.persistence</groupId>
-                    <artifactId>hibernate-jpa-2.1-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-orm</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-jcl</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>net.shibboleth.tool</groupId>
-                    <artifactId>xmlsectool</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.woodstox</groupId>
-                    <artifactId>woodstox-core</artifactId>
-                </exclusion>
-                <!-- Fix FactoryConfigurationError: Provider org.apache.xerces.jaxp.DocumentBuilderFactoryImpl not found -->
-                <exclusion>
-                    <groupId>xalan</groupId>
-                    <artifactId>xalan</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!-- Dependencies for code validation -->
         <dependency>
             <groupId>com.orientechnologies</groupId>
             <artifactId>orientdb-core</artifactId>
@@ -280,6 +145,12 @@
             <version>${nexus.plugin.version}</version>
             <scope>provided</scope>
             <optional>true</optional>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.sonatype.nexus</groupId>
@@ -287,12 +158,13 @@
             <version>${nexus.plugin.version}</version>
             <scope>provided</scope>
             <optional>true</optional>
-            <exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.sonatype.nexus</groupId>
+            <artifactId>nexus-transaction</artifactId>
+            <version>${nexus.plugin.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.sonatype.nexus</groupId>
@@ -326,6 +198,31 @@
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-bundle-plugin</artifactId>
+                    <version>5.1.8</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <instructions>
+                            <Include-Resource>
+                                META-INF/sisu/javax.inject.Named=-target/classes/META-INF/sisu/javax.inject.Named
+                                ,META-INF/services/=-target/classes/services/
+                                ,static/=-target/classes/static/
+                                ,META-INF/config/=-src/main/config/
+                                ,META-INF/groovy/=-src/main/groovy/
+                            </Include-Resource>
+                            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                            <Import-Package>*</Import-Package>
+                            <DynamicImport-Package>*</DynamicImport-Package>
+                            <Embed-Dependency></Embed-Dependency>
+                        </instructions>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -17,6 +17,11 @@
     </encoder>
   </appender>
 
+  <appender name="jvm" class="ch.qos.logback.core.FileAppender">
+    <File>${karaf.data}/log/jvm.log</File>
+    <append>true</append>
+  </appender>
+
   <appender name="logfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <File>${karaf.data}/log/nexus.log</File>
     <Append>true</Append>
@@ -59,6 +64,42 @@
     </sift>
   </appender>
 
+  <appender name="replicationlogfile" class="ch.qos.logback.classic.sift.SiftingAppender">
+    <filter class="org.sonatype.nexus.pax.logging.ReplicationLogsFilter" />
+    <discriminator>
+      <key>repositoryName</key>
+      <defaultValue>unknown</defaultValue>
+    </discriminator>
+    <sift>
+      <appender name="replicationAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${karaf.data}/log/replication/replication-${repositoryName}.log</file>
+        <encoder class="org.sonatype.nexus.pax.logging.NexusLayoutEncoder">
+          <pattern>%d{"yyyy-MM-dd HH:mm:ss,SSSZ"} %-5p [%thread] %node %mdc{userId:-*SYSTEM} %c - %m%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+          <fileNamePattern>${karaf.data}/log/replication/replication-${repositoryName}-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+          <maxHistory>90</maxHistory>
+        </rollingPolicy>
+      </appender>
+    </sift>
+  </appender>
+
+  <appender name="outboundRequestslogfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <File>${karaf.data}/log/outbound-request.log</File>
+    <Append>true</Append>
+    <encoder>
+      <pattern>%msg%n</pattern>
+    </encoder>
+    <filter class="org.sonatype.nexus.pax.logging.OutboundRequestsLogFilter" />
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${karaf.data}/log/outbound-request-%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+      <maxHistory>90</maxHistory>
+    </rollingPolicy>
+  </appender>
+  <logger name="outboundRequests">
+    <appender-ref ref="outboundRequestslogfile"/>
+  </logger>
+
   <appender name="auditlogfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <File>${karaf.data}/log/audit/audit.log</File>
     <Append>true</Append>
@@ -78,7 +119,7 @@
 
   <appender name="blobstore-reconciliation-log-file" class="ch.qos.logback.classic.sift.SiftingAppender">
     <discriminator>
-      <key>blobstore</key>
+      <key>blobstore-reconciliation-path</key>
       <defaultValue>unknown</defaultValue>
     </discriminator>
     <sift>
@@ -87,7 +128,7 @@
           <Pattern>%d{"yyyy-MM-dd HH:mm:ss"},%msg%n</Pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-          <fileNamePattern>${karaf.data}/log/blobstore/${blobstore}/%d</fileNamePattern>
+          <fileNamePattern>${blobstore-reconciliation-path}/%d</fileNamePattern>
           <maxHistory>90</maxHistory>
         </rollingPolicy>
       </appender>
@@ -106,25 +147,48 @@
   <logger name="org.apache.felix" level="WARN"/>
   <logger name="org.apache.karaf" level="WARN"/>
 
-  <!-- SAML: init log level -->
-  <logger name="org.tuckey.web.filters" level="INFO" />
   <!-- Set TRACE for Groovy scripts hot-reload -->
-  <logger name="com.github.alanger.shiroext.servlets.ScriptProcessedServlet" level="INFO" />
+  <logger name="com.github.alanger.nexus.plugin.Init" level="TRACE" />
+  <!-- <logger name="com.github.alanger.nexus.plugin.realm.NexusPac4jRealm" level="TRACE" /> -->
+  <!-- <logger name="com.github.alanger.nexus.plugin.realm.NexusTokenRealm" level="TRACE" /> -->
   <logger name="com.github.alanger.nexus.bootstrap.Main" level="INFO" />
-  <logger name="com.github.alanger.nexus.bootstrap.ReloadCongiguration" level="INFO" />
-  <logger name="com.github.alanger.nexus.bootstrap.Pac4jAuthenticationListener" level="INFO" />
-  <logger name="com.github.alanger.nexus.bootstrap.DockerExtdirectFilter" level="INFO" />
-  <logger name="com.github.alanger.nexus.bootstrap.DebugFilter" level="DEBUG" />
+  <!-- <logger name="com.github.alanger.nexus.bootstrap.ReloadCongiguration" level="TRACE" /> -->
+  <!-- <logger name="com.github.alanger.nexus.bootstrap.Pac4jAuthenticationListener" level="TRACE" /> -->
+  <!-- <logger name="com.github.alanger.nexus.bootstrap.DockerExtdirectFilter" level="TRACE" /> -->
+  <!-- <logger name="com.github.alanger.nexus.bootstrap.DebugFilter" level="DEBUG" /> -->
+  <!-- <logger name="com.github.alanger.nexus.bootstrap.EchoRealm" level="TRACE" /> -->
   <!-- <logger name="com.github.alanger.nexus.bootstrap.QuotaFilter" level="TRACE" /> -->
-  <!-- <logger name="com.github.alanger.shiroext.realm.jdbc.JdbcRealmName" level="INFO" /> -->
-  <!-- <logger name="io.buji.pac4j.filter.SecurityFilter" level="TRACE" /> -->
-  <!-- <logger name="org.pac4j.saml.client" level="DEBUG" /> -->
-  <!-- <logger name="org.opensaml.saml.metadata.resolver" level="DEBUG" /> -->
 
+  <!-- SAML debug -->
+  <!-- <logger name="io.buji.pac4j.filter.SecurityFilter" level="TRACE" /> -->
+  <!-- <logger name="io.buji.pac4j.filter.CallbackFilter" level="TRACE" /> -->
+  <!-- <logger name="org.pac4j.saml.client" level="DEBUG" /> -->
+  <!-- <logger name="org.pac4j.core.client" level="TRACE" /> -->
+  <!-- <logger name="org.pac4j.saml.crypto" level="TRACE" /> -->
+  <!-- <logger name="org.opensaml.saml" level="TRACE" /> -->
+  <!-- <logger name="org.opensaml.xmlsec" level="TRACE" /> -->
+  <!-- <logger name="org.opensaml.security" level="TRACE" />  -->
+
+  <!-- DI debug -->
+  <!-- <logger name="com.google.inject" level="TRACE" /> -->
+  <!-- <logger name="org.eclipse.sisu.inject" level="TRACE" /> -->
+  <!-- <logger name="org.sonatype.nexus.siesta" level="TRACE" /> -->
+  <!-- <logger name="org.sonatype.nexus.security" level="TRACE" /> -->
+
+  <!-- User Token debug -->
+  <!-- <logger name="org.pac4j.saml" level="TRACE" /> -->
+  <!-- <logger name="org.sonatype.nexus.extdirect.internal.ExtDirectExceptionHandler" level="OFF" /> -->
+  <!-- <logger name="com.sonatype.nexus.repository.nuget.internal.rest.NugetApiKeyResource" level="TRACE" /> -->
+  <!-- <logger name="org.sonatype.nexus.internal.security.apikey.ApiKeyStoreImpl" level="TRACE" /> -->
+  <!-- <logger name="org.sonatype.nexus.internal.security.apikey.OrientApiKeyEntityAdapter" level="TRACE" /> -->
+  <!-- <logger name="org.sonatype.nexus.internal.security.apikey.orient.OrientApiKeyStore" level="TRACE" /> -->
+  <!-- <logger name="com.sonatype.nexus.repository.nuget" level="TRACE" /> -->
+  <!-- <logger name="com.github.alanger.nexus.plugin.rest.NugetApiKeyResource" level="TRACE" /> -->
   <!-- <logger name="org.sonatype.nexus.security.authc.FirstSuccessfulModularRealmAuthenticator" level="TRACE" /> -->
   <!-- <logger name="org.sonatype.nexus.security.token.BearerTokenRealm" level="TRACE" /> -->
   <!-- <logger name="org.sonatype.nexus.repository.docker.internal.security.DockerTokenRealm" level="TRACE" /> -->
 
+  <!-- Startup progress log -->
   <logger name="org.sonatype.nexus.bootstrap" level="INFO" />
   <logger name="org.sonatype.nexus.extender.NexusLifecycleManager" level="INFO" />
   <logger name="org.sonatype.nexus.extender.NexusContextListener" level="INFO" />
@@ -138,9 +202,11 @@
   <root level="${root.level:-ERROR}">
     <appender-ref ref="osgi"/>
     <appender-ref ref="console"/>
+    <appender-ref ref="jvm"/>
     <appender-ref ref="logfile"/>
     <appender-ref ref="clusterlogfile"/>
     <appender-ref ref="tasklogfile"/>
+    <appender-ref ref="replicationlogfile"/>
     <appender-ref ref="metrics"/>
   </root>
 </configuration>

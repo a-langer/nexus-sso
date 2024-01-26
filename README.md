@@ -2,7 +2,7 @@
 
 [![license](https://img.shields.io/badge/license-EPL1-brightgreen.svg)](https://github.com/a-langer/nexus-sso/blob/main/LICENSE "License of source code")
 [![image](https://ghcr-badge.deta.dev/a-langer/nexus-sso/latest_tag?trim=major&label=latest)][0]
-[![image-size](https://ghcr-badge.deta.dev/a-langer/nexus-sso/size?tag=3.58.1)][0]
+[![image-size](https://ghcr-badge.deta.dev/a-langer/nexus-sso/size?tag=3.61.0)][0]
 [![JitPack](https://jitpack.io/v/a-langer/nexus-sso.svg)][1]
 
 Patch for [Nexus OSS][2] with authorization via [SSO][9] and [tokens][10]. By default this features available only in PRO version ([see comparison][5]), but this patch provides them an alternative implementation without violating the license.
@@ -23,19 +23,19 @@ Solution implement as Docker [container][0] (based on [official image][3] with S
 
 ## Supported features and examples of usage
 
+> **Note**: Since version `3.61.0` for SSO and User Tokens, it is enough to have three realms: "**Local Authenticating Realm**", "**SSO Pac4j Realm**" and "**SSO Token Realm**". Other realms are not required and may lead to conflicts.
+
 List of features this patch adds:
 
-* **SAML/SSO** - authentication via Single Sign-On (SSO) using a SAML identity provider such as [Keycloak][12], [Okta][13], [ADFS][14] and others. Nexus uses access system based on [Apache Shiro][6], this patch extends it with a [Pac4j][8] and [buji-pac4j][7] libraries, which can be configured with [shiro.ini](./etc/sso/config/shiro.ini) (see [SAML.md](./docs/SAML.md) and documentation of Apache Shiro and Pac4j for more detail informations). SSO users are created as internal Nexus accounts the first time they sign-in and are updated every next time. Example of usage SSO:
+* **SAML/SSO** - authentication via Single Sign-On (SSO) using a SAML identity provider such as [Keycloak][12], [Okta][13], [ADFS][14] and others. Nexus uses access system based on [Apache Shiro][6], this patch extends it with a [Pac4j][8] and [buji-pac4j][7] libraries, which can be configured with [shiro.ini](./nexus-pac4j-plugin/src/main/config/shiro.ini) (see [SAML.md](./docs/SAML.md) and documentation of Apache Shiro and Pac4j for more detail informations). SSO users are created as internal Nexus accounts the first time they sign-in and are updated every next time. Example of usage SSO:
+  * Enable "**SSO Pac4j Realm**" in the server administration panel.
   * Go to menu "Sign in", press to button "Sign in with SSO".
   * You will be redirected to the login page of identity provider.
   * Type you credentials (login, password, 2FA, etc.).
   * You will be redirected to the main page of Nexus, roles and permissions will be mapped with your account as configured.
 
-* **User Auth Tokens** - are applied when security policies do not allow the users password to be used, such as for storing in plain text (in settings Docker, Maven and etc.) or combined with **SAML/SSO**. Each user can set a personal token that can be used instead of a password. The creation of tokens is implemented through the "NuGet API Key" menu (privilegies `nx-apikey-all` required), however, the tokens themselves apply to all types of repositories.
-
-  > **Note**: For SSO and user tokens, it is enough to have two realms: "Local Authenticating Realm" and "Local Authorizing Realm". Other realms are not required and may lead to conflicts.
-
-  Example of usage user token:
+* **User Auth Tokens** - are applied when security policies do not allow the users password to be used, such as for storing in plain text (in settings Docker, Maven and etc.) or combined with **SAML/SSO**. Each user can set a personal token that can be used instead of a password. The creation of tokens is implemented through the "NuGet API Key" menu (privilegies `nx-apikey-all` required), however, the tokens themselves apply to all types of repositories. Example of usage user token:
+  * Enable "**SSO Token Realm**" in the server administration panel.
   * Go to menu "Nexus -> Manage your user account -> NuGet API Key", press "Access API key".
   * Type your **username** if using SSO login, otherwise type password, then press "Authenticate".
   * Copy "Your NuGet API Key", press "Close" and "Sign out".
@@ -90,14 +90,14 @@ List of features this patch adds:
 ## Additional settings (tips and tricks)
 
 * [Docker compose](./compose.yml) configuration may be extended with [compose.override.yml](./_compose.override_prod.yml) (for example, pass additional files to the container).
-* SAML/SSO authentication may be configured with environment variables in [.env](./.env) file, for more flexible settings, can make changes directly to [shiro.ini](./etc/sso/config/shiro.ini) ([variable interpolation][16] supported). However, this also requires that the configuration files of service provider (ex., [sp-metadata.xml](./etc/sso/config/sp-metadata.xml)) and identity provider (ex., [metadata-okta.xml](./etc/sso/config/metadata.xml) or [metadata-keycloak.xml](./etc/sso/config/metadata-keycloak.xml)) will be passed to the container. Examples of creating SAML configurations see in "[Keycloak SAML integration with Nexus application][15]" (except "Configure Sonatype Platform", instead follow [SAML.md](./docs/SAML.md)).
+* SAML/SSO authentication may be configured with environment variables in [.env](./.env) file, for more flexible settings, can make changes directly to [shiro.ini](./nexus-pac4j-plugin/src/main/config/shiro.ini) ([variable interpolation][16] supported). However, this also requires that the configuration files of service provider (ex., [sp-metadata.xml](./nexus-pac4j-plugin/src/main/config/sp-metadata.xml)) and identity provider (ex., [metadata-okta.xml](./nexus-pac4j-plugin/src/main/config/metadata.xml) or [metadata-keycloak.xml](./nexus-pac4j-plugin/src/main/config/metadata-keycloak.xml)) will be passed to the container. Examples of creating SAML configurations see in "[Keycloak SAML integration with Nexus application][15]" (except "Configure Sonatype Platform", instead follow [SAML.md](./docs/SAML.md)).
 * Nginx SSL is pre-configured, to enable it, need copy file [_ssl.conf](./etc/nginx/_ssl.conf) to `ssl.conf` and pass to directory `${NEXUS_ETC}/nginx/tls/` two files:
   * `site.crt` - PEM certificate of domain name.
   * `site.key` - key for certificate.
-* [UrlRewriteFilter][17] is used to route HTTP requests within the application and can be further configured using [urlrewrite.xml](./etc/sso/config/urlrewrite.xml) (for example override or protect API endpoint). Status of UrlRewriteFilter available in `http://localhost:8081/rewrite-status`. Also it supports hot-reload, to apply the any settings without restarting the container, run the command:
+* [Jetty Rewrite Handler][17] is used to route HTTP requests within the application and can be further configured using [jetty-sso.xml](./etc/jetty/jetty-sso.xml) (for example override or protect API endpoint). Also it supports hot-reload, to apply the any settings of plugin without restarting the container, run the command:
 
   ```bash
-  docker compose exec -- nexus curl -sSfkI http://localhost:8081/rewrite-status/?conf=etc/sso/config/urlrewrite.xml
+  docker compose exec -- nexus curl -k http://localhost:8081/rewrite-status
   ```
 
   > **Note**: Hot-reload not working for environment variables defined in [.env](./.env), this changes take effect only after the container is restarted.
@@ -158,6 +158,6 @@ Need installed Maven and Docker with [Compose][4] and [BuildKit][4.1] plugins:
 [14]: https://docs.microsoft.com/en-us/power-apps/maker/portals/configure/configure-saml2-settings "ADFS SAML"
 [15]: https://support.sonatype.com/hc/en-us/articles/1500000976522-Keycloak-SAML-integration-with-Nexus-Applications "Keycloak-SAML + Nexus"
 [16]: https://commons.apache.org/proper/commons-configuration/userguide/howto_basicfeatures.html "Variable interpolation"
-[17]: https://tuckey.org/urlrewrite/manual/4.0/index.html "Url Rewrite Filter"
+[17]: https://eclipse.dev/jetty/documentation/jetty-9/index.html "Jetty Rewrite Handler"
 [18]: https://gist.github.com/abdennour/74c5de79e57a47f3351217d674238da8?permalink_comment_id=4188452#gistcomment-4188452 "Nginx for Docker registry"
 [19]: https://github.com/sonatype/nexus-public/releases "Nexus release notes"
