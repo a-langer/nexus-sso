@@ -40,12 +40,7 @@ List of features this patch adds:
   * Type your **username** if using SSO login, otherwise type password, then press "Authenticate".
   * Copy "Your NuGet API Key", press "Close" and "Sign out".
   * To validate a token: press "Sign in", type your username and token instead of password.
-  * Also, a pair of username+token can be used for authorization in Maven, Docker, Pip, etc., example for HTTP api:
-
-      ```bash
-      # Authorization header for basic:
-      Basic <login:token in base64>
-      ```
+  * Also, a pair of username+token can be used for authorization in Maven, Docker, Pip, etc., example for HTTP basic authorization - `Authorization: Basic <login:token in base64>`.
 
 * **Docker Repository Reverse Proxy** - this [Nginx configuration](./etc/nginx/docker_location.conf) implements a proxy strategy to use Docker registries without additional ports or hostnames (while the [official documentation][11] only suggests two proxy strategies: "Port Mapping" and "Host Mapping"). To apply the proxy strategy, required pre-configuration of Nexus (see [gistcomment-4188452][18]):
   * After deployment, three Docker registries need to be created:
