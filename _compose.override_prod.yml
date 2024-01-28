@@ -4,15 +4,22 @@ version: "3.9"
 # export NEXUS_USER=$(id -u) NEXUS_GROUP=$(id -g)
 # export NEXUS_ETC="./etc_prod" NEXUS_DATA="./data_prod"
 
-## 2. Prepare directories and config templates, ex.:
-# mkdir ${NEXUS_ETC} ${NEXUS_DATA}
+## 2. Prepare Docker production configuration, ex.:
+# cp ./_compose.override_prod.yml ./compose.override.yml
+# cp ./.env ./.env_prod
+# sed -i "s/NEXUS_USER=.*/NEXUS_USER=\"${NEXUS_USER}\"/" ./.env_prod
+# sed -i "s/NEXUS_GROUP=.*/NEXUS_GROUP=\"${NEXUS_GROUP}\"/" ./.env_prod
+# sed -i "s|NEXUS_ETC=.*|NEXUS_ETC=\"${NEXUS_ETC}\"|" ./.env_prod
+# sed -i "s|NEXUS_DATA=.*|NEXUS_DATA=\"${NEXUS_DATA}\"|" ./.env_prod
+
+## 3. Prepare Nexus directories and configuration templates, ex.:
+# mkdir -p ${NEXUS_ETC}/sso/config/ ${NEXUS_DATA}
 # cp -rf ./etc/* ${NEXUS_ETC}/
-# cp -rf ./nexus-bootstrap/src/main/config/* ${NEXUS_ETC}/sso/config/
-# mkdir -p ${NEXUS_ETC}/sso/config/ && cp ./nexus-bootstrap/src/main/config/* "$_"
+# cp -rf ./nexus-pac4j-plugin/src/main/config/* ${NEXUS_ETC}/sso/config/
 
-## 3. Modify shiro.ini, metadata.xml and sp-metadata.xml, see docs/SAML.md.
+## 4. Modify shiro.ini, metadata.xml and sp-metadata.xml, see docs/SAML.md.
 
-## 4. Change these settings for your production environment, ex.:
+## 5. Change these settings for your production environment, ex.:
 services:
   nexus:
     volumes:
@@ -20,6 +27,8 @@ services:
       - ${NEXUS_ETC}/sso/config/shiro.ini:/opt/sonatype/nexus/etc/sso/config/shiro.ini:ro
       - ${NEXUS_ETC}/sso/config/metadata.xml:/opt/sonatype/nexus/etc/sso/config/metadata.xml:ro
       - ${NEXUS_ETC}/sso/config/sp-metadata.xml:/opt/sonatype/nexus/etc/sso/config/sp-metadata.xml:ro
+    env_file:
+      - .env_prod
 
   nginx:
     volumes:
@@ -28,3 +37,5 @@ services:
       # Pass the site certificate and key to container
       - ${NEXUS_ETC}/nginx/tls/mysite.crt:/etc/nginx/tls/site.crt:ro
       - ${NEXUS_ETC}/nginx/tls/mysite.key:/etc/nginx/tls/site.key:ro
+    env_file:
+      - .env_prod
