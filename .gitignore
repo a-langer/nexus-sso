@@ -24,6 +24,7 @@ compose.override.yml
 *\.png
 *\.crt
 *\.key
+ssl.conf
 *Debug\.java
 * copy*
 * - Copy*
