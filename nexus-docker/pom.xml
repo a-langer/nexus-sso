@@ -119,7 +119,7 @@
                                         <argument>prune</argument>
                                         <argument>--force</argument>
                                         <argument>--filter</argument>
-                                        <argument>"until=24"</argument>
+                                        <argument>until=24h</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
