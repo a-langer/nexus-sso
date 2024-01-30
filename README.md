@@ -28,8 +28,8 @@ Solution implement as Docker [container][0] (based on [official image][3] with S
 List of features this patch adds:
 
 * **SAML/SSO** - authentication via Single Sign-On (SSO) using a SAML identity provider such as [Keycloak][12], [Okta][13], [ADFS][14] and others. Nexus uses access system based on [Apache Shiro][6], this patch extends it with a [Pac4j][8] and [buji-pac4j][7] libraries, which can be configured with [shiro.ini](./nexus-pac4j-plugin/src/main/config/shiro.ini) (see [SAML.md](./docs/SAML.md) and documentation of Apache Shiro and Pac4j for more detail informations). SSO users are created as internal Nexus accounts the first time they sign-in and are updated every next time. Example of usage SSO:
-  * Enable "**SSO Pac4j Realm**" in the server administration panel.
-  * Go to menu "Sign in", press to button "Sign in with SSO".
+  * Enable "**SSO Pac4j Realm**" in the server administration panel and sign out.
+  * Reload page, go to menu "Sign in", press to button "Sign in with SSO".
   * You will be redirected to the login page of identity provider.
   * Type you credentials (login, password, 2FA, etc.).
   * You will be redirected to the main page of Nexus, roles and permissions will be mapped with your account as configured.
@@ -145,9 +145,9 @@ Need installed Maven and Docker with [Compose][4] and [BuildKit][4.1] plugins:
 [6]: https://shiro.apache.org/web.html "Shiro security framework"
 [7]: https://github.com/bujiio/buji-pac4j "Bridge from Pac4j to Shiro"
 [8]: https://www.pac4j.org/docs/clients/saml.html "Pac4j security framework"
-[9]: https://help.sonatype.com/repomanager3/nexus-repository-administration/user-authentication/saml "Nexus PRO SAML"
-[10]: https://help.sonatype.com/repomanager3/nexus-repository-administration/user-authentication/security-setup-with-user-tokens "Nexus PRO tokens"
-[11]: https://help.sonatype.com/repomanager3/nexus-repository-administration/formats/docker-registry/docker-repository-reverse-proxy-strategies "Docker reverse proxy"
+[9]: https://help.sonatype.com/en/saml.html "Nexus PRO SAML"
+[10]: https://help.sonatype.com/en/user-tokens.html "Nexus PRO tokens"
+[11]: https://help.sonatype.com/en/docker-repository-reverse-proxy-strategies.html "Docker reverse proxy"
 [12]: https://www.keycloak.org/docs/latest/server_admin/#assembly-managing-clients_server_administration_guide "Keycloak SAML"
 [13]: https://developer.okta.com/docs/concepts/saml/#enabling-saml-for-everyone-vs-a-subset-of-users "Okta SAML"
 [14]: https://docs.microsoft.com/en-us/power-apps/maker/portals/configure/configure-saml2-settings "ADFS SAML"
