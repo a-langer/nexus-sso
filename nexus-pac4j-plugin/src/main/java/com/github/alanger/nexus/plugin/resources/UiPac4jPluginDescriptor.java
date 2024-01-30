@@ -6,6 +6,8 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.sonatype.nexus.common.app.BaseUrlHolder;
 import org.sonatype.nexus.common.template.TemplateHelper;
 import org.sonatype.nexus.common.template.TemplateParameters;
@@ -13,8 +15,7 @@ import org.sonatype.nexus.ui.UiPluginDescriptorSupport;
 import org.sonatype.nexus.webresources.GeneratedWebResource;
 import org.sonatype.nexus.webresources.WebResource;
 import org.sonatype.nexus.webresources.WebResourceBundle;
-
-
+import com.github.alanger.nexus.plugin.realm.NexusPac4jRealm;
 import java.io.IOException;
 import java.net.URL;
 
@@ -35,6 +36,7 @@ public class UiPac4jPluginDescriptor extends UiPluginDescriptorSupport implement
     public static final String HEADER_PANEL_LOGO_TEXT = "Header_Panel_Logo_Text";
     public static final String SIGNIN_MODAL_DIALOG_HTML = "SignIn_Modal_Dialog_Html";
     public static final String SIGNIN_MODAL_DIALOG_TOOLTIP = "SignIn_Modal_Dialog_Tooltip";
+    public static final String SIGNIN_SSO_ENABLED = "SignIn_SSO_Enabled";
     public static final String AUTHENTICATE_MODAL_DIALOG_MESSAGE = "Authenticate_Modal_Dialog_Message";
 
     private String headerPanelLogoText = "Nexus OSS";
@@ -49,6 +51,7 @@ public class UiPac4jPluginDescriptor extends UiPluginDescriptorSupport implement
     private final List<String> scripts;
     private final String scriptLocation;
     private final TemplateHelper templateHelper;
+    private final DefaultWebSecurityManager securityManager;
 
     @Inject
     public UiPac4jPluginDescriptor(@Named("${nexus.sso.script.location:-" + NAME + ".vm.js}") final String location,
@@ -57,6 +60,7 @@ public class UiPac4jPluginDescriptor extends UiPluginDescriptorSupport implement
         scripts = asList(PATH);
         this.scriptLocation = location;
         this.templateHelper = checkNotNull(templateHelper);
+        this.securityManager = (DefaultWebSecurityManager) SecurityUtils.getSecurityManager();
     }
 
     @Nullable
@@ -103,6 +107,7 @@ public class UiPac4jPluginDescriptor extends UiPluginDescriptorSupport implement
                         .set(HEADER_PANEL_LOGO_TEXT, headerPanelLogoText) //
                         .set(SIGNIN_MODAL_DIALOG_HTML, signinModalDialogHtml) //
                         .set(SIGNIN_MODAL_DIALOG_TOOLTIP, signinModalDialogTooltip) //
+                        .set(SIGNIN_SSO_ENABLED, isSsoEnabled()) //
                         .set(AUTHENTICATE_MODAL_DIALOG_MESSAGE, authenticateModalDialogMessage) //
                 );
             }
@@ -127,6 +132,15 @@ public class UiPac4jPluginDescriptor extends UiPluginDescriptorSupport implement
     public void setAuthenticateModalDialogMessage(String authenticateModalDialogMessage) {
         if (authenticateModalDialogMessage != null && !authenticateModalDialogMessage.isEmpty())
             this.authenticateModalDialogMessage = authenticateModalDialogMessage;
+    }
+
+    private boolean isSsoEnabled() {
+        try {
+            return this.securityManager.getRealms().stream().anyMatch(r -> r != null && r.getName().equals(NexusPac4jRealm.NAME));
+        } catch (NullPointerException e) {
+            log.trace("isSsoEnabled error", e);
+            return false;
+        }
     }
 
 }

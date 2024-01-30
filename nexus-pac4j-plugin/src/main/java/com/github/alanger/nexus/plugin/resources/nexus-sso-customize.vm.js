@@ -3,6 +3,7 @@
 // Header_Panel_Logo_Text: "$Header_Panel_Logo_Text"
 // SignIn_Modal_Dialog_Html: "$SignIn_Modal_Dialog_Html"
 // SignIn_Modal_Dialog_Tooltip: "$SignIn_Modal_Dialog_Tooltip"
+// SignIn_SSO_Enabled: "$SignIn_SSO_Enabled"
 // Authenticate_Modal_Dialog_Message: "$Authenticate_Modal_Dialog_Message"
 
 // Wait all plugins
@@ -12,13 +13,16 @@ var checkExist = setInterval(function () {
   // console.log("! checkExist done: " + done);
   if (done) {
     clearInterval(checkExist);
-    init();
+    initHeader();
+    if ($SignIn_SSO_Enabled || false) {
+      initLoginDialog();
+      initApiKeyDialog();
+    }
   }
 }, 10);
 
-// Initialize SSO UI
-function init() {
-  console.log("Initializing pac4j UI");
+function initHeader() {
+  console.log("SSO Header");
   // Header text, see components/nexus-rapture/src/main/resources/static/rapture/NX/app/PluginStrings.js
   Ext.define("NX.app.PluginStrings", {
     "@aggregate_priority": 90,
@@ -30,7 +34,10 @@ function init() {
   }, function (a) {
     NX.I18n.register(a)
   });
+}
 
+function initLoginDialog() {
+  console.log("SSO Login dialog");
   // Login dialog
   Ext.define("NX.view.SignIn", {
     extend: "NX.view.ModalDialog",
@@ -123,7 +130,10 @@ function init() {
       }
     }
   });
+}
 
+function initApiKeyDialog() {
+  console.log("SSO Api key dialog");
   // Api key dialog (Accessing NuGet API Key)
   Ext.define("NX.view.Authenticate", {
     extend: "NX.view.ModalDialog",
