@@ -45,7 +45,7 @@ public class NexusPac4jRealm extends Pac4jRealmName {
         // Needed to request an API token
         setAuthenticationTokenClass(RememberMeAuthenticationToken.class);
 
-        logger.error("NexusPac4jRealm: {}, orient: {}", this, orient);
+        logger.trace("NexusPac4jRealm: {}, orient: {}", this, orient);
     }
 
     @Override
