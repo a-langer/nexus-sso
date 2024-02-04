@@ -5,11 +5,11 @@
 # docker rmi $(docker images -f "dangling=true" -q)
 # docker run --user=0:0 --rm -it -p 8081:8081/tcp sonatype/nexus3:3.37.3 /bin/bash
 
-ARG NEXUS_BASE_IMAGE="sonatype/nexus3:3.61.0"
+ARG NEXUS_BASE_IMAGE="sonatype/nexus3:3.62.0"
 FROM $NEXUS_BASE_IMAGE
 USER root
 
-ARG NEXUS_PLUGIN_VERSION="3.61.0-02"
+ARG NEXUS_PLUGIN_VERSION="3.62.0-01"
 ENV PLUG_VERSION="${NEXUS_PLUGIN_VERSION}"
 ENV NEXUS_PLUGINS="${NEXUS_HOME}/system"
 

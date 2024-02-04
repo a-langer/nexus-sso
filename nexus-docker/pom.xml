@@ -7,11 +7,16 @@
     <parent>
         <groupId>com.github.a-langer</groupId>
         <artifactId>nexus-sso</artifactId>
-        <version>3.61.0</version>
+        <version>3.62.0</version>
         <relativePath>..</relativePath>
     </parent>
     <artifactId>nexus-docker</artifactId>
     <packaging>pom</packaging>
+
+    <properties>
+        <nexus.base.image>sonatype/nexus3:${nexus.base.version}</nexus.base.image>
+        <docker.image>ghcr.io/a-langer/nexus-sso:${project.version}</docker.image>
+    </properties>
 
     <profiles>
         <!--
