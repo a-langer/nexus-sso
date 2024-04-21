@@ -23,8 +23,8 @@ public class OrientConnection {
 
     // Nexus jdbc data source
     private static final String CONNECTION_STR = "plocal:/nexus-data/db/security";
-    private static final String CREATE_API_KEY_PROPERTY = "CREATE PROPERTY api_key.created IF NOT EXISTS DATETIME (MANDATORY TRUE)";
-    private static final String ALTER_API_KEY_PROPERTY = "ALTER PROPERTY api_key.created DEFAULT \"sysdate()\"";
+    // private static final String CREATE_API_KEY_PROPERTY = "CREATE PROPERTY api_key.created IF NOT EXISTS DATETIME (MANDATORY TRUE)";
+    // private static final String ALTER_API_KEY_PROPERTY = "ALTER PROPERTY api_key.created DEFAULT \"sysdate()\"";
     private static final String REALM_NAMES_QUERY = "select realm_names from realm";
 
     private final AttributeMapper securityJdbcInfo = new AttributeMapper();

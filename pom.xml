@@ -4,7 +4,7 @@
     <groupId>com.github.a-langer</groupId>
     <artifactId>nexus-sso</artifactId>
     <packaging>pom</packaging>
-    <version>3.62.0</version>
+    <version>3.67.1</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Single Sign-On patch for Nexus OSS</description>
 
@@ -48,6 +48,7 @@
             <groupId>org.sonatype.nexus</groupId>
             <artifactId>nexus-rapture</artifactId>
             <version>${nexus.plugin.version}</version>
+            <type>pom</type>
             <scope>provided</scope>
             <optional>true</optional>
             <exclusions>
@@ -87,13 +88,6 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>2.4.17</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>

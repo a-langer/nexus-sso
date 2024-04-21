@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.github.a-langer</groupId>
         <artifactId>nexus-sso</artifactId>
-        <version>3.62.0</version>
+        <version>3.67.1</version>
         <relativePath>..</relativePath>
     </parent>
     <artifactId>nexus-docker</artifactId>
@@ -16,6 +16,7 @@
     <properties>
         <nexus.base.image>sonatype/nexus3:${nexus.base.version}</nexus.base.image>
         <docker.image>ghcr.io/a-langer/nexus-sso:${project.version}</docker.image>
+        <ansiblegalaxy.version>0.3.0</ansiblegalaxy.version>
     </properties>
 
     <profiles>
@@ -27,6 +28,37 @@
             <id>buildImage</id>
             <build>
                 <plugins>
+                    <!--
+                        A Nexus Repository 3 plugin that allows usage of Ansible Galaxy repositories. 
+                        https://github.com/l3ender/nexus-repository-ansiblegalaxy
+                        https://jitpack.io/#l3ender/nexus-repository-ansiblegalaxy 
+                        mvn dependency:copy -PbuildImage 
+                    -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-ansiblegalaxy-plugin</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.github.l3ender.nexus-repository-ansiblegalaxy</groupId>
+                                    <artifactId>nexus-repository-ansiblegalaxy</artifactId>
+                                    <version>${ansiblegalaxy.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-antrun-plugin</artifactId>
@@ -59,6 +91,11 @@
                                         <replaceregexp file="${maven.multiModuleProjectDirectory}/README.md" byline="true"
                                             match=".*/a-langer/nexus-sso/size\?tag=(.*)"
                                             replace='[![image-size](https://ghcr-badge.deta.dev/a-langer/nexus-sso/size?tag=${project.version})][0]' />
+
+                                        <echo>Set ANSIBLEGALAXY_VERSION="${ansiblegalaxy.version}" to Dockerfile</echo>
+                                        <replaceregexp file="${maven.multiModuleProjectDirectory}/Dockerfile" byline="true"
+                                            match="ARG ANSIBLEGALAXY_VERSION=(.*)"
+                                            replace='ARG ANSIBLEGALAXY_VERSION="${ansiblegalaxy.version}"' />
                                     </target>
                                 </configuration>
                             </execution>
@@ -85,6 +122,8 @@
                                         <argument>NEXUS_BASE_IMAGE=${nexus.base.image}</argument>
                                         <argument>--build-arg</argument>
                                         <argument>NEXUS_PLUGIN_VERSION=${nexus.plugin.version}</argument>
+                                        <argument>--build-arg</argument>
+                                        <argument>ANSIBLEGALAXY_VERSION=${ansiblegalaxy.version}</argument>
                                         <argument>--no-cache</argument>
                                         <argument>-t</argument>
                                         <argument>${docker.image}</argument>
