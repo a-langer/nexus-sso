@@ -13,7 +13,7 @@ ARG NEXUS_PLUGIN_VERSION="3.67.1-01"
 ENV PLUG_VERSION="${NEXUS_PLUGIN_VERSION}"
 ENV NEXUS_PLUGINS="${NEXUS_HOME}/system"
 
-ARG ANSIBLEGALAXY_VERSION="0.3.0"
+ARG ANSIBLEGALAXY_VERSION="0.3.2-fixed"
 
 # Add nexus-pac4j-plugin.jar
 RUN rm -rf ${NEXUS_PLUGINS}/com/github/alanger/nexus/plugin/nexus-pac4j-plugin/

@@ -16,7 +16,7 @@
     <properties>
         <nexus.base.image>sonatype/nexus3:${nexus.base.version}</nexus.base.image>
         <docker.image>ghcr.io/a-langer/nexus-sso:${project.version}</docker.image>
-        <ansiblegalaxy.version>0.3.0</ansiblegalaxy.version>
+        <ansiblegalaxy.version>0.3.2-fixed</ansiblegalaxy.version>
     </properties>
 
     <profiles>
@@ -30,8 +30,9 @@
                 <plugins>
                     <!--
                         A Nexus Repository 3 plugin that allows usage of Ansible Galaxy repositories. 
-                        https://github.com/l3ender/nexus-repository-ansiblegalaxy
-                        https://jitpack.io/#l3ender/nexus-repository-ansiblegalaxy 
+                        Origin https://github.com/l3ender/nexus-repository-ansiblegalaxy
+                        Fork with galaxy v3 support https://github.com/angeloxx/nexus-repository-ansiblegalaxy
+                        Maven repository https://jitpack.io/#angeloxx/nexus-repository-ansiblegalaxy
                         mvn dependency:copy -PbuildImage 
                     -->
                     <plugin>
@@ -49,7 +50,7 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>com.github.l3ender.nexus-repository-ansiblegalaxy</groupId>
+                                    <groupId>com.github.angeloxx.nexus-repository-ansiblegalaxy</groupId>
                                     <artifactId>nexus-repository-ansiblegalaxy</artifactId>
                                     <version>${ansiblegalaxy.version}</version>
                                     <type>jar</type>
