@@ -38,8 +38,8 @@ Description of configuration:
 - [metadata.xml](../nexus-pac4j-plugin/src/main/config/metadata.xml) - this is the configuration of the identity provider (hereinafter **IdP**), it needs to be downloaded from Okta/Keycloak/ADFS/Etc and passed into the Nexus container. Additionally, you must specify the "**SP Entity ID**/**Client ID**" and "**Single sign-on URL**/**Client SAML endpoint**" attributes in the IdP settings, whose value must match the "**entityID**" from sp-metadata.xml.
 - By default, "Nexus SSO" is already pre-configured for authorization through [Okta](https://www.okta.com/) with HTTP protocol on localhost (the endpoint `http://localhost/callback?client_name=SAML2Client`, see [Okta settings](./Okta-Nexus-SAML.png)). To configure authorization through another IdP-server is required:
     1. Configure new SAML client in the IdP server with DNS name for your Nexus instance and download **metadata.xml**.
-    2. Replace the protocol and DNS name in **sp-metadata.xml** and **shiro.ini** (as show above).
-    3. Pass **metadata.xml**, **sp-metadata.xml** and **shiro.ini** to the Nexus container, see [_compose.override_prod.yml](../_compose.override_prod.yml) for an example.
+    2. Replace the protocol and DNS name in **sp-metadata.xml** and **shiro.ini** (and **.env** if variable interpolation is used) as show above.
+    3. Pass **metadata.xml**, **sp-metadata.xml**, **shiro.ini** and custom **.env** to the Nexus container, see [_compose.override_prod.yml](../_compose.override_prod.yml) for an example.
 
 ## Attributes mapping
 
