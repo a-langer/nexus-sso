@@ -36,6 +36,9 @@ Description of configuration:
     > **_NOTE:_** ADFS does not support URI parameter in entityID, remove "_?client_name=SAML2Client_" from **Client ID** in the ADFS settings, from **serviceProviderEntityId** in shiro.ini and from **entityID** in sp-metadata.xml.
 
 - [metadata.xml](../nexus-pac4j-plugin/src/main/config/metadata.xml) - this is the configuration of the identity provider (hereinafter **IdP**), it needs to be downloaded from Okta/Keycloak/ADFS/Etc and passed into the Nexus container. Additionally, you must specify the "**SP Entity ID**/**Client ID**" and "**Single sign-on URL**/**Client SAML endpoint**" attributes in the IdP settings, whose value must match the "**entityID**" from sp-metadata.xml.
+
+    > **_NOTE:_** Attribute `WantAuthnRequestsSigned` should be `false` by default in the  **metadata.xml** file. If you want authentication requests to be signed, you will need to perform more complex settings that are beyond the scope of this instruction.
+
 - By default, "Nexus SSO" is already pre-configured for authorization through [Okta](https://www.okta.com/) with HTTP protocol on localhost (the endpoint `http://localhost/callback?client_name=SAML2Client`, see [Okta settings](./Okta-Nexus-SAML.png)). To configure authorization through another IdP-server is required:
     1. Configure new SAML client in the IdP server with DNS name for your Nexus instance and download **metadata.xml**.
     2. Replace the protocol and DNS name in **sp-metadata.xml** and **shiro.ini** (and **.env** if variable interpolation is used) as show above.
@@ -68,10 +71,24 @@ Roles from Nexus and groups from IdP are mapped to each other by name, for examp
 
 ## Debug
 
-To enable debugging, add the following lines to the [logback.xml](../etc/logback/logback.xml) file (output will be to `${NEXUS_DATA}/log/nexus.log`):
+To enable debugging, add the following lines to the [shiro.ini](../nexus-pac4j-plugin/src/main/config/shiro.ini):
+
+```ini
+# Force re-authenticate, see https://github.com/a-langer/nexus-sso/issues/11
+saml2Config.forceAuth = true
+# Disable all validation, good for testing
+saml2Config.allSignatureValidationDisabled = true
+# Debug callback
+callbackLogic = com.github.alanger.nexus.plugin.Pac4jCallbackLogic
+callbackFilter.callbackLogic = $callbackLogic
+```
+
+And following lines to the [logback.xml](../etc/logback/logback.xml) file (output will be to `${NEXUS_DATA}/log/nexus.log`):
 
 ```xml
 <logger name="com.github.alanger.nexus.bootstrap.Pac4jAuthenticationListener" level="TRACE" />
+<logger name="com.github.alanger.nexus.plugin.Pac4jCallbackLogic" level="TRACE" />
+<logger name="io.buji.pac4j.engine.ShiroSecurityLogic" level="TRACE" />
 <logger name="org.pac4j.saml.client" level="TRACE" />
 <logger name="org.opensaml.saml.metadata.resolver" level="TRACE" />
 ```

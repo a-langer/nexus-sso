@@ -2,7 +2,7 @@
     xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
     xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
     xmlns:ds="http://www.w3.org/2000/09/xmldsig#" entityID="http://localhost:8080/auth/realms/master">
-    <md:IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+    <md:IDPSSODescriptor WantAuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
         <md:KeyDescriptor use="signing">
             <ds:KeyInfo>
                 <ds:KeyName>qMpXA1IiGC9rHa2xVQkU-uOBuiWr0NN-S-nMYLrutdE</ds:KeyName>
