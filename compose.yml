@@ -11,7 +11,9 @@ x-logging: &logging
     max-size: ${LOGGING_MAX_SIZE:-5M}
     max-file: ${LOGGING_COUNT_FILES:-10}
 
+# docker compose up -d --wait --wait-timeout 45
 services:
+  # docker compose exec -- nexus curl -k http://localhost:8081/rewrite-status
   nexus:
     <<: *container
     image: ${NEXUS_IMAGE}
@@ -30,6 +32,7 @@ services:
       timeout: ${HEAL_TIMEOUT:-2s}
       retries: ${HEAL_RETRIES:-5}
 
+  # docker-compose exec -- nginx nginx -s reload;
   nginx:
     <<: *container
     image: ${NGINX_IMAGE:-nginx:1.23.3}
@@ -49,6 +52,8 @@ services:
       <<: *logging
 
   # docker compose --profile debug up
+  # docker-compose --profile debug up -d orientdb
+  # docker-compose --profile debug rm -sf orientdb
   orientdb:
     <<: *container
     image: ${ORIENTDB_IMAGE:-orientdb:2.2.37}
@@ -72,4 +77,4 @@ networks:
     driver: ${NETWORK_DRIVER:-bridge}
     ipam:
       config:
-        - subnet: ${NETWORK_SUBNET:-172.30.0.0/24}
+        - subnet: ${NETWORK_SUBNET:-172.30.0.0/16}
