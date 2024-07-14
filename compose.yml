@@ -14,6 +14,7 @@ x-logging: &logging
 # docker compose up -d --wait --wait-timeout 45
 services:
   # docker compose exec -- nexus curl -k http://localhost:8081/rewrite-status
+  # Rebuild OrientDB: docker compose run --rm -u 0:0 nexus bash -> then follow https://gist.github.com/micalbrecht/212d37865fbc24afc6d8b1aab621dea6
   nexus:
     <<: *container
     image: ${NEXUS_IMAGE}
@@ -32,7 +33,7 @@ services:
       timeout: ${HEAL_TIMEOUT:-2s}
       retries: ${HEAL_RETRIES:-5}
 
-  # docker-compose exec -- nginx nginx -s reload;
+  # docker compose exec -- nginx nginx -s reload;
   nginx:
     <<: *container
     image: ${NGINX_IMAGE:-nginx:1.23.3}
@@ -52,8 +53,8 @@ services:
       <<: *logging
 
   # docker compose --profile debug up
-  # docker-compose --profile debug up -d orientdb
-  # docker-compose --profile debug rm -sf orientdb
+  # docker compose --profile debug up -d orientdb
+  # docker compose --profile debug rm -sf orientdb
   orientdb:
     <<: *container
     image: ${ORIENTDB_IMAGE:-orientdb:2.2.37}

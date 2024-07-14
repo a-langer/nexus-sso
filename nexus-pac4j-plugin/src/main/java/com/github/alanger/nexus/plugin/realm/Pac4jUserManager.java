@@ -150,4 +150,10 @@ public class Pac4jUserManager extends AbstractUserManager implements RoleMapping
         throw new UnsupportedOperationException("SSO/SAML users can't change passwords");
     }
 
+    /** @since 3.70.0 */
+    @Override
+    public boolean isConfigured() {
+        return true;
+    }
+
 }

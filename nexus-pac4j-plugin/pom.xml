@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.github.a-langer</groupId>
         <artifactId>nexus-sso</artifactId>
-        <version>3.68.0</version>
+        <version>3.70.0</version>
         <relativePath>..</relativePath>
     </parent>
 

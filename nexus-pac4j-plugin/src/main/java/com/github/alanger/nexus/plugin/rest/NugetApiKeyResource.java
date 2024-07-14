@@ -48,8 +48,9 @@ public class NugetApiKeyResource extends ComponentSupport implements Resource {
 
     public static final String RESOURCE_URI = "/internal/nuget-api-key";
 
-    public static final String DAMAIN = "NuGetApiKey";
+    public static final String DOMAIN = "NuGetApiKey";
 
+    // org.sonatype.nexus.internal.security.apikey.orient.OrientApiKeyStore
     private final Provider<ApiKeyStore> apiKeyStore;
 
     private final AuthTicketService authTicketService;
@@ -85,11 +86,11 @@ public class NugetApiKeyResource extends ComponentSupport implements Resource {
         PrincipalCollection principals = this.securityHelper.subject().getPrincipals();
 
         // Read by principals
-        char[] apiKey = this.apiKeyStore.get().getApiKey(DAMAIN, principals).map(ApiKey::getApiKey).orElse(null);
+        char[] apiKey = this.apiKeyStore.get().getApiKey(DOMAIN, principals).map(ApiKey::getApiKey).orElse(null);
 
         // Read by primary principal or create a new
         if (apiKey == null) {
-            apiKey = finfApiKey(principals).map(ApiKey::getApiKey).orElseGet(() -> this.apiKeyStore.get().createApiKey(DAMAIN, principals));
+            apiKey = finfApiKey(principals).map(ApiKey::getApiKey).orElseGet(() -> this.apiKeyStore.get().createApiKey(DOMAIN, principals));
         }
         log.trace("Read apiKey for principal {} = {}", principals.getPrimaryPrincipal(), apiKey != null ? "***" : null);
 
@@ -105,14 +106,14 @@ public class NugetApiKeyResource extends ComponentSupport implements Resource {
         PrincipalCollection principals = this.securityHelper.subject().getPrincipals();
 
         // Delete by principals
-        this.apiKeyStore.get().deleteApiKey(DAMAIN, principals);
+        this.apiKeyStore.get().deleteApiKey(DOMAIN, principals);
 
         // Delete by entity, see org.sonatype.nexus.internal.security.apikey.orient.OrientApiKeyStore#deleteApiKey
         inTxRetry(databaseInstance).run(db -> {
             entityAdapter.deleteEntity(db, (AbstractEntity) finfApiKey(principals).orElse(null));
         });
 
-        char[] apiKey = this.apiKeyStore.get().createApiKey(DAMAIN, principals);
+        char[] apiKey = this.apiKeyStore.get().createApiKey(DOMAIN, principals);
         log.trace("Reset apiKey for principal {} = {}", principals.getPrimaryPrincipal(), apiKey != null ? "***" : null);
 
         return new NugetApiKeyXO(apiKey);
@@ -120,7 +121,7 @@ public class NugetApiKeyResource extends ComponentSupport implements Resource {
 
     // ApiKey by primary principal
     private Optional<ApiKey> finfApiKey(PrincipalCollection principals) {
-        for (ApiKey ak : apiKeyStore.get().browse(DAMAIN)) {
+        for (ApiKey ak : apiKeyStore.get().browse(DOMAIN)) {
             if (principals.getPrimaryPrincipal().toString().equals(ak.getPrincipals().getPrimaryPrincipal().toString())) {
                 return Optional.of(ak);
             }

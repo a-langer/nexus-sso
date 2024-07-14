@@ -2,7 +2,7 @@
 
 [![license](https://img.shields.io/badge/license-EPL1-brightgreen.svg)](https://github.com/a-langer/nexus-sso/blob/main/LICENSE "License of source code")
 [![image](https://ghcr-badge.deta.dev/a-langer/nexus-sso/latest_tag?trim=major&label=latest)][0]
-[![image-size](https://ghcr-badge.deta.dev/a-langer/nexus-sso/size?tag=3.68.0)][0]
+[![image-size](https://ghcr-badge.deta.dev/a-langer/nexus-sso/size?tag=3.70.0)][0]
 [![JitPack](https://jitpack.io/v/a-langer/nexus-sso.svg)][1]
 
 Patch for [Nexus OSS][2] with authorization via [SSO][9] and [tokens][10]. By default this features available only in PRO version ([see comparison][5]), but this patch provides them an alternative implementation without violating the license.
@@ -101,7 +101,7 @@ List of features this patch adds:
 
 Need installed Maven and Docker with [Compose][4] and [BuildKit][4.1] plugins:
 
-1. Change Nexus version if update required (see [Release Notes][19] for more information), ex.:
+1. Change Nexus version if update required (see [Release Notes][19] and [Maven Central][19.1] for more information), ex.:
 
     ```bash
     # Set version of the current project and any child modules
@@ -156,3 +156,4 @@ Need installed Maven and Docker with [Compose][4] and [BuildKit][4.1] plugins:
 [17]: https://eclipse.dev/jetty/documentation/jetty-9/index.html "Jetty Rewrite Handler"
 [18]: https://gist.github.com/abdennour/74c5de79e57a47f3351217d674238da8?permalink_comment_id=4188452#gistcomment-4188452 "Nginx for Docker registry"
 [19]: https://github.com/sonatype/nexus-public/releases "Nexus release notes"
+[19.1]: https://mvnrepository.com/artifact/org.sonatype.nexus/nexus-bootstrap "Version of Nexus plugins in Maven Central"

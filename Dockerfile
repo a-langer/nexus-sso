@@ -5,11 +5,11 @@
 # docker rmi $(docker images -f "dangling=true" -q)
 # docker run --user=0:0 --rm -it -p 8081:8081/tcp sonatype/nexus3:3.37.3 /bin/bash
 
-ARG NEXUS_BASE_IMAGE="sonatype/nexus3:3.68.0"
+ARG NEXUS_BASE_IMAGE="sonatype/nexus3:3.70.0"
 FROM $NEXUS_BASE_IMAGE
 USER root
 
-ARG NEXUS_PLUGIN_VERSION="3.68.0-04"
+ARG NEXUS_PLUGIN_VERSION="3.70.0-03"
 ENV PLUG_VERSION="${NEXUS_PLUGIN_VERSION}"
 ENV NEXUS_PLUGINS="${NEXUS_HOME}/system"
 
@@ -30,8 +30,6 @@ RUN chmod -R 644 ${NEXUS_PLUGINS}/org/sonatype/nexus/nexus-repository-services/$
 COPY etc/nexus-default.properties /opt/sonatype/nexus/etc/nexus-default.properties
 COPY etc/jetty/nexus-web.xml /opt/sonatype/nexus/etc/jetty/nexus-web.xml
 COPY etc/jetty/jetty-sso.xml /opt/sonatype/nexus/etc/jetty/jetty-sso.xml
-# Fix CVE-2024-4956 https://support.sonatype.com/hc/en-us/articles/29412417068819-Mitigations-for-CVE-2024-4956-Nexus-Repository-3-Vulnerability
-COPY etc/jetty/jetty.xml /opt/sonatype/nexus/etc/jetty/jetty.xml
 COPY nexus-pac4j-plugin/src/main/config/ /opt/sonatype/nexus/etc/sso/config/
 COPY nexus-pac4j-plugin/src/main/groovy/ /opt/sonatype/nexus/etc/sso/script/
 RUN chown nexus:nexus -R /opt/sonatype/nexus/etc/sso/
