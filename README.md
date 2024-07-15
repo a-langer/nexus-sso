@@ -23,7 +23,14 @@ Solution implement as Docker [container][0] (based on [official image][3] with S
 
 ## Supported features and examples of usage
 
-> **Note**: Since version `3.61.0` for SSO and User Tokens, it is enough to have three realms: "**Local Authenticating Realm**", "**SSO Pac4j Realm**" and "**SSO Token Realm**". Other realms are not required and may lead to conflicts.
+> **Note**: Since version `3.61.0` for SSO and User Tokens, it is enough to have following [realms][8.1] in the order listed:
+>
+> 1. "**Local Authenticating Realm**" - built-in realm used by default.
+> 2. "**SSO Pac4j Realm**" - single sign-on realm uses an external Identity Provider (IdP).
+> 3. "**SSO Token Realm**" - realm allows you to use user tokens instead of a password.
+> 4. "**Docker Bearer Token Realm**" - required to access Docker repositories through a Docker client (must be below the "**SSO Token Realm**").
+>
+> Other realms are not required and may lead to conflicts.
 
 List of features this patch adds:
 
@@ -35,7 +42,7 @@ List of features this patch adds:
   * You will be redirected to the main page of Nexus, roles and permissions will be mapped with your account as configured.
 
 * **User Auth Tokens** - are applied when security policies do not allow the users password to be used, such as for storing in plain text (in settings Docker, Maven and etc.) or combined with **SAML/SSO**. Each user can set a personal token that can be used instead of a password. The creation of tokens is implemented through the "NuGet API Key" menu (privilegies `nx-apikey-all` required), however, the tokens themselves apply to all types of repositories. Example of usage user token:
-  * Enable "**SSO Token Realm**" in the server administration panel.
+  * Enable "**SSO Token Realm**" (above "**Docker Bearer Token Realm**") in the server administration panel.
   * Go to menu "Nexus -> Manage your user account -> NuGet API Key", press "Access API key".
   * Type your **username** if using SSO login, otherwise type password, then press "Authenticate".
   * Copy "Your NuGet API Key", press "Close" and "Sign out".
@@ -145,6 +152,7 @@ Need installed Maven and Docker with [Compose][4] and [BuildKit][4.1] plugins:
 [6]: https://shiro.apache.org/web.html "Shiro security framework"
 [7]: https://github.com/bujiio/buji-pac4j "Bridge from Pac4j to Shiro"
 [8]: https://www.pac4j.org/docs/clients/saml.html "Pac4j security framework"
+[8.1]: https://help.sonatype.com/en/realms.html "Nexus Realms"
 [9]: https://help.sonatype.com/en/saml.html "Nexus PRO SAML"
 [10]: https://help.sonatype.com/en/user-tokens.html "Nexus PRO tokens"
 [11]: https://help.sonatype.com/en/docker-repository-reverse-proxy-strategies.html "Docker reverse proxy"
