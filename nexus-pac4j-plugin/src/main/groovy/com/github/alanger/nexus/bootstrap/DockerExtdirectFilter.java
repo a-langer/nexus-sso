@@ -26,6 +26,7 @@ import org.apache.shiro.SecurityUtils;
 
 import com.github.alanger.shiroext.servlets.MultiReadRequestWrapper;
 import com.github.alanger.shiroext.servlets.MutableResponseWrapper;
+import com.github.alanger.nexus.plugin.ui.NonTransitiveSearchComponent;
 
 /**
  * Change response from "/service/extdirect".
@@ -120,6 +121,14 @@ public class DockerExtdirectFilter extends QuotaFilter {
 
         String reqAction = String.valueOf(reqMap.get("action"));
         String reqMethod = String.valueOf(reqMap.get("method"));
+
+        // Override search endpoint if enabled non-transitive privileges
+        if ("coreui_Search".equals(reqAction) && Boolean.getBoolean("nexus.group.nontransitive.privileges.enabled")) {
+            reqMap.put("action", NonTransitiveSearchComponent.ACTION);
+            requestWrapper.setContent(JsonOutput.toJson(reqMap).getBytes());
+            chain.doFilter(requestWrapper, response);
+            return;
+        }
 
         if (COREUI_COMPONENT.equals(reqAction) && (READ_COMPONENT.equals(reqMethod) ||
                 READ_ASSET.equals(reqMethod)) || READ_COMPONENT_ASSETS.equals(reqMethod)) {

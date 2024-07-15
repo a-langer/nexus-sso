@@ -178,6 +178,27 @@
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>org.sonatype.nexus.plugins</groupId>
+            <artifactId>nexus-coreui-plugin</artifactId>
+            <version>${nexus.plugin.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.sonatype.nexus</groupId>
+            <artifactId>nexus-repository-services</artifactId>
+            <version>${nexus.plugin.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.sonatype.nexus</groupId>
+            <artifactId>nexus-plugin-api</artifactId>
+            <version>${nexus.plugin.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
         <!-- https://github.com/sonatype/nexus-public/blob/main/buildsupport/commons/pom.xml -->
         <dependency>
             <groupId>org.apache.commons</groupId>
