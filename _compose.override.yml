@@ -3,6 +3,14 @@ version: "3.9"
 # This is development environment, for production see _compose.override_prod.yml
 services:
   nexus:
+    # Disable analytics https://help.sonatype.com/en/in-product-analytics-capability.html
+    environment:
+      - "INSTALL4J_ADD_VM_PARAMS=${INSTALL4J_ADD_VM_PARAMS} -Dnexus.analytics.enabled=false"
+    # Disabling "Analyze Application" https://stackoverflow.com/a/41726259/19707292
+    extra_hosts:
+      - clm.sonatype.com:0.0.0.0
+      - rhc.sonatype.com:0.0.0.0
+      - rhc-pro.sonatype.com:0.0.0.0
     dns:
       - ${NETWORK_DNS_RESOLVER_1:-8.8.8.8}
       - ${NETWORK_DNS_RESOLVER_2:-4.4.4.4}
