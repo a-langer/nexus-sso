@@ -37,7 +37,7 @@ import com.github.alanger.shiroext.http.MockFilterChain;
 import com.github.alanger.shiroext.http.MockHttpServletRequest;
 import com.github.alanger.shiroext.http.MockHttpServletResponse;
 import com.github.alanger.shiroext.realm.jdbc.JdbcRealmName;
-import com.github.alanger.shiroext.realm.pac4j.Pac4jRealmName;
+import com.github.alanger.nexus.plugin.realm.NexusPac4jRealm;
 
 /**
  * Main object of script initialization.
@@ -221,7 +221,7 @@ public class Main {
         objects.put("echoRealm", echoRealm);
 
         // Realm for authorization by SAML/SSO
-        Pac4jRealmName pac4jRealm = (Pac4jRealmName) objects.getOrDefault("pac4jRealm", DI.getInstance().pac4jRealm);
+        NexusPac4jRealm pac4jRealm = (NexusPac4jRealm) objects.getOrDefault("pac4jRealm", DI.getInstance().pac4jRealm);
         pac4jRealm.setName("pac4jRealm");
         objects.put("pac4jRealm", pac4jRealm);
 

@@ -16,8 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.security.NexusSimpleAuthenticationInfo;
 import org.sonatype.nexus.security.RealmCaseMapping;
-import com.github.alanger.shiroext.realm.pac4j.Pac4jPrincipalName;
-import com.github.alanger.shiroext.realm.pac4j.Pac4jRealmName;
 import io.buji.pac4j.token.Pac4jToken;
 
 /**

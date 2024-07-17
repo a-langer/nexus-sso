@@ -11,8 +11,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
         <nexus.base.version>${project.version}</nexus.base.version>
         <nexus.extension.version>03</nexus.extension.version>
         <nexus.plugin.version>${nexus.base.version}-${nexus.extension.version}</nexus.plugin.version>
@@ -257,7 +257,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Nexus 3 supports only JDK 8 -->
+            <!-- Nexus 3.70.X supports max JDK 11, see https://help.sonatype.com/en/sonatype-nexus-repository-3-70-0-release-notes.html -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
@@ -271,7 +271,7 @@
                         <configuration>
                             <rules>
                                 <enforceBytecodeVersion>
-                                    <maxJdkVersion>1.8</maxJdkVersion>
+                                    <maxJdkVersion>${maven.compiler.target}</maxJdkVersion>
                                     <excludes>
                                         <exclude>org.bouncycastle:bcprov-jdk15on</exclude>
                                         <exclude>org.eclipse.jetty:jetty-server</exclude>

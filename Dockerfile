@@ -5,7 +5,7 @@
 # docker rmi $(docker images -f "dangling=true" -q)
 # docker run --user=0:0 --rm -it -p 8081:8081/tcp sonatype/nexus3:3.37.3 /bin/bash
 
-ARG NEXUS_BASE_IMAGE="sonatype/nexus3:3.70.0"
+ARG NEXUS_BASE_IMAGE="sonatype/nexus3:3.70.0-java11-ubi"
 FROM $NEXUS_BASE_IMAGE
 USER root
 

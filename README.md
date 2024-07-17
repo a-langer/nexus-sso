@@ -2,7 +2,7 @@
 
 [![license](https://img.shields.io/badge/license-EPL1-brightgreen.svg)](https://github.com/a-langer/nexus-sso/blob/main/LICENSE "License of source code")
 [![image](https://ghcr-badge.deta.dev/a-langer/nexus-sso/latest_tag?trim=major&label=latest)][0]
-[![image-size](https://ghcr-badge.deta.dev/a-langer/nexus-sso/size?tag=3.70.0)][0]
+[![image-size](https://ghcr-badge.deta.dev/a-langer/nexus-sso/size?tag=3.70.0-java11-ubi)][0]
 [![JitPack](https://jitpack.io/v/a-langer/nexus-sso.svg)][1]
 
 Patch for [Nexus OSS][2] with authorization via [SSO][9] and [tokens][10]. By default this features available only in PRO version ([see comparison][5]), but this patch provides them an alternative implementation without violating the license.
@@ -23,14 +23,16 @@ Solution implement as Docker [container][0] (based on [official image][3] with S
 
 ## Supported features and examples of usage
 
-> **Note**: Since version `3.61.0` for SSO and User Tokens, it is enough to have following [realms][8.1] in the order listed:
->
-> 1. "**Local Authenticating Realm**" - built-in realm used by default.
-> 2. "**SSO Pac4j Realm**" - single sign-on realm uses an external Identity Provider (IdP).
-> 3. "**SSO Token Realm**" - realm allows you to use user tokens instead of a password.
-> 4. "**Docker Bearer Token Realm**" - required to access Docker repositories through a Docker client (must be below the "**SSO Token Realm**").
->
-> Other realms are not required and may lead to conflicts.
+> **Note**: Since version `3.70.0-java11-ubi` image and all libraries have been updated to Java 11. See [release notes](https://help.sonatype.com/en/sonatype-nexus-repository-3-70-0-release-notes.html) for more information.
+
+Since version `3.61.0` for using SSO and User Tokens, it is enough to have following [realms][8.1] in the order listed:
+
+1. "**Local Authenticating Realm**" - built-in realm used by default.
+2. "**SSO Pac4j Realm**" - single sign-on realm uses an external Identity Provider (IdP).
+3. "**SSO Token Realm**" - realm allows you to use user tokens instead of a password.
+4. "**Docker Bearer Token Realm**" - required to access Docker repositories through a Docker client (must be below the "**SSO Token Realm**").
+
+Other realms are not required and may lead to conflicts.
 
 List of features this patch adds:
 

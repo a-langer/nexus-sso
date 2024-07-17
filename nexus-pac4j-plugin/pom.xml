@@ -36,23 +36,33 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- Newer version requires JDK 11, Nexus 3 supports only JDK 8 -->
+        <!-- Newer version requires JDK 17, Nexus 3.70.X with OrientDB supports max JDK 11 -->
         <dependency>
             <groupId>io.buji</groupId>
             <artifactId>buji-pac4j</artifactId>
-            <version>4.1.1</version>
+            <version>8.0.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.shiro</groupId>
                     <artifactId>*</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
-        <!-- Fix NoClassDefFoundError: org/pac4j/core/redirect/RedirectActionBuilder -->
+        <!-- Since buji-pac4j:8.0.0 -->
+        <dependency>
+            <groupId>org.pac4j</groupId>
+            <artifactId>javaee-pac4j</artifactId>
+            <version>7.1.0</version>
+        </dependency>
+        <!-- Newer version requires JDK 17, Nexus 3.70.X with OrientDB supports max JDK 11 -->
         <dependency>
             <groupId>org.pac4j</groupId>
             <artifactId>pac4j-core</artifactId>
-            <version>3.9.0</version>
+            <version>5.6.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -60,11 +70,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- Newer version requires JDK 11, Nexus 3 supports only JDK 8 -->
+        <!-- Newer version requires JDK 17, Nexus 3.70.X with OrientDB supports max JDK 11 -->
         <dependency>
             <groupId>org.pac4j</groupId>
             <artifactId>pac4j-saml</artifactId>
-            <version>3.9.0</version>
+            <version>5.6.0</version>
             <exclusions>
                 <!-- Shared libraries will be loaded from OSGI bundles -->
                 <exclusion>
@@ -157,6 +167,19 @@
                 <exclusion>
                     <groupId>com.fasterxml.woodstox</groupId>
                     <artifactId>woodstox-core</artifactId>
+                </exclusion>
+                <!-- Not required since buji-pac4j:8.0.0 -->
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk15on</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-beans</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
                 </exclusion>
                 <!-- Fix FactoryConfigurationError: Provider org.apache.xerces.jaxp.DocumentBuilderFactoryImpl not found -->
                 <exclusion>

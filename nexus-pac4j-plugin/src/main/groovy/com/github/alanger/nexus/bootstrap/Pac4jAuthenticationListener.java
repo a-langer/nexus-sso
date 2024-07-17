@@ -29,8 +29,8 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.subject.support.WebDelegatingSubject;
 
-import com.github.alanger.shiroext.realm.pac4j.Pac4jPrincipalName;
-import com.github.alanger.shiroext.realm.pac4j.Pac4jRealmName;
+import com.github.alanger.nexus.plugin.realm.Pac4jPrincipalName;
+import com.github.alanger.nexus.plugin.realm.Pac4jRealmName;
 import com.github.alanger.shiroext.realm.RealmUtils;
 import com.github.alanger.shiroext.realm.ICommonRole;
 

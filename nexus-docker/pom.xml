@@ -14,8 +14,8 @@
     <packaging>pom</packaging>
 
     <properties>
-        <nexus.base.image>sonatype/nexus3:${nexus.base.version}</nexus.base.image>
-        <docker.image>ghcr.io/a-langer/nexus-sso:${project.version}</docker.image>
+        <nexus.base.image>sonatype/nexus3:${nexus.base.version}-java11-ubi</nexus.base.image>
+        <docker.image>ghcr.io/a-langer/nexus-sso:${project.version}-java11-ubi</docker.image>
         <ansiblegalaxy.version>0.3.2-fixed</ansiblegalaxy.version>
     </properties>
 
@@ -88,10 +88,12 @@
                                             match="ARG NEXUS_PLUGIN_VERSION=(.*)"
                                             replace='ARG NEXUS_PLUGIN_VERSION="${nexus.plugin.version}"' />
 
-                                        <echo>Set size?tag=${project.version} to README.md</echo>
+                                        <taskdef resource="net/sf/antcontrib/antcontrib.properties" />
+                                        <propertyregex property="image.tag" input="${docker.image}" regexp="^.*\:(.*)$" select="\1" />
+                                        <echo>Set size?tag=${image.tag} to README.md</echo>
                                         <replaceregexp file="${maven.multiModuleProjectDirectory}/README.md" byline="true"
                                             match=".*/a-langer/nexus-sso/size\?tag=(.*)"
-                                            replace='[![image-size](https://ghcr-badge.deta.dev/a-langer/nexus-sso/size?tag=${project.version})][0]' />
+                                            replace='[![image-size](https://ghcr-badge.deta.dev/a-langer/nexus-sso/size?tag=${image.tag})][0]' />
 
                                         <echo>Set ANSIBLEGALAXY_VERSION="${ansiblegalaxy.version}" to Dockerfile</echo>
                                         <replaceregexp file="${maven.multiModuleProjectDirectory}/Dockerfile" byline="true"
@@ -101,6 +103,19 @@
                                 </configuration>
                             </execution>
                         </executions>
+                        <dependencies>
+                            <dependency>
+                                <groupId>ant-contrib</groupId>
+                                <artifactId>ant-contrib</artifactId>
+                                <version>1.0b3</version>
+                                <exclusions>
+                                    <exclusion>
+                                        <groupId>ant</groupId>
+                                        <artifactId>ant</artifactId>
+                                    </exclusion>
+                                </exclusions>
+                            </dependency>
+                        </dependencies>
                     </plugin>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
