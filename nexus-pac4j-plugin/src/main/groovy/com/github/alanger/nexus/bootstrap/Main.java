@@ -215,11 +215,6 @@ public class Main {
         tokenRealm.setName("tokenRealm");
         objects.put("tokenRealm", tokenRealm);
 
-        // Realm for access to API token from SSO user, see org.sonatype.nexus.rapture.internal.security.SecurityComponent
-        EchoRealm echoRealm = new EchoRealm();
-        echoRealm.setName("echoRealm");
-        objects.put("echoRealm", echoRealm);
-
         // Realm for authorization by SAML/SSO
         NexusPac4jRealm pac4jRealm = (NexusPac4jRealm) objects.getOrDefault("pac4jRealm", DI.getInstance().pac4jRealm);
         pac4jRealm.setName("pac4jRealm");
