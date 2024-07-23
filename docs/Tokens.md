@@ -9,4 +9,22 @@
 * To validate a token: press "Sign in", type your username and token instead of password.
 * Also, a pair of username+token can be used for authorization in Maven, Docker, Pip, etc., example for HTTP basic authorization - `Authorization: Basic <login:token in base64>`.
 
+## Debug
+
+To enable debugging, add the following lines to the [shiro.ini](../nexus-pac4j-plugin/src/main/config/shiro.ini):
+
+```ini
+# Disable authentication caching
+tokenRealm.authenticationCachingEnabled = false
+```
+
+And following lines to the [logback.xml](../etc/logback/logback.xml) file (output will be to `${NEXUS_DATA}/log/nexus.log`):
+
+```xml
+<logger name="org.sonatype.nexus.siesta.internal.UnexpectedExceptionMapper" level="TRACE" />
+<logger name="com.github.alanger.nexus.plugin.realm.NexusPac4jRealm" level="TRACE" />
+<logger name="com.github.alanger.nexus.plugin.realm.NexusTokenRealm" level="TRACE" />
+<logger name="com.github.alanger.nexus.plugin.rest.NugetApiKeyResource" level="TRACE" />
+```
+
 [0]: https://help.sonatype.com/en/user-tokens.html "Nexus PRO tokens"

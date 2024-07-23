@@ -1,29 +1,6 @@
 version: "3.9"
 
-## 1. Set variables for your production environment, ex.:
-# export NEXUS_USER=$(id -u) NEXUS_GROUP=$(id -g)
-# export NEXUS_ETC="./etc_prod" NEXUS_DATA="./data_prod"
-
-## 2. Prepare Docker production configuration, ex.:
-# cp ./_compose.override_prod.yml ./compose.override.yml
-# cp ./.env ./.env_prod
-# sed -i "s/NEXUS_USER=.*/NEXUS_USER=\"${NEXUS_USER}\"/" ./.env_prod
-# sed -i "s/NEXUS_GROUP=.*/NEXUS_GROUP=\"${NEXUS_GROUP}\"/" ./.env_prod
-# sed -i "s|NEXUS_ETC=.*|NEXUS_ETC=\"${NEXUS_ETC}\"|" ./.env_prod
-# sed -i "s|NEXUS_DATA=.*|NEXUS_DATA=\"${NEXUS_DATA}\"|" ./.env_prod
-
-## 3. Prepare Nexus directories and configuration templates, ex.:
-# mkdir -p ${NEXUS_ETC}/sso/config/ ${NEXUS_DATA}
-# cp -rf ./etc/* ${NEXUS_ETC}/
-# cp -rf ./nexus-pac4j-plugin/src/main/config/* ${NEXUS_ETC}/sso/config/
-
-## 4. Modify shiro.ini, metadata.xml and sp-metadata.xml, see docs/SAML.md.
-
-## 5. Enable Nginx SSL configuration, ex.:
-# cp ${NEXUS_ETC}/nginx/_ssl.conf ${NEXUS_ETC}/nginx/ssl.conf
-# openssl req -x509 -nodes -sha256 -days 3650 -newkey rsa:2048 -keyout ${NEXUS_ETC}/nginx/tls/site.key -out ${NEXUS_ETC}/nginx/tls/site.crt
-
-## 6. Change these settings for your production environment, ex.:
+# See docs/Docker.md, change these settings for your production environment, ex.:
 services:
   nexus:
     volumes:

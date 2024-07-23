@@ -98,7 +98,8 @@ And following lines to the [logback.xml](../etc/logback/logback.xml) file (outpu
 ```xml
 <logger name="com.github.alanger.nexus.bootstrap.Pac4jAuthenticationListener" level="TRACE" />
 <logger name="com.github.alanger.nexus.plugin.Pac4jCallbackLogic" level="TRACE" />
-<logger name="io.buji.pac4j.engine.ShiroSecurityLogic" level="TRACE" />
+<logger name="org.pac4j.jee.filter.SecurityFilter" level="TRACE" />
+<logger name="org.pac4j.jee.filter.CallbackFilter" level="TRACE" />
 <logger name="org.pac4j.saml.client" level="TRACE" />
 <logger name="org.opensaml.saml.metadata.resolver" level="TRACE" />
 ```

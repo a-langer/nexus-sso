@@ -14,7 +14,6 @@ x-logging: &logging
 # docker compose up -d --wait --wait-timeout 45
 services:
   # docker compose exec -- nexus curl -k http://localhost:8081/rewrite-status
-  # Rebuild OrientDB: docker compose run --rm -u 0:0 nexus bash -> then follow https://gist.github.com/micalbrecht/212d37865fbc24afc6d8b1aab621dea6
   nexus:
     <<: *container
     image: ${NEXUS_IMAGE}
