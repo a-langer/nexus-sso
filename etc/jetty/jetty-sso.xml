@@ -48,6 +48,15 @@
                         </New>
                     </Arg>
                 </Call> -->
+                <!-- SSO API key endpoint /service/rest/internal/nuget-api-key -->
+                <!-- <Call name="addRule">
+                    <Arg>
+                        <New class="org.eclipse.jetty.rewrite.handler.RewritePatternRule">
+                            <Set name="pattern">/service/rest/internal/nuget-api-key</Set>
+                            <Set name="replacement">/service/rest/internal/nuget-api-key-sso</Set>
+                        </New>
+                    </Arg>
+                </Call> -->
                 <!-- SSO reload endpoint for compatibility with UrlRewriteFilter -->
                 <Call name="addRule">
                     <Arg>

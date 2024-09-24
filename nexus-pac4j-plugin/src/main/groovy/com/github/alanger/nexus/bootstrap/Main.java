@@ -11,12 +11,13 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
-import org.apache.commons.configuration2.interpol.DefaultLookups;
+import org.apache.commons.text.StringSubstitutor;
+import org.apache.commons.text.lookup.StringLookupFactory;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
 import org.apache.shiro.authz.ModularRealmAuthorizer;
-import org.apache.shiro.config.CommonsInterpolator;
 import org.apache.shiro.config.Ini;
+import org.apache.shiro.config.Interpolator;
 import org.apache.shiro.config.ReflectionBuilder;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.text.IniRealm;
@@ -36,8 +37,8 @@ import com.github.alanger.nexus.plugin.DI;
 import com.github.alanger.shiroext.http.MockFilterChain;
 import com.github.alanger.shiroext.http.MockHttpServletRequest;
 import com.github.alanger.shiroext.http.MockHttpServletResponse;
-import com.github.alanger.shiroext.realm.jdbc.JdbcRealmName;
 import com.github.alanger.nexus.plugin.realm.NexusPac4jRealm;
+import com.github.alanger.nexus.plugin.realm.NexusTokenRealm;
 
 /**
  * Main object of script initialization.
@@ -52,6 +53,31 @@ public class Main {
     private final WebEnvironment env;
     private final DefaultWebSecurityManager securityManager;
     private final CommonsInterpolator interpolator;
+
+    /**
+     * Variable interpolation for shiro.ini
+     * @see https://commons.apache.org/proper/commons-text/apidocs/org/apache/commons/text/StringSubstitutor.html
+     */
+    class CommonsInterpolator implements Interpolator {
+
+        private final StringSubstitutor stringSubstitutor;
+
+        public CommonsInterpolator() {
+            stringSubstitutor = new StringSubstitutor(
+                    StringLookupFactory.INSTANCE.interpolatorStringLookup(StringLookupFactory.INSTANCE.environmentVariableStringLookup()));
+            stringSubstitutor.setEnableSubstitutionInVariables(true);
+        }
+
+        @Override
+        public String interpolate(String value) {
+            String res = stringSubstitutor.replace(value);
+            if (logger.isTraceEnabled() && value.startsWith("" + '$' + '{')) {
+                boolean replaceIn = stringSubstitutor.replaceIn(new StringBuilder(value));
+                logger.trace("ini {} = {}, replaceIn: {}", value, res, replaceIn);
+            }
+            return res != null ? res : value;
+        }
+    }
 
     public static final String OBJ_ID = "objects";
     public static final String CONTEXT_DONE = "AVAILABLE";
@@ -116,33 +142,13 @@ public class Main {
     }
 
     public void init() {
-        initInterpolator();
         initDelegatingFilter();
         initObjects();
         logger.info("Init script done, env: {}", env);
     }
 
-    protected void initInterpolator() {
-        this.interpolator.getConfigurationInterpolator().registerLookup("b64decode", DefaultLookups.BASE64_DECODER.getLookup());
-        this.interpolator.getConfigurationInterpolator().registerLookup("b64encode", DefaultLookups.BASE64_ENCODER.getLookup());
-        this.interpolator.getConfigurationInterpolator().registerLookup("date", DefaultLookups.DATE.getLookup());
-        this.interpolator.getConfigurationInterpolator().registerLookup("dns", DefaultLookups.DNS.getLookup());
-        this.interpolator.getConfigurationInterpolator().registerLookup("env", DefaultLookups.ENVIRONMENT.getLookup());
-        this.interpolator.getConfigurationInterpolator().registerLookup("file", DefaultLookups.FILE.getLookup());
-        this.interpolator.getConfigurationInterpolator().registerLookup("java", DefaultLookups.JAVA.getLookup());
-        this.interpolator.getConfigurationInterpolator().registerLookup("host", DefaultLookups.LOCAL_HOST.getLookup());
-        this.interpolator.getConfigurationInterpolator().registerLookup("prop", DefaultLookups.PROPERTIES.getLookup());
-        this.interpolator.getConfigurationInterpolator().registerLookup("res", DefaultLookups.RESOURCE_BUNDLE.getLookup());
-        this.interpolator.getConfigurationInterpolator().registerLookup("script", DefaultLookups.SCRIPT.getLookup());
-        this.interpolator.getConfigurationInterpolator().registerLookup("groovy", GroovyStringLookup.INSTANCE);
-        this.interpolator.getConfigurationInterpolator().registerLookup("sys", DefaultLookups.SYSTEM_PROPERTIES.getLookup());
-        this.interpolator.getConfigurationInterpolator().registerLookup("url", DefaultLookups.URL.getLookup());
-        this.interpolator.getConfigurationInterpolator().registerLookup("urlDecode", DefaultLookups.URL_DECODER.getLookup());
-        this.interpolator.getConfigurationInterpolator().registerLookup("urlEncode", DefaultLookups.URL_ENCODER.getLookup());
-        this.interpolator.getConfigurationInterpolator().registerLookup("xml", DefaultLookups.XML.getLookup());
-    }
-
     public void initDelegatingFilter() {
+        logger.trace("initDelegatingFilter");
         MockHttpServletRequest mockRequest = new MockHttpServletRequest(servletContext);
         mockRequest.setMethod("GET");
         mockRequest.setRequestURI("/service/rapture/session");
@@ -159,18 +165,17 @@ public class Main {
     }
 
     public void initObjects() {
+        logger.trace("initObjects");
 
         // Shiro ini config
         Ini ini = getIni();
         logger.trace("ini: {}", ini);
 
         // Nexus jdbc data source
-        OrientConnection orientConnection = new OrientConnection(true);
-        objects.put("securityJdbcInfo", orientConnection.getSecurityJdbcInfo());
-        objects.put("securityDataSource", orientConnection.getSecurityDataSource());
+        objects.put("securityDataSource", DI.getInstance().dataSource);
 
         // SSO/SAML profile authentication listener
-        Pac4jAuthenticationListener pac4jAuthenticationListener = new Pac4jAuthenticationListener(orientConnection.getSecurityDataSource());
+        Pac4jAuthenticationListener pac4jAuthenticationListener = new Pac4jAuthenticationListener(DI.getInstance().securityConfiguration);
         objects.put("pac4jAuthenticationListener", pac4jAuthenticationListener);
 
         // org.sonatype.nexus.security.authc.FirstSuccessfulModularRealmAuthenticator
@@ -211,7 +216,7 @@ public class Main {
         objects.put("iniRealm", iniRealm);
 
         // Realm for authorization by API token (Basic and Bearer if enabled com.github.alanger.shiroext.web.BearerAuthcFilter)
-        JdbcRealmName tokenRealm = (JdbcRealmName) objects.getOrDefault("tokenRealm", DI.getInstance().tokenRealm);
+        NexusTokenRealm tokenRealm = (NexusTokenRealm) objects.getOrDefault("tokenRealm", DI.getInstance().tokenRealm);
         tokenRealm.setName("tokenRealm");
         objects.put("tokenRealm", tokenRealm);
 
@@ -234,7 +239,6 @@ public class Main {
         DefaultFilterChainManager chainManager = (DefaultFilterChainManager) chainResolver.getFilterChainManager();
         objects.put("chainManager", chainManager);
         logger.trace("chainManager: {}", chainManager);
-        // chainResolver.setFilterChainManager(chainManager);
 
         // Debugging a previous filter chains
         for (Entry<String, NamedFilterList> entry : chainManager.getFilterChains().entrySet()) {
@@ -257,7 +261,7 @@ public class Main {
         Map<String, ?> buildObjects = builder.buildObjects(ini.getSection("main"));
 
         // Add Nexus default realms to current realms list
-        for (String nexusRealmName : orientConnection.getRealmNames()) {
+        for (String nexusRealmName : DI.getInstance().realmManager.getConfiguredRealmIds(true)) {
             Realm nexusRealm = (Realm) buildObjects.get(nexusRealmName);
             if (nexusRealm != null) {
                 securityManager.getRealms().add(nexusRealm);
@@ -291,12 +295,11 @@ public class Main {
         }
 
         // Set UI variable
-        UiPac4jPluginDescriptor uiDescriptor = DI.getInstance().uiPac4jPluginDescriptor;
-        uiDescriptor.setHeaderPanelLogoText(ini.getSectionProperty("", UiPac4jPluginDescriptor.HEADER_PANEL_LOGO_TEXT));
-        uiDescriptor.setSigninModalDialogHtml(ini.getSectionProperty("", UiPac4jPluginDescriptor.SIGNIN_MODAL_DIALOG_HTML));
-        uiDescriptor.setSigninModalDialogTooltip(ini.getSectionProperty("", UiPac4jPluginDescriptor.SIGNIN_MODAL_DIALOG_TOOLTIP));
-        uiDescriptor
-                .setAuthenticateModalDialogMessage(ini.getSectionProperty("", UiPac4jPluginDescriptor.AUTHENTICATE_MODAL_DIALOG_MESSAGE));
+        UiPac4jPluginDescriptor ui = DI.getInstance().uiPac4jPluginDescriptor;
+        ui.setHeaderPanelLogoText(ini.getSectionProperty("", UiPac4jPluginDescriptor.HEADER_PANEL_LOGO_TEXT));
+        ui.setSigninModalDialogHtml(ini.getSectionProperty("", UiPac4jPluginDescriptor.SIGNIN_MODAL_DIALOG_HTML));
+        ui.setSigninModalDialogTooltip(ini.getSectionProperty("", UiPac4jPluginDescriptor.SIGNIN_MODAL_DIALOG_TOOLTIP));
+        ui.setAuthenticateModalDialogMessage(ini.getSectionProperty("", UiPac4jPluginDescriptor.AUTHENTICATE_MODAL_DIALOG_MESSAGE));
     }
 
     private String getInitParameter(String name) {
@@ -306,24 +309,31 @@ public class Main {
     }
 
     private Ini getIni() {
-        Ini ini = new Ini();
-        String configPath = getInitParameter(Init.CONFIG_PATH);
-        if (configPath != null) {
-            ini.loadFromPath(configPath);
-            interpolateIni(ini);
-            String scanPeriod = ini.getSectionProperty("", "scanPeriod");
-            String urlRewriteStatusPath = ini.getSectionProperty("", "urlRewriteStatusPath");
-            long interval = scanPeriod != null ? Long.parseLong(scanPeriod) : 0;
-            if (configPath.startsWith("file:") && interval > 0 && urlRewriteStatusPath != null) {
-                createReloadThread(urlRewriteStatusPath, configPath, Long.parseLong(scanPeriod));
+        try {
+            Ini ini = new Ini();
+            String configPath = getInitParameter(Init.CONFIG_PATH);
+            if (configPath != null) {
+                logger.trace("Ini load from path: {}", configPath);
+                ini.loadFromPath(configPath);
+                interpolateIni(ini);
+                String scanPeriod = ini.getSectionProperty("", "scanPeriod");
+                String urlRewriteStatusPath = ini.getSectionProperty("", "urlRewriteStatusPath");
+                long interval = scanPeriod != null ? Long.parseLong(scanPeriod) : 0;
+                if (configPath.startsWith("file:") && interval > 0 && urlRewriteStatusPath != null) {
+                    createReloadThread(urlRewriteStatusPath, configPath, Long.parseLong(scanPeriod));
+                } else {
+                    removeReloadThread();
+                }
             } else {
-                removeReloadThread();
+                logger.trace("Ini load from init parameter 'config'");
+                ini.load(getInitParameter("config"));
+                interpolateIni(ini);
             }
-        } else {
-            ini.load(getInitParameter("config"));
-            interpolateIni(ini);
+            return ini;
+        } catch (Exception e) {
+            logger.error("Load Shiro ini error", e);
+            throw e;
         }
-        return ini;
     }
 
     private void interpolateIni(Ini ini) {

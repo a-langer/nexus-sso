@@ -14,6 +14,8 @@ x-logging: &logging
 # docker compose up -d --wait --wait-timeout 45
 services:
   # docker compose exec -- nexus curl -k http://localhost:8081/rewrite-status
+  # docker compose exec -- nexus bash
+  # docker compose run --rm nexus bash
   nexus:
     <<: *container
     image: ${NEXUS_IMAGE}
@@ -52,18 +54,20 @@ services:
       <<: *logging
 
   # docker compose --profile debug up
-  # docker compose --profile debug up -d orientdb
-  # docker compose --profile debug rm -sf orientdb
-  orientdb:
+  # docker compose --profile debug up -d dbconsole
+  # docker compose --profile debug rm -sf dbconsole
+  dbconsole:
     <<: *container
-    image: ${ORIENTDB_IMAGE:-orientdb:2.2.37}
-    cpus: ${ORIENTDB_CPUS:-2}
-    mem_limit: ${ORIENTDB_MEM_LIMIT:-512m}
-    mem_reservation: ${ORIENTDB_MEM_RESERVATION:-64m}
+    image: ${DBCONSOLE_IMAGE:-$NEXUS_IMAGE}
+    user: ${DBCONSOLE_USER:-${NEXUS_USER:-nexus}}:${DBCONSOLE_GROUP:-${NEXUS_GROUP:-nexus}}
+    cpus: ${DBCONSOLE_CPUS:-2}
+    mem_limit: ${DBCONSOLE_MEM_LIMIT:-128m}
+    mem_reservation: ${DBCONSOLE_MEM_RESERVATION:-64m}
     volumes:
-      - ${NEXUS_ETC}/orientdb:/orientdb/config:rw
+      - ${NEXUS_ETC}/h2db:/h2db:rw # H2DB console config
     ports:
-      - "${ORIENTDB_HTTP_PORT:-2480}:2480" # OrientDB: http://localhost:2480/studio/index.html
+      # H2 web console: http://localhost:2480 -> jdbc:h2:tcp://nexus:2424/nexus -> emplty login/pass
+      - "${DBCONSOLE_HTTP_PORT:-2480}:2480"
     depends_on:
       nexus:
         condition: service_healthy
@@ -71,6 +75,9 @@ services:
       - debug
     logging:
       <<: *logging
+    entrypoint: ["bash", "-c", 
+      "java -cp $NEXUS_HOME/system/com/h2database/h2/*/h2*.jar org.h2.tools.Server -web -webPort 2480 -webAllowOthers -ifExists -properties /h2db/"
+    ]
 
 networks:
   default:

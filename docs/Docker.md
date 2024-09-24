@@ -38,40 +38,81 @@
 
 6. Change others settings for your production environment, see examples in [_compose.override_prod.yml](../_compose.override_prod.yml) and [_compose.override.yml](../_compose.override.yml).
 
-## OrientDB studio
+## DB console
 
-**OrientDB studio** - web interface to interact with an embedded database, will available at the URL `http://localhost:2480/studio/index.html` if run service with profile "debug" (does not start by default):
+**DB console** - interface to interact with an embedded database. Available in the following modes:
+
+1. H2 TCP server + command line:
+
+    Start service with H2 TCP server:
+
+    ```bash
+    export INSTALL4J_ADD_VM_PARAMS="-Dnexus.sso.h2.tcpListenerEnabled=true -Dnexus.sso.h2.tcpListenerPort=2424"
+    docker compose up
+    ```
+
+    Example SQL executing from command line:
+
+    ```bash
+    docker compose exec -- nexus bash
+
+    # Locking admin account
+    java -cp $NEXUS_HOME/system/com/h2database/h2/*/h2*.jar org.h2.tools.Shell -url jdbc:h2:tcp://nexus:2424/nexus <<<"update SECURITY_USER set STATUS = 'locked' WHERE ID = 'admin';"
+
+    # Unlocking admin account
+    java -cp $NEXUS_HOME/system/com/h2database/h2/*/h2*.jar org.h2.tools.Shell -url jdbc:h2:tcp://nexus:2424/nexus <<<"update SECURITY_USER set STATUS = 'active' WHERE ID = 'admin';"
+    ```
+
+2. H2 TCP server + Web console in different container:
+
+   Start service with H2 TCP server and Web console in different container if the "debug" profile is set (does not start by default):
+
+    ```bash
+    export INSTALL4J_ADD_VM_PARAMS="-Dnexus.sso.h2.tcpListenerEnabled=true -Dnexus.sso.h2.tcpListenerPort=2424"
+    docker compose --profile debug up 
+    ```
+
+    Open web browser: `http://localhost:2480` -> `jdbc:h2:tcp://nexus:2424/nexus` -> emplty `login/pass`.
+
+3. Or use embedded Web console:
+
+    Expose port `2481` in compose config before running, then:
+
+    ```bash
+    export INSTALL4J_ADD_VM_PARAMS="-Dnexus.h2.httpListenerEnabled=true -Dnexus.h2.httpListenerPort=2481"
+    docker compose up
+    ```
+
+    Open web browser: `http://localhost:2481` -> `jdbc:h2:/nexus-data/db/nexus` -> emplty `login/pass`.
+
+## Rebuild DB
+
+If the integrity of the H2 database is compromised, follow the instruction [1] and [2]:
 
 ```bash
-docker compose --profile debug up
-```
-
-## Rebuild OrientDB
-
-If the integrity of the database is compromised, follow the [instruction][1]:
-
-```bash
-docker compose run --rm -u 0:0 nexus bash
-cd /tmp
-java -Xmx128m -jar /opt/sonatype/nexus/lib/support/nexus-orient-console.jar
-
-CONNECT PLOCAL:/nexus-data/db/component admin admin
-REBUILD INDEX *
-REPAIR DATABASE --fix-graph
-REPAIR DATABASE --fix-links
-REPAIR DATABASE --fix-ridbags
-REPAIR DATABASE --fix-bonsai
-DISCONNECT
-
-docker compose restart nexus
-docker compose logs -f
+docker compose down
+docker compose run -w /nexus-data/db --rm nexus bash
 
 # Backup (if required)
-backup database /nexus-data/db-component-backup.zip
+java -cp $NEXUS_HOME/system/com/h2database/h2/*/h2*.jar org.h2.tools.Script -url jdbc:h2:./nexus -script nexus.zip -options compression zip
+
+# Create a dump of the current database
+java -cp $NEXUS_HOME/system/com/h2database/h2/*/h2*.jar org.h2.tools.Recover -db nexus -trace
+
+# Rename the corrupt database file
+mv nexus.mv.db nexus.mv.db.bak
+
+# Import the dump from 
+java -cp $NEXUS_HOME/system/com/h2database/h2/*/h2*.jar org.h2.tools.RunScript -url jdbc:h2:./nexus -script nexus.h2.sql -checkResults
+
+# Run and check logs
+docker compose up -d
+docker compose logs -f
 
 # Restore (if required)
-restore database /nexus-data/db-component-backup.zip
+java -cp $NEXUS_HOME/system/com/h2database/h2/*/h2*.jar org.h2.tools.RunScript -url jdbc:h2:./nexus -script nexus.zip -options compression zip
 ```
 
 [0]: https://docs.docker.com/compose/multiple-compose-files/merge/ "Merge Compose files"
-[1]: https://gist.github.com/micalbrecht/212d37865fbc24afc6d8b1aab621dea6 "Rebuild OrientDB gist"
+[1]: https://stackoverflow.com/a/41898677 "Rebuild H2DB"
+[2]: https://www.h2database.com/html/tutorial.html#upgrade_backup_restore "Upgrade, Backup, and Restore"

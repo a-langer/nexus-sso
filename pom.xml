@@ -4,7 +4,7 @@
     <groupId>com.github.a-langer</groupId>
     <artifactId>nexus-sso</artifactId>
     <packaging>pom</packaging>
-    <version>3.70.0</version>
+    <version>3.70.1</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Single Sign-On patch for Nexus OSS</description>
 
@@ -14,7 +14,7 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <nexus.base.version>${project.version}</nexus.base.version>
-        <nexus.extension.version>03</nexus.extension.version>
+        <nexus.extension.version>02</nexus.extension.version>
         <nexus.plugin.version>${nexus.base.version}-${nexus.extension.version}</nexus.plugin.version>
     </properties>
 
@@ -59,30 +59,11 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.orientechnologies</groupId>
-            <artifactId>orientdb-core</artifactId>
-            <version>2.2.37</version>
+            <groupId>org.sonatype.nexus</groupId>
+            <artifactId>nexus-datastore-mybatis</artifactId>
+            <version>${nexus.plugin.version}</version>
             <scope>provided</scope>
             <optional>true</optional>
-            <exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.orientechnologies</groupId>
-            <artifactId>orientdb-jdbc</artifactId>
-            <version>2.2.37</version>
-            <scope>provided</scope>
-            <optional>true</optional>
-            <exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -143,20 +124,6 @@
                     <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.sonatype.nexus</groupId>
-            <artifactId>nexus-orient</artifactId>
-            <version>${nexus.plugin.version}</version>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.sonatype.nexus</groupId>
-            <artifactId>nexus-transaction</artifactId>
-            <version>${nexus.plugin.version}</version>
-            <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.sonatype.nexus</groupId>

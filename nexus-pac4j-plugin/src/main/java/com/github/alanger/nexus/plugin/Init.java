@@ -55,34 +55,40 @@ public class Init extends StateGuardLifecycleSupport {
     public void doStart() throws Exception {
         log.trace("Init doStart()");
 
+        ClassLoader oldTccl = Thread.currentThread().getContextClassLoader();
         GroovyClassLoader gcl = getGroovyClassLoader();
 
-        // For Shiro Object Builder
-        Thread.currentThread().setContextClassLoader(gcl);
-
-        // FIX SAMLSignatureValidationException: Signature is not trusted
         try {
-            SignatureValidator.validate(null, null);
-        } catch (ConstraintViolationException e) {
-            // OK: Validation credential cannot be null
-            log.debug("Initialize SPI SignatureValidationProvider done");
+            // For Shiro Object Builder
+            Thread.currentThread().setContextClassLoader(gcl);
+
+            // FIX SAMLSignatureValidationException: Signature is not trusted
+            try {
+                SignatureValidator.validate(null, null);
+            } catch (ConstraintViolationException e) {
+                // OK: Validation credential cannot be null
+                log.debug("Initialize SPI SignatureValidationProvider done");
+            }
+
+            String scriptDir = getInitParameter(SCRIPT_DIR) != null ? getInitParameter(SCRIPT_DIR) : SCRIPT_DIR_DEFAULT;
+            String mainFile = getInitParameter(MAIN_FILE) != null ? getInitParameter(MAIN_FILE) : MAIN_FILE_DEFAULT;
+            // String mainClassName = getInitParameter("mainClassName") ?: "com.github.alanger.nexus.bootstrap.Main";
+
+            File scriptPath = new File(scriptDir);
+            log.trace("scriptPath: {}", scriptPath.getAbsolutePath());
+            gcl.addURL(scriptPath.toURI().toURL());
+
+            Class<?> groovyClass = gcl.parseClass(new File(scriptPath, mainFile));
+            // Class groovyClass = gcl.loadClass(mainClassName, true, false, true);
+
+            // com.github.alanger.nexus.bootstrap.Main
+            log.trace("groovyClass: {}", groovyClass.getCanonicalName());
+
+            groovyClass.getDeclaredConstructor(ServletContext.class).newInstance(servletContext);
+        } finally {
+            Thread.currentThread().setContextClassLoader(oldTccl);
         }
 
-        String scriptDir = getInitParameter(SCRIPT_DIR) != null ? getInitParameter(SCRIPT_DIR) : SCRIPT_DIR_DEFAULT;
-        String mainFile = getInitParameter(MAIN_FILE) != null ? getInitParameter(MAIN_FILE) : MAIN_FILE_DEFAULT;
-        // String mainClassName = getInitParameter("mainClassName") ?: "com.github.alanger.nexus.bootstrap.Main";
-
-        File scriptPath = new File(scriptDir);
-        log.trace("scriptPath: {}", scriptPath.getAbsolutePath());
-        gcl.addURL(scriptPath.toURI().toURL());
-
-        Class<?> groovyClass = gcl.parseClass(new File(scriptPath, mainFile));
-        // Class groovyClass = gcl.loadClass(mainClassName, true, false, true);
-
-        // com.github.alanger.nexus.bootstrap.Main
-        log.trace("groovyClass: {}", groovyClass.getCanonicalName());
-
-        groovyClass.getDeclaredConstructor(ServletContext.class).newInstance(servletContext);
     }
 
     //-- Utils --//

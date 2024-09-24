@@ -13,10 +13,21 @@ etc/*/*_SAVE*
 etc/*/*_TEST*
 etc/*/* copy*
 etc/*/*.crt
-nexus-bootstrap/src/main/*/*_SAVE*
-nexus-bootstrap/src/main/*/*_TEST*
-nexus-bootstrap/src/main/*/* copy*
-nexus-bootstrap/src/main/*/*.crt
-nexus-bootstrap/src/main/groovy/com/github/alanger/nexus/bootstrap/*_SAVE*
-nexus-bootstrap/src/main/groovy/com/github/alanger/nexus/bootstrap/*_TEST*
-nexus-bootstrap/src/main/groovy/com/github/alanger/nexus/bootstrap/* copy*
+nexus-pac4j-plugin/src/main/*/*_SAVE
+nexus-pac4j-plugin/src/main/*/*_SAVE*
+nexus-pac4j-plugin/src/main/*/*_TEST*
+nexus-pac4j-plugin/src/main/*/* copy*
+nexus-pac4j-plugin/src/main/*/* copy
+nexus-pac4j-plugin/src/main/*/*.crt
+nexus-pac4j-plugin/src/main/groovy/com/github/alanger/nexus/bootstrap/*_SAVE
+nexus-pac4j-plugin/src/main/groovy/com/github/alanger/nexus/bootstrap/*_SAVE*
+nexus-pac4j-plugin/src/main/groovy/com/github/alanger/nexus/bootstrap/*_TEST
+nexus-pac4j-plugin/src/main/groovy/com/github/alanger/nexus/bootstrap/*_TEST*
+nexus-pac4j-plugin/src/main/groovy/com/github/alanger/nexus/bootstrap/* copy*
+nexus-pac4j-plugin/src/main/groovy/com/github/alanger/nexus/bootstrap/* copy
+nexus-pac4j-plugin/src/main/config/*_SAVE
+nexus-pac4j-plugin/src/main/config/*_SAVE*
+nexus-pac4j-plugin/src/main/config/*_TEST
+nexus-pac4j-plugin/src/main/config/*_TEST*
+nexus-pac4j-plugin/src/main/config/* copy*
+nexus-pac4j-plugin/src/main/config/* copy

@@ -5,7 +5,8 @@ services:
   nexus:
     # Disable analytics https://help.sonatype.com/en/in-product-analytics-capability.html
     environment:
-      - "INSTALL4J_ADD_VM_PARAMS=${INSTALL4J_ADD_VM_PARAMS} -Dnexus.analytics.enabled=false"
+      - INSTALL4J_ADD_VM_PARAMS=${INSTALL4J_ADD_VM_PARAMS} -Dnexus.analytics.enabled=false -Dnexus.datastore.enabled=true 
+          -Dnexus.sso.h2.tcpListenerEnabled=true -Dnexus.sso.h2.tcpListenerPort=2424 -Dnexus.h2.httpListenerEnabled=true -Dnexus.h2.httpListenerPort=2480
     # Disabling "Analyze Application" https://stackoverflow.com/a/41726259/19707292
     extra_hosts:
       - clm.sonatype.com:0.0.0.0
@@ -22,6 +23,8 @@ services:
       - ${NEXUS_ETC}/nexus-default.properties:/opt/sonatype/nexus/etc/nexus-default.properties:ro
       - ./nexus-pac4j-plugin/src/main/config:/opt/sonatype/nexus/etc/sso/config:ro
       - ./nexus-pac4j-plugin/src/main/groovy:/opt/sonatype/nexus/etc/sso/script:ro
+      - ${NEXUS_ETC}/h2db:/h2db:rw # H2DB console config
     ports:
-      - "${NEXUS_HTTP_PORT:-8081}:8081" # Nexus: http://localhost:8081/ (remove it from production environment)
-      - "${ORIENTDB_BINARY_PORT:-2424}:2424" # OrientDB: tcp://localhost:2424 (remove it from production environment)
+      - ${NEXUS_HTTP_PORT:-8081}:8081 # Nexus: http://localhost:8081/ (remove it from production environment)
+      - ${DBCONSOLE_TCP_PORT:-2424}:2424 # H2DB: tcp://localhost:2424 (remove it from production environment)
+      - ${DBCONSOLE_HTTP_PORT:-2481}:2480 # H2DB: http://localhost:2481 (remove it from production environment)

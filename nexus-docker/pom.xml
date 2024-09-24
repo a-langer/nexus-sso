@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.github.a-langer</groupId>
         <artifactId>nexus-sso</artifactId>
-        <version>3.70.0</version>
+        <version>3.70.1</version>
         <relativePath>..</relativePath>
     </parent>
     <artifactId>nexus-docker</artifactId>
@@ -15,8 +15,9 @@
 
     <properties>
         <nexus.base.image>sonatype/nexus3:${nexus.base.version}-java11-ubi</nexus.base.image>
-        <docker.image>ghcr.io/a-langer/nexus-sso:${project.version}-java11-ubi</docker.image>
-        <ansiblegalaxy.version>0.3.2-fixed</ansiblegalaxy.version>
+        <docker.image>ghcr.io/a-langer/nexus-sso:${project.version}-java11-ubi-BETA</docker.image>
+        <!-- <ansiblegalaxy.version>0.3.2-fixed</ansiblegalaxy.version> -->
+        <ansiblegalaxy.version>0.3.3</ansiblegalaxy.version>
     </properties>
 
     <profiles>
@@ -48,9 +49,12 @@
                             </execution>
                         </executions>
                         <configuration>
+                            <!-- TODO Ansiblegalaxy plugin does not support new storage API -->
+                            <skip>true</skip>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>com.github.angeloxx.nexus-repository-ansiblegalaxy</groupId>
+                                    <!-- <groupId>com.github.angeloxx.nexus-repository-ansiblegalaxy</groupId> -->
+                                    <groupId>org.sonatype.nexus.plugins</groupId>
                                     <artifactId>nexus-repository-ansiblegalaxy</artifactId>
                                     <version>${ansiblegalaxy.version}</version>
                                     <type>jar</type>
@@ -66,13 +70,26 @@
                         <version>3.1.0</version>
                         <executions>
                             <execution>
+                                <id>get-migrator-utility</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target description="Get Database Migrator Utility">
+                                        <echo>Download nexus-db-migrator, see https://help.sonatype.com/en/orientdb-downloads.html</echo>
+                                        <get src="https://download.sonatype.com/nexus/nxrm3-migrator/nexus-db-migrator-3.70.1-03.jar" dest="target" skipexisting="true" />
+                                    </target>
+                                </configuration>
+                            </execution>
+                            <execution>
                                 <id>docker-prepare</id>
                                 <phase>install</phase>
                                 <goals>
                                     <goal>run</goal>
                                 </goals>
                                 <configuration>
-                                    <target description="Main target from pom.xml">
+                                    <target description="Change Dockerfile">
                                         <echo>Set NEXUS_IMAGE="${docker.image}" to .env</echo>
                                         <replaceregexp file="${maven.multiModuleProjectDirectory}/.env" byline="true"
                                             match="NEXUS_IMAGE=(.*)"

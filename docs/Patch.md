@@ -7,7 +7,7 @@ Additional features implemented in this patch.
 **Non-transitive privileges in group repositories** - by default group repository privileges in Nexus are transitive (all or nothing), this [property](../etc/nexus-default.properties) enables mode of non-transitive privileges (only what is allowed):
 
 ```properties
-nexus.group.nontransitive.privileges.enabled=true
+nexus.sso.group.nontransitive.privileges.enabled=true
 ```
 
 > **Note**:

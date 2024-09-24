@@ -114,4 +114,4 @@ It is better to perform each check in a new private browser window (or delete co
 [5]: https://developer.okta.com/docs/concepts/saml/#enabling-saml-for-everyone-vs-a-subset-of-users "Okta SAML"
 [6]: https://docs.microsoft.com/en-us/power-apps/maker/portals/configure/configure-saml2-settings "ADFS SAML"
 [7]: https://support.sonatype.com/hc/en-us/articles/1500000976522-Keycloak-SAML-integration-with-Nexus-Applications "Keycloak-SAML + Nexus"
-[8]: https://commons.apache.org/proper/commons-configuration/userguide/howto_basicfeatures.html "Variable interpolation"
+[8]: https://commons.apache.org/proper/commons-text/apidocs/org/apache/commons/text/StringSubstitutor.html "Variable interpolation"

@@ -5,11 +5,10 @@ import java.util.Objects;
 import javax.script.ScriptEngine;
 
 import org.apache.commons.text.lookup.StringLookup;
-import org.apache.commons.configuration2.interpol.Lookup;
 
 import org.codehaus.groovy.jsr223.GroovyScriptEngineImpl;
 
-public class GroovyStringLookup implements StringLookup, Lookup {
+public class GroovyStringLookup implements StringLookup {
 
     public static final GroovyStringLookup INSTANCE = new GroovyStringLookup();
 

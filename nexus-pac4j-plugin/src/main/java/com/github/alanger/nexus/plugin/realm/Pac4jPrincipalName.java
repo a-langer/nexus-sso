@@ -91,8 +91,16 @@ public class Pac4jPrincipalName implements Principal, Serializable, IUserPrefix,
         return this.profiles;
     }
 
+    /**
+     * Equals by string for compatibility with internal ApiKeyStore implementation
+     * 
+     * @since 3.70.1-02 - Equals by string
+     * @see org.sonatype.nexus.internal.security.apikey.ApiKeyStoreImpl#principalMatches
+     */
     @Override
     public boolean equals(Object o) {
+        if (o instanceof String)
+            return ((String) o).equals(getName());
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())

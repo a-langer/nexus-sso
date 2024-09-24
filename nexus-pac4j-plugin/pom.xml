@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.github.a-langer</groupId>
         <artifactId>nexus-sso</artifactId>
-        <version>3.70.0</version>
+        <version>3.70.1</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -19,22 +19,6 @@
             <groupId>com.github.a-langer</groupId>
             <artifactId>shiro-ext</artifactId>
             <version>e0b5923e39</version>
-        </dependency>
-        <!-- Variable interpolation for shiro.ini, see https://shiro.apache.org/configuration.html -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-configuration2</artifactId>
-            <version>2.8.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-lang3</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <!-- Newer version requires JDK 17, Nexus 3.70.X with OrientDB supports max JDK 11 -->
         <dependency>
@@ -223,7 +207,6 @@
                             com.github.alanger.nexus.plugin.*,com.github.alanger.nexus.bootstrap.*
                             <!-- SAML dependencies for Nexus runtime -->
                             ,com.github.alanger.shiroext.*,org.pac4j.*,io.buji.*,org.opensaml.*
-                            ,org.apache.commons.configuration2.*,org.apache.commons.text.*
                         </Export-Package>
                         <Private-Package>
                             <!-- Extract only plugin packages -->

@@ -93,7 +93,7 @@ public class GroupFacetImpl
   private RepositoryPermissionChecker repositoryPermissionChecker;
 
   @Inject // SSO patch
-  @Named("${nexus.group.nontransitive.privileges.enabled:-false}")
+  @Named("${nexus.sso.group.nontransitive.privileges.enabled:-false}")
   private boolean groupPermissionEnabled;
 
   @Inject

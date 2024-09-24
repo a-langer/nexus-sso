@@ -1,6 +1,5 @@
 package com.github.alanger.nexus.bootstrap;
 
-import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
@@ -22,8 +21,7 @@ import javax.servlet.ServletResponse;
 import groovy.json.JsonSlurper;
 import groovy.json.JsonOutput;
 
-import org.apache.shiro.SecurityUtils;
-
+import org.sonatype.nexus.repository.Repository;
 import com.github.alanger.shiroext.servlets.MultiReadRequestWrapper;
 import com.github.alanger.shiroext.servlets.MutableResponseWrapper;
 import com.github.alanger.nexus.plugin.ui.NonTransitiveSearchComponent;
@@ -54,6 +52,7 @@ public class DockerExtdirectFilter extends QuotaFilter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         this.servletContext = filterConfig.getServletContext();
+        super.init(filterConfig);
     }
 
     /**
@@ -100,8 +99,7 @@ public class DockerExtdirectFilter extends QuotaFilter {
      * </pre>
      */
     @Override
-    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
-            throws IOException, ServletException {
+    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) resp;
 
@@ -123,15 +121,15 @@ public class DockerExtdirectFilter extends QuotaFilter {
         String reqMethod = String.valueOf(reqMap.get("method"));
 
         // Override search endpoint if enabled non-transitive privileges
-        if ("coreui_Search".equals(reqAction) && Boolean.getBoolean("nexus.group.nontransitive.privileges.enabled")) {
+        if ("coreui_Search".equals(reqAction) && Boolean.getBoolean("nexus.sso.group.nontransitive.privileges.enabled")) {
             reqMap.put("action", NonTransitiveSearchComponent.ACTION);
             requestWrapper.setContent(JsonOutput.toJson(reqMap).getBytes());
             chain.doFilter(requestWrapper, response);
             return;
         }
 
-        if (COREUI_COMPONENT.equals(reqAction) && (READ_COMPONENT.equals(reqMethod) ||
-                READ_ASSET.equals(reqMethod)) || READ_COMPONENT_ASSETS.equals(reqMethod)) {
+        if (COREUI_COMPONENT.equals(reqAction) && (READ_COMPONENT.equals(reqMethod) || READ_ASSET.equals(reqMethod))
+                || READ_COMPONENT_ASSETS.equals(reqMethod)) {
 
             MutableResponseWrapper responseWrapper = new MutableResponseWrapper(response);
             chain.doFilter(requestWrapper, responseWrapper);
@@ -155,15 +153,13 @@ public class DockerExtdirectFilter extends QuotaFilter {
 
                 String repoName = String.valueOf(data.get("repositoryName"));
                 String repoFormat = String.valueOf(data.get("format"));
-                logger.trace("repoName: {}, repoFormat: {}, action: {}, method: {}", repoName, repoFormat, action,
-                        method);
+                logger.trace("repoName: {}, repoFormat: {}, action: {}, method: {}", repoName, repoFormat, action, method);
 
                 // Hide private properties of an asset
-                if (success && COREUI_COMPONENT.equals(action)
-                        && (READ_ASSET.equals(method) || READ_COMPONENT_ASSETS.equals(method))) {
+                if (success && COREUI_COMPONENT.equals(action) && (READ_ASSET.equals(method) || READ_COMPONENT_ASSETS.equals(method))) {
                     // Check push permission
-                    boolean pushAllowed = SecurityUtils.getSubject()
-                            .isPermitted(format(permission, repoFormat, repoName));
+                    Repository repo = repoName != null ? this.repositoryManager.get(repoName) : null;
+                    boolean pushAllowed = repo != null && userCanInRepository(repo);
                     if (!pushAllowed) {
                         data.put("createdBy", "***");
                         data.put("createdByIp", "***");
@@ -206,8 +202,8 @@ public class DockerExtdirectFilter extends QuotaFilter {
 
         chain.doFilter(requestWrapper, response);
 
-        if ("POST".equals(request.getMethod()) && response.getStatus() == 200
-                && "coreui_RealmSettings".equals(reqMap.get("action")) && "update".equals(reqMap.get("method"))) {
+        if ("POST".equals(request.getMethod()) && response.getStatus() == 200 && "coreui_RealmSettings".equals(reqMap.get("action"))
+                && "update".equals(reqMap.get("method"))) {
             logger.trace("Realm update - request method: {}, json method: {}, response status: {}", request.getMethod(),
                     reqMap.get("method"), response.getStatus());
             servletContext.setAttribute(ReloadCongiguration.NEED_RELOAD, true);

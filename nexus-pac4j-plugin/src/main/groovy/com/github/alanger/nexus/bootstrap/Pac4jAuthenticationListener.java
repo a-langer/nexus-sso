@@ -5,11 +5,6 @@ import static java.text.MessageFormat.format;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.Statement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -23,21 +18,23 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.shiro.util.JdbcUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.subject.support.WebDelegatingSubject;
-
+import com.github.alanger.nexus.plugin.realm.NexusPac4jRealm;
 import com.github.alanger.nexus.plugin.realm.Pac4jPrincipalName;
 import com.github.alanger.nexus.plugin.realm.Pac4jRealmName;
 import com.github.alanger.shiroext.realm.RealmUtils;
+import io.buji.pac4j.token.Pac4jToken;
 import com.github.alanger.shiroext.realm.ICommonRole;
 
 import org.pac4j.core.profile.UserProfile;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.security.config.CUser;
+import org.sonatype.nexus.security.config.CUserRoleMapping;
+import org.sonatype.nexus.security.config.SecurityConfiguration;
 
 /**
  * SSO authentication listener.
@@ -59,22 +56,14 @@ public class Pac4jAuthenticationListener implements AuthenticationListener {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final DefaultWebSecurityManager securityManager;
     private final Properties mapper;
-    private DataSource dataSource;
 
     private Class<?> principalClass = Pac4jPrincipalName.class;
     private Class<?> realmClass = Pac4jRealmName.class;
 
-    // @formatter:off
-    private String userQuery = "SELECT * FROM user WHERE id = ''{0}''";
-    private String userUpdate = "UPDATE user SET firstName = ''{1}'', lastName = ''{2}'', email = ''{3}'', status = ''{4}'', password = ''{5}'' WHERE id = ''{0}''";
-    private String userInsert = "INSERT INTO user (id, firstName, lastName, email, status, password) VALUES (''{0}'', ''{1}'', ''{2}'', ''{3}'', ''{4}'', ''{5}'')";
+    public final SecurityConfiguration securityConfiguration;
 
-    private String roleQuery = "SELECT * FROM user_role_mapping WHERE userId = ''{0}''";
-    private String roleUpdate = "UPDATE user_role_mapping SET source = ''{1}'', roles = ''{2}'' WHERE userId = ''{0}''";
-    private String roleInsert = "INSERT INTO user_role_mapping (userId, source, roles) VALUES (''{0}'', ''{1}'', ''{2}'')";
-    // @formatter:on
-
-    public Pac4jAuthenticationListener() {
+    public Pac4jAuthenticationListener(final SecurityConfiguration securityConfiguration) {
+        this.securityConfiguration = securityConfiguration;
         this.securityManager = (DefaultWebSecurityManager) SecurityUtils.getSecurityManager();
 
         // Default SAML profile attributes
@@ -90,20 +79,15 @@ public class Pac4jAuthenticationListener implements AuthenticationListener {
         this.mapper.put(ATTR_ID, attrs);
     }
 
-    public Pac4jAuthenticationListener(DataSource dataSource) {
-        this();
-        this.dataSource = dataSource;
-    }
-
     @Override
     public void onSuccess(AuthenticationToken token, AuthenticationInfo ai) {
         PrincipalCollection principals = ai.getPrincipals();
         logger.trace("token: {}, info: {}, principals: {}", token, ai, principals);
 
-        if (principals != null) {
+        if (principals != null && supports(token) && supports(principals)) {
             try {
                 Pac4jPrincipalName principal = (Pac4jPrincipalName) principals.oneByType(principalClass);
-                logger.trace("principal: {} = {}", principal, principal != null ? principal.getClass() : null);
+                logger.trace("principal: {}, {}", principal, principal != null ? principal.getClass() : null);
 
                 if (principal != null) {
                     UserProfile profile = principal.getProfile();
@@ -132,49 +116,31 @@ public class Pac4jAuthenticationListener implements AuthenticationListener {
                     logger.trace("attrs: firstName = {}, lastName = {}, email = {}, status = {}, source = {}, roles = '{}'", firstName,
                             lastName, email, status, source, roles);
 
-                    Connection conn = null;
-                    Statement stmt = null;
-                    ResultSet rs = null;
-                    try {
-                        conn = dataSource.getConnection();
-                        stmt = conn.createStatement();
+                    // Set user profile
+                    CUser curUser = securityConfiguration.getUser(id);
+                    CUser user = curUser != null ? curUser : securityConfiguration.newUser();
+                    user.setId(id);
+                    user.setFirstName(firstName);
+                    user.setLastName(lastName);
+                    user.setEmail(email);
+                    user.setStatus(status);
+                    user.setPassword(password);
+                    if (curUser == null) {
+                        securityConfiguration.addUser(user, roleSet);
+                    } else {
+                        securityConfiguration.updateUser(user, roleSet);
+                    }
 
-                        // Set user profile
-                        String sql = format(this.userUpdate, id, firstName, lastName, email, status, password);
-                        String query = format(this.userQuery, id, firstName, lastName, email, status, password);
-                        logger.trace("userQuery sql: {}", query);
-                        rs = stmt.executeQuery(query);
-                        if (rs.next()) {
-                            String currentStatus = rs.getString(STATUS_ID);
-                            if (!DEFAULT_STATUS.equals(currentStatus)) {
-                                String tmpl = "Account '%s' must have '%s' status, current status is %s";
-                                sendError(403, tmpl, id, DEFAULT_STATUS, currentStatus);
-                                return;
-                            }
-                        } else {
-                            sql = format(this.userInsert, id, firstName, lastName, email, status, password);
-                        }
-                        logger.trace("userUpdate/userInsert sql: {}", sql);
-                        stmt.execute(sql);
-                        rs.close();
-
-                        // Set roles
-                        sql = format(this.roleUpdate, id, source, roles);
-                        query = format(this.roleQuery, id, source, roles);
-                        logger.trace("roleQuery sql: {}", query);
-                        rs = stmt.executeQuery(query);
-                        if (!rs.next()) {
-                            sql = format(this.roleInsert, id, source, roles);
-                        }
-                        logger.trace("roleUpdate/roleInsert sql: {}", sql);
-                        stmt.execute(sql);
-                    } catch (SQLException e) {
-                        logger.error("onSuccess method SQL error", e);
-                        sendError(500, "Pac4jAuthenticationListener: %s", e.toString());
-                    } finally {
-                        JdbcUtils.closeResultSet(rs);
-                        JdbcUtils.closeStatement(stmt);
-                        JdbcUtils.closeConnection(conn);
+                    // Set roles
+                    CUserRoleMapping curRoleMapping = securityConfiguration.getUserRoleMapping(id, source);
+                    CUserRoleMapping roleMapping = curRoleMapping != null ? curRoleMapping : securityConfiguration.newUserRoleMapping();
+                    roleMapping.setUserId(id);
+                    roleMapping.setSource(source);
+                    roleMapping.setRoles(roleSet);
+                    if (curRoleMapping == null) {
+                        securityConfiguration.addUserRoleMapping(roleMapping);
+                    } else {
+                        securityConfiguration.updateUserRoleMapping(roleMapping);
                     }
                 }
             } catch (Exception e) {
@@ -185,11 +151,14 @@ public class Pac4jAuthenticationListener implements AuthenticationListener {
     }
 
     public void onFailure(AuthenticationToken token, AuthenticationException ae) {
-        logger.trace("onFailure token: {} , exception:", token, ae);
+        if (supports(token)) {
+            logger.trace("onFailure token: {}, exception:", token, ae);
+        }
     }
 
     public void onLogout(PrincipalCollection principals) {
-        logger.trace("onLogout principals: {}", principals);
+        if (supports(principals))
+            logger.trace("onLogout principals: {}", principals);
     }
 
     private void sendError(int code, String tmpl, Object... objects) throws AuthenticationException {
@@ -229,12 +198,12 @@ public class Pac4jAuthenticationListener implements AuthenticationListener {
         return StringUtils.normalizeSpace(val.toString());
     }
 
-    public DataSource getDataSource() {
-        return dataSource;
+    private boolean supports(AuthenticationToken token) {
+        return token != null && Pac4jToken.class.isAssignableFrom(token.getClass());
     }
 
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
+    private boolean supports(PrincipalCollection principals) {
+        return NexusPac4jRealm.isSupports(principals, NexusPac4jRealm.NAME);
     }
 
     public void setPrincipalClass(String className) throws ClassNotFoundException {
@@ -245,52 +214,36 @@ public class Pac4jAuthenticationListener implements AuthenticationListener {
         this.realmClass = Class.forName(className);
     }
 
-    public String getUserQuery() {
-        return userQuery;
-    }
+    /** Deprecated since 3.70.1-02 */
 
+    @Deprecated(since = "3.70.1-02")
     public void setUserQuery(String userQuery) {
-        this.userQuery = userQuery;
+        logger.warn("Property 'useQuery' has been deprecated since 3.70.1-02 and will be removed in next release");
     }
 
-    public String getUserUpdate() {
-        return userUpdate;
-    }
-
+    @Deprecated(since = "3.70.1-02")
     public void setUserUpdate(String userUpdate) {
-        this.userUpdate = userUpdate;
+        logger.warn("Property 'userUpdate' has been deprecated since 3.70.1-02 and will be removed in next release");
     }
 
-    public String getUserInsert() {
-        return userInsert;
-    }
-
+    @Deprecated(since = "3.70.1-02")
     public void setUserInsert(String userInsert) {
-        this.userInsert = userInsert;
+        logger.warn("Property 'userInsert' has been deprecated since 3.70.1-02 and will be removed in next release");
     }
 
-    public String getRoleQuery() {
-        return roleQuery;
-    }
-
+    @Deprecated(since = "3.70.1-02")
     public void setRoleQuery(String roleQuery) {
-        this.roleQuery = roleQuery;
+        logger.warn("Property 'roleQuery' has been deprecated since 3.70.1-02 and will be removed in next release");
     }
 
-    public String getRoleUpdate() {
-        return roleUpdate;
-    }
-
+    @Deprecated(since = "3.70.1-02")
     public void setRoleUpdate(String roleUpdate) {
-        this.roleUpdate = roleUpdate;
+        logger.warn("Property 'roleUpdate' has been deprecated since 3.70.1-02 and will be removed in next release");
     }
 
-    public String getRoleInsert() {
-        return roleInsert;
-    }
-
+    @Deprecated(since = "3.70.1-02")
     public void setRoleInsert(String roleInsert) {
-        this.roleInsert = roleInsert;
+        logger.warn("Property 'roleInsert' has been deprecated since 3.70.1-02 and will be removed in next release");
     }
 
 }

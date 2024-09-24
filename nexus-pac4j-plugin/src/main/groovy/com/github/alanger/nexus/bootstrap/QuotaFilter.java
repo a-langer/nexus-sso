@@ -1,13 +1,13 @@
 package com.github.alanger.nexus.bootstrap;
 
 import static com.github.alanger.shiroext.realm.RealmUtils.asList;
-import static org.sonatype.nexus.common.text.UnitFormatter.formatStorage;
-import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static javax.servlet.RequestDispatcher.ERROR_MESSAGE;
+import static java.util.Collections.singletonList;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,70 +19,65 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.Permission;
+import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.blobstore.api.BlobStore;
+import org.sonatype.nexus.blobstore.api.BlobStoreManager;
+import org.sonatype.nexus.blobstore.quota.BlobStoreQuotaResult;
+import org.sonatype.nexus.blobstore.quota.BlobStoreQuotaService;
+import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.manager.RepositoryManager;
+import org.sonatype.nexus.repository.security.RepositoryContentSelectorPermission;
+import org.sonatype.nexus.repository.security.RepositoryViewPermission;
+import org.sonatype.nexus.security.BreadActions;
+import org.sonatype.nexus.security.SecurityHelper;
+import org.sonatype.nexus.selector.SelectorManager;
+import com.github.alanger.nexus.plugin.DI;
 
-import com.orientechnologies.orient.core.sql.query.OSQLSynchQuery;
-import com.orientechnologies.orient.core.db.OPartitionedDatabasePool;
-import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.record.impl.ODocument;
-
-// https://orientdb.com/docs/2.2.x/Java-Web-Apps.html
-// https://orientdb.com/docs/2.2.x/Document-API-Documents.html
-// https://orientdb.com/docs/2.2.x/Document-API-Database.html
-// https://orientdb.com/docs/2.2.x/Document-Database.html
+/**
+ * Quota filter.
+ * 
+ * @see https://help.sonatype.com/en/configuring-blob-stores.html#adding-a-soft-quota
+ * @see https://help.sonatype.com/en/storage-guide.html
+ * @see org.sonatype.nexus.repository.internal.blobstore.BlobStoreQuotaHealthCheck
+ */
 public class QuotaFilter implements Filter {
+
+    public static final String REPO_NAME_ATTR = QuotaFilter.class.getCanonicalName() + ".REPO_NAME";
+
+    // All protected for fix groovy.lang.MissingPropertyException: No such property: XXXXX
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public static final String REPO_NAME_ATTR = QuotaFilter.class.getCanonicalName() + ".REPO_NAME";
-    public static final String REPO_FORMAT_ATTR = QuotaFilter.class.getCanonicalName() + ".REPO_FORMAT";
-
-    private OPartitionedDatabasePool configPool = null;
-    private String configURL = "plocal:/nexus-data/db/config";
-    private String configUser = "admin";
-    private String configPassword = "admin";
-    private int configMaxPartitionSize = 1;
-    private int configMaxPoolSize = 50;
-
-    private OPartitionedDatabasePool componentPool = null;
-    private String componentURL = "plocal:/nexus-data/db/component";
-    private String componentUser = "admin";
-    private String componentPassword = "admin";
-    private int componentMaxPartitionSize = 1;
-    private int componentMaxPoolSize = 50;
-
-    // Example: nexus:repository-view:docker:myrepo-docker-hosted:add
-    protected String permission = "nexus:repository-view:%s:%s:add";
-
-    private boolean formatFromRepositoryName = false;
-    private String formatSplitBy = "-";
-    private int formatSplitIndex = 1;
+    protected String permission = BreadActions.ADD; // Example: read, add, delete 
 
     protected List<String> methods = asList("PUT,POST");
 
-    private String quotaSql = new StringBuilder()
-            .append("select name, attributes.blobStoreQuotaConfig.quotaLimitBytes as quota from repository_blobstore")
-            .append(" where attributes.blobStoreQuotaConfig.quotaType = 'spaceUsedQuota'")
-            .append(" and name in (select attributes.storage.blobStoreName from repository where repository_name = ?)")
-            .toString();
-
-    private String sizeSql = "SELECT sum(size) as size FROM asset where bucket.repository_name = ? GROUP BY bucket";
-
     private int responseStatus = 507; // Insufficient Storage
+
+    protected RepositoryManager repositoryManager;
+
+    protected SecurityHelper securityHelper;
+
+    protected SelectorManager selectorManager;
+
+    protected BlobStoreManager blobStoreManager;
+
+    protected BlobStoreQuotaService blobStoreQuotaService;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        this.configPool = new OPartitionedDatabasePool(configURL, configUser, configPassword, configMaxPartitionSize,
-                configMaxPoolSize);
-        this.componentPool = new OPartitionedDatabasePool(componentURL, componentUser, componentPassword,
-                componentMaxPartitionSize, componentMaxPoolSize);
+        this.repositoryManager = DI.getInstance().repositoryManager;
+        this.securityHelper = DI.getInstance().securityHelper;
+        this.selectorManager = DI.getInstance().selectorManager;
+        this.blobStoreManager = DI.getInstance().blobStoreManager;
+        this.blobStoreQuotaService = DI.getInstance().blobStoreQuotaService;
     }
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
-            throws IOException, ServletException {
+    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) resp;
 
@@ -97,58 +92,42 @@ public class QuotaFilter implements Filter {
         response.setCharacterEncoding(UTF_8.name());
 
         String repoName = getRepoName(request);
-        boolean pushAllowed = isPushAllowed(request, repoName);
+        Repository repo = repoName != null ? this.repositoryManager.get(repoName) : null;
+        boolean pushAllowed = repo != null && userCanInRepository(repo);
 
-        if (repoName != null && pushAllowed && isPush) {
-            ODatabaseDocumentTx component = null;
-            ODatabaseDocumentTx config = null;
-            try {
-                config = configPool.acquire();
-                List<ODocument> quotaResult = config.query(new OSQLSynchQuery<ODocument>(quotaSql), repoName);
+        if (repo != null && pushAllowed && isPush) {
 
-                for (ODocument storeDoc : quotaResult) {
-                    String storeName = storeDoc.field("name");
-                    long quota = storeDoc.field("quota");
+            String storeName = repo.getConfiguration().attributes("storage").get("blobStoreName", String.class);
+            BlobStore blobStore = storeName != null ? this.blobStoreManager.get(storeName) : null;
+            BlobStoreQuotaResult result = blobStore != null ? this.blobStoreQuotaService.checkQuota(blobStore) : null;
+            logger.trace("repoName: {}, storeName: {}, result: {},", repoName, storeName, result);
 
-                    logger.trace("repoName: {}, storeName: {}, quota: {},", repoName, storeName, quota);
-
-                    component = componentPool.acquire();
-                    List<ODocument> sizeResult = component.query(new OSQLSynchQuery<ODocument>(sizeSql), repoName);
-
-                    for (ODocument repoDoc : sizeResult) {
-                        long size = repoDoc.field("size");
-                        if (size >= quota) {
-                            String msg = format("Blob store %s is using %s space and has a limit of %s", storeName,
-                                    formatStorage(size),
-                                    formatStorage(quota));
-                            logger.trace(msg);
-                            response.setStatus(responseStatus);
-                            response.setHeader(ERROR_MESSAGE, msg);
-                            request.setAttribute(ERROR_MESSAGE, msg);
-                            writeJsonMessage(response, msg);
-                            return;
-                        }
-                    }
-                }
-            } finally {
-                if (component != null)
-                    component.close();
-                if (config != null)
-                    config.close();
+            if (result != null && result.isViolation()) {
+                String msg = result.getMessage();
+                logger.trace(msg);
+                response.setStatus(responseStatus(request));
+                response.setHeader(ERROR_MESSAGE, msg);
+                request.setAttribute(ERROR_MESSAGE, msg);
+                writeJsonMessage(response, msg);
+                return;
             }
         }
 
         chain.doFilter(request, response);
     }
 
+    @Override
+    public void destroy() {
+        // nothing
+    }
+
     protected void writeJsonMessage(HttpServletResponse response, String msg) throws IOException {
         if (!response.isCommitted()) {
             response.setContentType("text/json");
-            String data = new StringBuilder()
-                    .append("[{'message':'")
-                    .append(msg)
-                    .append("','success':false,'tid':1,'action':'upload','method':'upload','type':'rpc'}]")
-                    .toString().replace("'", "\"");
+            String data = new StringBuilder().append("[{'message':'") //
+                    .append(msg) //
+                    .append("','success':false,'tid':1,'action':'upload','method':'upload','type':'rpc'}]") //
+                    .toString().replace("'", "\""); //
             response.getWriter().write(data);
             response.getWriter().close();
         }
@@ -164,119 +143,31 @@ public class QuotaFilter implements Filter {
         return repoName;
     }
 
-    protected boolean isPushAllowed(HttpServletRequest request, String repoName) {
-        boolean pushAllowed = SecurityUtils.getSubject().isAuthenticated();
-        if (!pushAllowed) {
-            logger.trace("repoName: {}, pushAllowed: {}", repoName, pushAllowed);
-            return false;
-        }
-
-        // Format from request attribute
-        String repoFormat = (String) request.getAttribute(REPO_FORMAT_ATTR);
-
-        // Format from repository name
-        if (repoFormat == null && formatFromRepositoryName) {
-            // Split repository name, ex.: <name>-<format>-<type>
-            String[] arr = repoName.split(formatSplitBy);
-            repoFormat = (arr.length > formatSplitIndex) ? arr[formatSplitIndex] : "*";
-        } else {
-            repoFormat = "*"; // Require permission for all formats
-        }
-
-        pushAllowed = SecurityUtils.getSubject().isPermitted(format(permission, repoFormat, repoName));
-
-        logger.trace("repoName: {}, pushAllowed: {}, repoFormat: {}", repoName, pushAllowed, repoFormat);
-
-        return pushAllowed;
+    private int responseStatus(HttpServletRequest request) {
+        // UI response must be 200
+        return request.getRequestURI().startsWith("/repository/") ? getResponseStatus() : 200;
     }
 
-    @Override
-    public void destroy() {
-        if (configPool != null)
-            configPool.close();
-        if (componentPool != null)
-            componentPool.close();
+    // org.sonatype.nexus.repository.security.RepositoryPermissionChecker
+
+    public boolean userCanInRepository(final Repository repository) {
+        return userHasRepositoryViewPermissionTo(permission, repository) || userHasAnyContentSelectorAccessTo(repository, permission);
     }
 
-    public String getConfigURL() {
-        return configURL;
+    private boolean userHasRepositoryViewPermissionTo(final String action, final Repository repository) {
+        return this.securityHelper.anyPermitted(new RepositoryViewPermission(repository, action));
     }
 
-    public void setConfigURL(String configURL) {
-        this.configURL = configURL;
+    private boolean userHasAnyContentSelectorAccessTo(final Repository repository, final String... actions) {
+        Subject subject = this.securityHelper.subject();
+        return this.selectorManager.browse().stream()
+                .anyMatch(selector -> this.securityHelper.anyPermitted(subject,
+                        Arrays.stream(actions)
+                                .map(action -> new RepositoryContentSelectorPermission(selector, repository, singletonList(action)))
+                                .toArray(Permission[]::new)));
     }
 
-    public String getConfigUser() {
-        return configUser;
-    }
-
-    public void setConfigUser(String configUser) {
-        this.configUser = configUser;
-    }
-
-    public String getConfigPassword() {
-        return configPassword;
-    }
-
-    public void setConfigPassword(String configPassword) {
-        this.configPassword = configPassword;
-    }
-
-    public int getConfigMaxPartitionSize() {
-        return configMaxPartitionSize;
-    }
-
-    public void setConfigMaxPartitionSize(int configMaxPartitionSize) {
-        this.configMaxPartitionSize = configMaxPartitionSize;
-    }
-
-    public int getConfigMaxPoolSize() {
-        return configMaxPoolSize;
-    }
-
-    public void setConfigMaxPoolSize(int configMaxPoolSize) {
-        this.configMaxPoolSize = configMaxPoolSize;
-    }
-
-    public String getComponentURL() {
-        return componentURL;
-    }
-
-    public void setComponentURL(String componentURL) {
-        this.componentURL = componentURL;
-    }
-
-    public String getComponentUser() {
-        return componentUser;
-    }
-
-    public void setComponentUser(String componentUser) {
-        this.componentUser = componentUser;
-    }
-
-    public String getComponentPassword() {
-        return componentPassword;
-    }
-
-    public void setComponentPassword(String componentPassword) {
-        this.componentPassword = componentPassword;
-    }
-
-    public int getComponentMaxPartitionSize() {
-        return componentMaxPartitionSize;
-    }
-
-    public void setComponentMaxPartitionSize(int componentMaxPartitionSize) {
-        this.componentMaxPartitionSize = componentMaxPartitionSize;
-    }
-
-    public int getComponentMaxPoolSize() {
-        return componentMaxPoolSize;
-    }
-
-    public void setComponentMaxPoolSize(int componentMaxPoolSize) {
-        this.componentMaxPoolSize = componentMaxPoolSize;
-    }
+    // Getters and Setters
 
     public String getPermission() {
         return permission;
@@ -284,30 +175,6 @@ public class QuotaFilter implements Filter {
 
     public void setPermission(String permission) {
         this.permission = permission;
-    }
-
-    public boolean isFormatFromRepositoryName() {
-        return formatFromRepositoryName;
-    }
-
-    public void setFormatFromRepositoryName(boolean formatFromRepositoryName) {
-        this.formatFromRepositoryName = formatFromRepositoryName;
-    }
-
-    public String getFormatSplitBy() {
-        return formatSplitBy;
-    }
-
-    public void setFormatSplitBy(String formatSplitBy) {
-        this.formatSplitBy = formatSplitBy;
-    }
-
-    public int getFormatSplitIndex() {
-        return formatSplitIndex;
-    }
-
-    public void setFormatSplitIndex(int formatSplitIndex) {
-        this.formatSplitIndex = formatSplitIndex;
     }
 
     public List<String> getMethods() {
@@ -320,22 +187,6 @@ public class QuotaFilter implements Filter {
 
     public void setMethods(String methodsStr) {
         this.methods = asList(methodsStr);
-    }
-
-    public String getQuotaSql() {
-        return quotaSql;
-    }
-
-    public void setQuotaSql(String quotaSql) {
-        this.quotaSql = quotaSql;
-    }
-
-    public String getSizeSql() {
-        return sizeSql;
-    }
-
-    public void setSizeSql(String sizeSql) {
-        this.sizeSql = sizeSql;
     }
 
     public int getResponseStatus() {
