@@ -78,7 +78,7 @@
                                 <configuration>
                                     <target description="Get Database Migrator Utility">
                                         <echo>Download nexus-db-migrator, see https://help.sonatype.com/en/orientdb-downloads.html</echo>
-                                        <get src="https://download.sonatype.com/nexus/nxrm3-migrator/nexus-db-migrator-3.70.1-03.jar" dest="target" skipexisting="true" />
+                                        <get src="https://download.sonatype.com/nexus/nxrm3-migrator/nexus-db-migrator-3.70.2-01.jar" dest="target" skipexisting="true" />
                                     </target>
                                 </configuration>
                             </execution>
