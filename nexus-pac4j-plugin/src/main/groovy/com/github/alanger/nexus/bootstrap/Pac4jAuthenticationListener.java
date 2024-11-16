@@ -124,8 +124,8 @@ public class Pac4jAuthenticationListener implements AuthenticationListener {
                     user.setLastName(lastName);
                     user.setEmail(email);
                     user.setStatus(status);
-                    user.setPassword(password);
                     if (curUser == null) {
+                        user.setPassword(password); // Set only in new account
                         securityConfiguration.addUser(user, roleSet);
                     } else {
                         securityConfiguration.updateUser(user, roleSet);

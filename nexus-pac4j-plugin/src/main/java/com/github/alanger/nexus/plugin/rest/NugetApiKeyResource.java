@@ -27,6 +27,7 @@ import org.sonatype.nexus.security.SecurityHelper;
 import org.sonatype.nexus.security.authc.apikey.ApiKey;
 import org.sonatype.nexus.validation.Validate;
 import com.github.alanger.nexus.plugin.apikey.ApiTokenService;
+import com.github.alanger.nexus.plugin.realm.NexusTokenRealm;
 
 /**
  * Nuget API key implementation for SSO.
@@ -51,17 +52,21 @@ public class NugetApiKeyResource extends ComponentSupport implements Resource {
 
     private final SecurityHelper securityHelper;
 
+    private final NexusTokenRealm nexusTokenRealm;
+
     @Inject
     public NugetApiKeyResource(final ApiTokenService apiTokenService //
             , final AuthTicketService authTicketService //
-            , final SecurityHelper securityHelper) {
+            , final SecurityHelper securityHelper //
+            , final NexusTokenRealm nexusTokenRealm) {
         super();
         this.apiTokenService = Preconditions.checkNotNull(apiTokenService);
         this.authTicketService = Preconditions.checkNotNull(authTicketService);
         this.securityHelper = Preconditions.checkNotNull(securityHelper);
+        this.nexusTokenRealm = Preconditions.checkNotNull(nexusTokenRealm);
 
-        log.trace("NugetApiKeyResource apiTokenService: {}, authTicketService: {}, securityHelper: {}", //
-                apiTokenService, authTicketService, securityHelper);
+        log.trace("NugetApiKeyResource apiTokenService: {}, authTicketService: {}, securityHelper: {}, nexusTokenRealm: {}", //
+                apiTokenService, authTicketService, securityHelper, nexusTokenRealm);
     }
 
     @GET
@@ -73,21 +78,16 @@ public class NugetApiKeyResource extends ComponentSupport implements Resource {
         validateAuthToken(base64AuthToken);
         PrincipalCollection principals = this.securityHelper.subject().getPrincipals();
 
-        // Read by principals
+        // Read by primary principal or create a new
         char[] apiKey = null;
         try {
-            apiKey = apiTokenService.getApiKey(DOMAIN, principals).map(ApiKey::getApiKey).orElse(null);
+            apiKey = apiTokenService.getApiKey(DOMAIN, principals).map(ApiKey::getApiKey)
+                    .orElseGet(() -> apiTokenService.createApiKey(DOMAIN, principals));
         } catch (Exception e) {
-            log.trace("Error read apiKey from KeyStore by principal {}: {}", principals.getPrimaryPrincipal(), e);
+            log.trace("Error read apiKey from store by principal {}: {}", principals.getPrimaryPrincipal(), e);
             apiTokenService.deleteApiKey(DOMAIN, principals);
         }
 
-        // Read by primary principal or create a new
-        if (apiKey == null) {
-            log.trace("Find apiKey by primary principal or create a new");
-            apiKey = apiTokenService.getApiKey(DOMAIN, principals).map(ApiKey::getApiKey)
-                    .orElseGet(() -> apiTokenService.createApiKey(DOMAIN, principals));
-        }
         log.trace("Read apiKey for principal {} = {}", principals.getPrimaryPrincipal(),
                 (apiKey != null && apiKey.length > 0) ? "***" : null);
 
@@ -102,6 +102,9 @@ public class NugetApiKeyResource extends ComponentSupport implements Resource {
     public NugetApiKeyXO resetKey(@NotNull @Valid @QueryParam("authToken") String base64AuthToken) {
         validateAuthToken(base64AuthToken);
         PrincipalCollection principals = this.securityHelper.subject().getPrincipals();
+        if (principals.getRealmNames().contains(nexusTokenRealm.getName())) {
+            throw new WebApplicationMessageException(Response.Status.FORBIDDEN, "Token reset is denied when authorizing via token realm");
+        }
 
         // Delete by principals
         apiTokenService.deleteApiKey(DOMAIN, principals);
