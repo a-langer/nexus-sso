@@ -16,11 +16,13 @@ ENV NEXUS_PLUGINS="${NEXUS_HOME}/system"
 ARG ANSIBLEGALAXY_VERSION="0.3.3"
 
 # Add nexus-pac4j-plugin.jar
+RUN rm -rf ${NEXUS_PLUGINS}/com/github/alanger/nexus/plugin/nexus-pac4j-plugin/
 COPY nexus-pac4j-plugin/target/nexus-pac4j-plugin-*.jar ${NEXUS_PLUGINS}/com/github/alanger/nexus/plugin/nexus-pac4j-plugin/${PLUG_VERSION}/nexus-pac4j-plugin-${PLUG_VERSION}.jar
 RUN chmod -R 644 ${NEXUS_PLUGINS}/com/github/alanger/nexus/plugin/nexus-pac4j-plugin/${PLUG_VERSION}/nexus-pac4j-plugin-${PLUG_VERSION}.jar && \
   echo "reference\:file\:com/github/alanger/nexus/plugin/nexus-pac4j-plugin/${PLUG_VERSION}/nexus-pac4j-plugin-${PLUG_VERSION}.jar = 200" >> /opt/sonatype/nexus/etc/karaf/startup.properties
 
 # Override nexus-repository-services.jar
+RUN rm -rf ${NEXUS_PLUGINS}/org/sonatype/nexus/nexus-repository-services/
 COPY nexus-repository-services/target/nexus-repository-services-*.jar ${NEXUS_PLUGINS}/org/sonatype/nexus/nexus-repository-services/${PLUG_VERSION}/nexus-repository-services-${PLUG_VERSION}.jar
 RUN chmod -R 644 ${NEXUS_PLUGINS}/org/sonatype/nexus/nexus-repository-services/${PLUG_VERSION}/nexus-repository-services-${PLUG_VERSION}.jar
 
