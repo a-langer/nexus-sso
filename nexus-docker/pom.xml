@@ -15,7 +15,7 @@
 
     <properties>
         <nexus.base.image>sonatype/nexus3:${nexus.base.version}-java11-ubi</nexus.base.image>
-        <docker.image>ghcr.io/a-langer/nexus-sso:${project.version}-java11-ubi-BETA-2</docker.image>
+        <docker.image>ghcr.io/a-langer/nexus-sso:${project.version}-java11-ubi-BETA-3</docker.image>
         <!-- <ansiblegalaxy.version>0.3.2-fixed</ansiblegalaxy.version> -->
         <ansiblegalaxy.version>0.3.3</ansiblegalaxy.version>
     </properties>
@@ -49,7 +49,7 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <!-- TODO Ansiblegalaxy plugin does not support new storage API -->
+                            <!-- TODO Ansiblegalaxy plugin does not support new storage API, see https://github.com/l3ender/nexus-repository-ansiblegalaxy/issues/25 -->
                             <skip>true</skip>
                             <artifactItems>
                                 <artifactItem>
@@ -78,7 +78,7 @@
                                 <configuration>
                                     <target description="Get Database Migrator Utility">
                                         <echo>Download nexus-db-migrator, see https://help.sonatype.com/en/orientdb-downloads.html</echo>
-                                        <get src="https://download.sonatype.com/nexus/nxrm3-migrator/nexus-db-migrator-3.70.2-01.jar" dest="target" skipexisting="true" />
+                                        <get src="https://download.sonatype.com/nexus/nxrm3-migrator/nexus-db-migrator-3.70.3-01.jar" dest="target" skipexisting="true" />
                                     </target>
                                 </configuration>
                             </execution>

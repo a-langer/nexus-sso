@@ -151,7 +151,6 @@
   <logger name="com.github.alanger.nexus.plugin.Init" level="TRACE" />
   <!-- <logger name="com.github.alanger.nexus.plugin.realm.NexusPac4jRealm" level="TRACE" /> -->
   <!-- <logger name="com.github.alanger.nexus.plugin.realm.NexusTokenRealm" level="TRACE" /> -->
-  <!-- <logger name="com.github.alanger.nexus.plugin.apikey.ApiTokenService" level="TRACE" /> -->
   <logger name="com.github.alanger.nexus.bootstrap.Main" level="INFO" />
   <!-- <logger name="com.github.alanger.nexus.bootstrap.ReloadCongiguration" level="TRACE" /> -->
   <!-- <logger name="com.github.alanger.nexus.bootstrap.Pac4jAuthenticationListener" level="TRACE" /> -->
@@ -184,6 +183,7 @@
   <!-- <logger name="org.sonatype.nexus.repository.docker.internal.security.DockerTokenRealm" level="TRACE" /> -->
   <!-- <logger name="com.sonatype.nexus.repository.nuget.internal.rest.NugetApiKeyResource" level="TRACE" /> -->
   <!-- <logger name="com.github.alanger.nexus.plugin.rest.NugetApiKeyResource" level="TRACE" /> -->
+  <!-- <logger name="com.github.alanger.nexus.plugin.apikey.ApiTokenService" level="TRACE" /> -->
   <!-- <logger name="org.sonatype.nexus.internal.security.apikey.ApiKeyStoreImpl" level="TRACE" /> -->
   <!-- <logger name="org.sonatype.nexus.internal.security.apikey.OrientApiKeyEntityAdapter" level="TRACE" /> -->
   <!-- <logger name="org.sonatype.nexus.internal.security.apikey.orient.OrientApiKeyStore" level="TRACE" /> -->
