@@ -24,6 +24,7 @@ import org.sonatype.nexus.security.config.SecurityConfiguration;
 /**
  * API Token service for "NuGet API Key".
  * 
+ * @since 3.70.1-02
  * @see org.sonatype.nexus.internal.security.apikey.ApiKeyStoreImpl
  */
 @Singleton
@@ -44,7 +45,7 @@ public class ApiTokenService extends ComponentSupport {
             , final UserPrincipalsHelper principalsHelper) {
         this.apiKeyStore = Preconditions.checkNotNull(apiKeyStore);
         this.encryptedString = encryptedString;
-        log.trace("ApiTokenServiceImpl: {}", this);
+        log.trace("ApiTokenService: {}", this);
     }
 
     public char[] createApiKey(String domain, PrincipalCollection principals) {
@@ -68,7 +69,7 @@ public class ApiTokenService extends ComponentSupport {
         return this.createApiKey(DOMAIN, principals);
     }
 
-    public Optional<ApiKey> findApiKey(UsernamePasswordToken token) {
+    public Optional<ApiKey> findApiKey(String domain, UsernamePasswordToken token, boolean domainAsLogin) {
         String username = token.getUsername();
 
         if (username != null) {
@@ -77,18 +78,21 @@ public class ApiTokenService extends ComponentSupport {
             try {
                 // FIX ClassNotFoundException: com.github.alanger.nexus.plugin.realm.Pac4jPrincipalName not found by org.hibernate.validator
                 Thread.currentThread().setContextClassLoader(ApiTokenService.class.getClassLoader());
+                Optional<ApiKey> key = null;
 
-                // "DockerToken:XXXXX" if org.sonatype.nexus.security.authc.NexusApiKeyAuthenticationToken
-                Optional<ApiKey> key = this.apiKeyStore.getApiKeyByToken(username, token.getPassword());
-                if (key.isPresent()) {
-                    log.trace("findApiKey principal {}, domain {}", key.get().getPrimaryPrincipal(), username);
-                    return key;
+                // Domain as login for "DockerToken:XXXXX" if org.sonatype.nexus.security.authc.NexusApiKeyAuthenticationToken
+                if (domainAsLogin) {
+                    key = this.apiKeyStore.getApiKeyByToken(username, token.getPassword());
+                    if (key.isPresent()) {
+                        log.trace("findApiKey principal: {}, domain as login: {}", key.get().getPrimaryPrincipal(), username);
+                        return key;
+                    }
                 }
 
-                // "Username:XXXXX" if org.apache.shiro.authc.UsernamePasswordToken
-                key = this.apiKeyStore.getApiKeyByToken(DOMAIN, token.getPassword());
+                // Default domain for "Username:XXXXX" if org.apache.shiro.authc.UsernamePasswordToken
+                key = this.apiKeyStore.getApiKeyByToken(domain, token.getPassword());
                 if (key.isPresent() && username.equals(key.get().getPrimaryPrincipal())) {
-                    log.trace("findApiKey principal {}, domain {}", key.get().getPrimaryPrincipal(), DOMAIN);
+                    log.trace("findApiKey principal: {}, default domain: {}", key.get().getPrimaryPrincipal(), domain);
                     return key;
                 }
             } catch (Exception e) {
@@ -101,25 +105,36 @@ public class ApiTokenService extends ComponentSupport {
         return Optional.empty();
     }
 
+    public Optional<ApiKey> findApiKey(UsernamePasswordToken token, boolean domainAsLogin) {
+        return findApiKey(DOMAIN, token, domainAsLogin);
+    }
+
+    /** For compatibility with 3.70.1-java11-ubi-BETA-3 */
+    public Optional<ApiKey> findApiKey(UsernamePasswordToken token) {
+        return findApiKey(DOMAIN, token, false);
+    }
+
     public Optional<ApiKey> getApiKey(String domain, PrincipalCollection principals) {
 
-        Optional<ApiKey> apiKey = getApiKeyFromDatabase(domain, principals); // Get via SQL
-        if (apiKey.isPresent()) {
-            return apiKey;
-        }
-
         ClassLoader oldTccl = Thread.currentThread().getContextClassLoader();
+        Optional<ApiKey> apiKey = Optional.empty();
+
         try {
             // FIX ClassNotFoundException: com.github.alanger.nexus.plugin.realm.Pac4jPrincipalName not found by org.hibernate.validator
             Thread.currentThread().setContextClassLoader(ApiTokenService.class.getClassLoader());
-            return this.apiKeyStore.getApiKey(domain, principals);
+            apiKey = this.apiKeyStore.getApiKey(domain, principals);
         } catch (Exception e) {
             log.trace("Error getApiKey for principal: " + principals.getPrimaryPrincipal() + " and domain: " + domain, e);
         } finally {
             Thread.currentThread().setContextClassLoader(oldTccl);
         }
 
-        return Optional.empty();
+        // Get via SQL if not present
+        if (apiKey == null || !apiKey.isPresent()) {
+            apiKey = getApiKeyFromDatabase(domain, principals);
+        }
+
+        return apiKey;
     }
 
     public Optional<ApiKey> getApiKey(PrincipalCollection principals) {
@@ -129,8 +144,8 @@ public class ApiTokenService extends ComponentSupport {
     /**
      * Delete ApiKey by primary principal
      * 
-     * @since buji-pac4j:5.0.0
-     * @since Nexus:3.70.0
+     * @since buji-pac4j 5.0.0
+     * @since Nexus 3.70.0
      * 
      * @see com.github.alanger.nexus.plugin.realm.Pac4jPrincipalName#equals(Object)
      */
@@ -141,14 +156,15 @@ public class ApiTokenService extends ComponentSupport {
             // FIX ClassNotFoundException: com.github.alanger.nexus.plugin.realm.Pac4jPrincipalName not found by org.hibernate.validator
             Thread.currentThread().setContextClassLoader(ApiTokenService.class.getClassLoader());
 
-            // May not delete without error
+            // May not return an error even if the deletion failed
             this.apiKeyStore.deleteApiKey(domain, principals);
         } catch (Exception e) {
             log.error("Error delete apiKey from store by principal {}: {}", principals.getPrimaryPrincipal(), e.getMessage());
             log.trace("Invalid apiKey will be deleted from database");
         } finally {
             Thread.currentThread().setContextClassLoader(oldTccl);
-            deleteApiKeyFromDatabase(domain, principals); // Delete via SQL
+            // Delete via SQL anyway
+            deleteApiKeyFromDatabase(domain, principals);
         }
     }
 
@@ -156,11 +172,15 @@ public class ApiTokenService extends ComponentSupport {
         this.deleteApiKey(DOMAIN, principals);
     }
 
-    // SQL: Select first API key from database
+    /**
+     * SQL: Select first API key from database
+     * 
+     * @since 3.70.1-02
+     */
     public Optional<ApiKey> getApiKeyFromDatabase(String domain, PrincipalCollection principals) {
         String encPrincipal = encryptedString.encrypt(principals.getPrimaryPrincipal().toString());
         String sql = "SELECT token FROM api_key WHERE domain = '" + domain + "' AND primary_principal = '" + encPrincipal + "'";
-        log.trace("Get ApiKey sql: {}", sql);
+        log.trace("Get ApiKey SQL: {}", sql);
         try (Connection conn = DI.getInstance().dataSource.getConnection();
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql);) {
@@ -175,11 +195,15 @@ public class ApiTokenService extends ComponentSupport {
         return Optional.empty();
     }
 
-    // SQL: Force deleting API key from database
+    /**
+     * SQL: Force deleting API key from database
+     * 
+     * @since 3.70.1-02
+     */
     public void deleteApiKeyFromDatabase(String domain, PrincipalCollection principals) {
         String encPrincipal = encryptedString.encrypt(principals.getPrimaryPrincipal().toString());
         String sql = "DELETE FROM api_key WHERE domain = '" + domain + "' AND primary_principal = '" + encPrincipal + "'";
-        log.trace("Delete ApiKey sql: {}", sql);
+        log.trace("Delete ApiKey SQL: {}", sql);
         try (Connection conn = DI.getInstance().dataSource.getConnection(); Statement stmt = conn.createStatement();) {
             stmt.execute(sql);
         } catch (SQLException e) {
