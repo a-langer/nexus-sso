@@ -28,6 +28,12 @@ import com.github.alanger.nexus.plugin.ui.NonTransitiveSearchComponent;
 
 /**
  * Change response from "/service/extdirect".
+ * 
+ * <p>
+ * TODO Override {@link org.sonatype.nexus.repository.rest.api.AssetXO AssetXO} and
+ * {@link org.sonatype.nexus.repository.rest.api.DefaultComponentXO DefaultComponentXO} in nexus-repository-services.
+ * @see https://github.com/sonatype/nexus-public/blob/main/components/nexus-repository-services/src/main/java/org/sonatype/nexus/repository/rest/api/AssetXO.groovy
+ * @see https://github.com/sonatype/nexus-public/blob/main/components/nexus-repository-services/src/main/java/org/sonatype/nexus/repository/rest/api/DefaultComponentXO.groovy
  */
 public class DockerExtdirectFilter extends QuotaFilter {
 

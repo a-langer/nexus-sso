@@ -72,7 +72,7 @@
     docker compose --profile debug up 
     ```
 
-    Open web browser: `http://localhost:2480` -> `jdbc:h2:tcp://nexus:2424/nexus` -> emplty `login/pass`.
+    Open web browser: `http://localhost:2480` -> JDBC URL: `jdbc:h2:tcp://nexus:2424/nexus` -> User/Password: `empty` -> `Connect`.
 
 3. Or use embedded Web console:
 
@@ -83,7 +83,7 @@
     docker compose up
     ```
 
-    Open web browser: `http://localhost:2481` -> `jdbc:h2:/nexus-data/db/nexus` -> emplty `login/pass`.
+    Open web browser: `http://localhost:2481` -> JDBC URL: `jdbc:h2:/nexus-data/db/nexus` -> User/Password: `empty` -> `Connect`.
 
 ## Rebuild DB
 
@@ -93,23 +93,23 @@ If the integrity of the H2 database is compromised, follow the instruction [1] a
 docker compose down
 docker compose run -w /nexus-data/db --rm nexus bash
 
-# Backup (if required)
+# Backup nexus.mv.db to nexus.zip (if required)
 java -cp $NEXUS_HOME/system/com/h2database/h2/*/h2*.jar org.h2.tools.Script -url jdbc:h2:./nexus -script nexus.zip -options compression zip
 
-# Create a dump of the current database
+# Create a dump nexus.h2.sql of the current database nexus.mv.db
 java -cp $NEXUS_HOME/system/com/h2database/h2/*/h2*.jar org.h2.tools.Recover -db nexus -trace
 
-# Rename the corrupt database file
+# Rename the corrupt database file to nexus.mv.db.bak
 mv nexus.mv.db nexus.mv.db.bak
 
-# Import the dump from 
+# Import the dump nexus.h2.sql to new nexus.mv.db
 java -cp $NEXUS_HOME/system/com/h2database/h2/*/h2*.jar org.h2.tools.RunScript -url jdbc:h2:./nexus -script nexus.h2.sql -checkResults
 
 # Run and check logs
 docker compose up -d
 docker compose logs -f
 
-# Restore (if required)
+# Restore nexus.mv.db from nexus.zip (if required)
 java -cp $NEXUS_HOME/system/com/h2database/h2/*/h2*.jar org.h2.tools.RunScript -url jdbc:h2:./nexus -script nexus.zip -options compression zip
 ```
 

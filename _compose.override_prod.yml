@@ -1,5 +1,3 @@
-version: "3.9"
-
 # See docs/Docker.md, change these settings for your production environment, ex.:
 services:
   nexus:
