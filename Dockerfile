@@ -30,6 +30,7 @@ RUN chmod -R 644 ${NEXUS_PLUGINS}/org/sonatype/nexus/nexus-repository-services/$
 COPY etc/nexus-default.properties /opt/sonatype/nexus/etc/nexus-default.properties
 COPY etc/jetty/nexus-web.xml /opt/sonatype/nexus/etc/jetty/nexus-web.xml
 COPY etc/jetty/jetty-sso.xml /opt/sonatype/nexus/etc/jetty/jetty-sso.xml
+COPY etc/h2db/.h2.server.properties /opt/sonatype/nexus/etc/h2db/.h2.server.properties
 COPY nexus-pac4j-plugin/src/main/config/ /opt/sonatype/nexus/etc/sso/config/
 COPY nexus-pac4j-plugin/src/main/groovy/ /opt/sonatype/nexus/etc/sso/script/
 RUN chown nexus:nexus -R /opt/sonatype/nexus/etc/sso/

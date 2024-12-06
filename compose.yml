@@ -62,7 +62,8 @@ services:
     mem_limit: ${DBCONSOLE_MEM_LIMIT:-128m}
     mem_reservation: ${DBCONSOLE_MEM_RESERVATION:-64m}
     volumes:
-      - ${NEXUS_ETC}/h2db:/h2db:rw # H2DB console config
+      - ${NEXUS_ETC}/h2db:/opt/sonatype/nexus/etc/h2db:ro # H2DB console config
+      - ${NEXUS_DATA}:/nexus-data # H2DB file (accessible only if Nexus not running)
     ports:
       # H2 web console: http://localhost:2480 -> jdbc:h2:tcp://nexus:2424/nexus -> emplty login/pass
       - "${DBCONSOLE_HTTP_PORT:-2480}:2480"
@@ -74,7 +75,7 @@ services:
     logging:
       <<: *logging
     entrypoint: ["bash", "-c", 
-      "java -cp $NEXUS_HOME/system/com/h2database/h2/*/h2*.jar org.h2.tools.Server -web -webPort 2480 -webAllowOthers -ifExists -properties /h2db/"
+      "java -cp $NEXUS_HOME/system/com/h2database/h2/*/h2*.jar org.h2.tools.Server -web -webPort 2480 -webAllowOthers -ifExists -properties /opt/sonatype/nexus/etc/h2db/"
     ]
 
 networks:
