@@ -2,7 +2,7 @@
 
 [![license](https://img.shields.io/badge/license-EPL1-brightgreen.svg)](https://github.com/a-langer/nexus-sso/blob/main/LICENSE "License of source code")
 [![image](https://ghcr-badge.deta.dev/a-langer/nexus-sso/latest_tag?trim=major&label=latest)][0]
-[![image-size](https://ghcr-badge.deta.dev/a-langer/nexus-sso/size?tag=3.70.1-java11-ubi-BETA-3)][0]
+[![image-size](https://ghcr-badge.deta.dev/a-langer/nexus-sso/size?tag=3.70.1-java11-ubi)][0]
 [![JitPack](https://jitpack.io/v/a-langer/nexus-sso.svg)][1]
 
 Patch for [Nexus OSS][2] with authorization via [SSO][7] and [tokens][8]. By default this features available only in PRO version ([see comparison][5]), but this patch provides them an alternative implementation without violating the license.
@@ -23,9 +23,11 @@ Solution implement as Docker [container][0] (based on [official image][3] with S
 
 ## Supported features and examples of usage
 
-> **Warn**: Since version `3.70.1-java11-ubi` your need migrate from legacy OrientDB to H2DB. Version 3.71.0 and beyond do not support OrientDB, Java 8, or Java 11, see [Migration.md](docs/Migration.md) for more information.
+> **Warn**: Since version `3.70.1-java11-ubi`:
 >
-> **Note**: Since version `3.70.0-java11-ubi` image and all libraries have been updated to Java 11. See [release notes][9.1] for more information.
+> * Your need migrate from legacy OrientDB to H2DB. Version 3.71.0 and beyond do not support OrientDB, Java 8, or Java 11, see [Migration.md](docs/Migration.md) for more information.
+> * Class `com.github.alanger.nexus.bootstrap.Pac4jAuthenticationListener` has been deprecated, see [SAML.md](docs/SAML.md#attributes-mapping).
+> * Image released without [nexus-repository-ansiblegalaxy](https://github.com/angeloxx/nexus-repository-ansiblegalaxy), cause by plugin does not support new storage API, see [issue #25](https://github.com/l3ender/nexus-repository-ansiblegalaxy/issues/25).
 
 Since version `3.61.0` for using SSO and User Tokens, it is enough to have following [realms][6] in the order listed:
 
@@ -97,5 +99,4 @@ Need installed Maven and Docker with [Compose][4] and [BuildKit][4.1] plugins:
 [7]: https://help.sonatype.com/en/saml.html "Nexus PRO SAML"
 [8]: https://help.sonatype.com/en/user-tokens.html "Nexus PRO tokens"
 [9]: https://github.com/sonatype/nexus-public/releases "Nexus release notes"
-[9.1]: https://help.sonatype.com/en/sonatype-nexus-repository-3-70-0-release-notes.html "Nexus Repository 3.70.0 - 3.70.1 Release Notes"
 [10]: https://mvnrepository.com/artifact/org.sonatype.nexus/nexus-bootstrap "Version of Nexus plugins in Maven Central"

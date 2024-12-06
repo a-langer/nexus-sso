@@ -15,7 +15,7 @@
 
     <properties>
         <nexus.base.image>sonatype/nexus3:${nexus.base.version}-java11-ubi</nexus.base.image>
-        <docker.image>ghcr.io/a-langer/nexus-sso:${project.version}-java11-ubi-BETA-3</docker.image>
+        <docker.image>ghcr.io/a-langer/nexus-sso:${project.version}-java11-ubi</docker.image>
         <!-- <ansiblegalaxy.version>0.3.2-fixed</ansiblegalaxy.version> -->
         <ansiblegalaxy.version>0.3.3</ansiblegalaxy.version>
     </properties>
