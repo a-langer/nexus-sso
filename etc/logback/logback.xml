@@ -149,11 +149,11 @@
 
   <!-- Set TRACE for Groovy scripts hot-reload -->
   <logger name="com.github.alanger.nexus.plugin.Init" level="TRACE" />
-  <!-- <logger name="com.github.alanger.nexus.plugin.realm.NexusPac4jRealm" level="TRACE" /> -->
+  <logger name="com.github.alanger.nexus.plugin.realm.NexusPac4jRealm" level="INFO" />
   <!-- <logger name="com.github.alanger.nexus.plugin.realm.NexusTokenRealm" level="TRACE" /> -->
+  <!-- <logger name="com.github.alanger.nexus.plugin.ui.NonTransitiveSearchComponent" level="TRACE" /> -->
   <logger name="com.github.alanger.nexus.bootstrap.Main" level="INFO" />
   <!-- <logger name="com.github.alanger.nexus.bootstrap.ReloadCongiguration" level="TRACE" /> -->
-  <!-- <logger name="com.github.alanger.nexus.bootstrap.Pac4jAuthenticationListener" level="TRACE" /> -->
   <!-- <logger name="com.github.alanger.nexus.bootstrap.DockerExtdirectFilter" level="TRACE" /> -->
   <!-- <logger name="com.github.alanger.nexus.bootstrap.DebugFilter" level="DEBUG" /> -->
   <!-- <logger name="com.github.alanger.nexus.bootstrap.EchoRealm" level="TRACE" /> -->

@@ -174,8 +174,8 @@ public class Main {
         // Nexus jdbc data source
         objects.put("securityDataSource", DI.getInstance().dataSource);
 
-        // SSO/SAML profile authentication listener
-        Pac4jAuthenticationListener pac4jAuthenticationListener = new Pac4jAuthenticationListener(DI.getInstance().securityConfiguration);
+        // SSO/SAML profile authentication listener, for compatibility with previous versions
+        Pac4jAuthenticationListener pac4jAuthenticationListener = new Pac4jAuthenticationListener();
         objects.put("pac4jAuthenticationListener", pac4jAuthenticationListener);
 
         // org.sonatype.nexus.security.authc.FirstSuccessfulModularRealmAuthenticator

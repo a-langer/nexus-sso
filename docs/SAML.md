@@ -65,14 +65,16 @@ authorizationGenerator.roleAttributes = roles
 pac4jRealm.principalNameAttribute = id
 
 # User profile attributes mapping in one line
-pac4jAuthenticationListener.map(attrs) = firstName:myIdpFirstName, lastName:myIdpLastName, email:myIdpEmailaddress
+pac4jRealm.map(attrs) = firstName:myIdpFirstName, lastName:myIdpLastName, email:myIdpEmailaddress
 # User profile attributes mapping by separately
-pac4jAuthenticationListener.attrs[id] = myIdpUPN
-pac4jAuthenticationListener.attrs[firstName] = myIdpFirstName
-pac4jAuthenticationListener.attrs[lastName] = myIdpLastName
-pac4jAuthenticationListener.attrs[email] = myIdpEmailaddress
+pac4jRealm.attrs[id] = myIdpUPN
+pac4jRealm.attrs[firstName] = myIdpFirstName
+pac4jRealm.attrs[lastName] = myIdpLastName
+pac4jRealm.attrs[email] = myIdpEmailaddress
 ```
 
+> **_NOTE_** Since `3.70.1` class `com.github.alanger.nexus.bootstrap.Pac4jAuthenticationListener` has been deprecated and `pac4jRealm` is now used for attribute mapping instead of `pac4jAuthenticationListener`.
+>
 > **_NOTE:_** If variable interpolation is used, such as `${PAC4J_PRINCIPAL_NAME_ATTR:-username}`, then the value of the variables must be changed in the [.env](../.env) file. To quickly apply changes, can use hot-reload, see [Jetty Rewrite Handler](./Patch.md#jetty-rewrite-handler).
 
 ## Group and role mapping
@@ -96,7 +98,7 @@ callbackFilter.callbackLogic = $callbackLogic
 And following lines to the [logback.xml](../etc/logback/logback.xml) file (output will be to `${NEXUS_DATA}/log/nexus.log`):
 
 ```xml
-<logger name="com.github.alanger.nexus.bootstrap.Pac4jAuthenticationListener" level="TRACE" />
+<logger name="com.github.alanger.nexus.plugin.realm.NexusPac4jRealm" level="TRACE" />
 <logger name="com.github.alanger.nexus.plugin.Pac4jCallbackLogic" level="TRACE" />
 <logger name="org.pac4j.jee.filter.SecurityFilter" level="TRACE" />
 <logger name="org.pac4j.jee.filter.CallbackFilter" level="TRACE" />
