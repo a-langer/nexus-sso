@@ -3,7 +3,7 @@ services:
   nexus:
     # Disable analytics https://help.sonatype.com/en/in-product-analytics-capability.html
     environment:
-      - INSTALL4J_ADD_VM_PARAMS=${INSTALL4J_ADD_VM_PARAMS} -Dnexus.analytics.enabled=false -Dnexus.datastore.enabled=true 
+      - INSTALL4J_ADD_VM_PARAMS=${INSTALL4J_ADD_VM_PARAMS} -Dnexus.analytics.enabled=false -Dnexus.scripts.allowCreation=true -Dnexus.datastore.enabled=true 
           -Dnexus.sso.h2.tcpListenerEnabled=true -Dnexus.sso.h2.tcpListenerPort=2424 -Dnexus.h2.httpListenerEnabled=true -Dnexus.h2.httpListenerPort=2480
     # Disabling "Analyze Application" https://stackoverflow.com/a/41726259/19707292
     extra_hosts:
