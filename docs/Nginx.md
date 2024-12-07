@@ -6,8 +6,8 @@
 
 * After deployment, three Docker registries need to be created:
 
-  * `docker-login` - uses to check authorization, it is recommended to choose type "group" containing registry "proxy" for "hub.docker.com". To allow anonymous access, enable "Allow anonymous docker pull".
-  * `docker-group` - choose type "group", uses to look up images in docker registries. CLI searches will be performed on all registries added to this group (assuming the user has read permissions or the "Allow anonymous docker pull" option is enabled).
+  * `docker-login` - uses to check authorization, it is recommended to choose type "group" or "hosted". To allow anonymous access, enable "Allow anonymous docker pull".
+  * `docker-group` (optional) - choose type "group", uses to look up images in docker registries. CLI searches will be performed on all registries added to this group (assuming the user has read permissions or the "Allow anonymous docker pull" option is enabled).
   * `docker-root` (optional) - is used to pull an image from the Docker registry hosted in the Nexus root, i.e. without a given repository name. Can be of any type, for host your own images required the "hosted" type. Image names in this repository must not contain a slash (for example, myhost/myimage:latest).
 
 * After authorization, working with docker registries is controlled by Nexus permissions. For example, if you don't give a user permission to write to the "super-secret-docker-hosted-repo" registry, they can log in, but they can't push images to that registry.
