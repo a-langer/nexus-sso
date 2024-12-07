@@ -46,7 +46,7 @@ List of features this patch adds:
 
 * [**Nginx Reverse Proxy**](./docs/Nginx.md) - this Nginx configuration implements a proxy strategy to use Docker registries without additional ports or hostnames. Also provides pre-configured SSL.
 
-* [**Docker Compose**](./docs/Docker.md) - provide flexible Compose configuration and **OrientDB studio** - web interface to interact with an embedded database.
+* [**Docker Compose**](./docs/Docker.md) - provide flexible Compose configuration and **DB console** - web interface to interact with an embedded database.
 
 * [**Patch features**](./docs/Patch.md) - additional features implemented in this patch.
 

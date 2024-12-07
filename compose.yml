@@ -61,11 +61,13 @@ services:
     cpus: ${DBCONSOLE_CPUS:-2}
     mem_limit: ${DBCONSOLE_MEM_LIMIT:-128m}
     mem_reservation: ${DBCONSOLE_MEM_RESERVATION:-64m}
+    environment:
+      - DBCONSOLE_NAMES=${DBCONSOLE_NAMES:-localhost} # The comma-separated list of external names https://h2database.com/javadoc/org/h2/tools/Server.html#main-java.lang.String...-
     volumes:
       - ${NEXUS_ETC}/h2db:/opt/sonatype/nexus/etc/h2db:ro # H2DB console config
       - ${NEXUS_DATA}:/nexus-data # H2DB file (accessible only if Nexus not running)
     ports:
-      # H2 web console: http://localhost:2480 -> jdbc:h2:tcp://nexus:2424/nexus -> emplty login/pass
+      # H2 web console: http://localhost:2480 -> jdbc:h2:tcp://nexus:2424/nexus -> empty login/pass
       - "${DBCONSOLE_HTTP_PORT:-2480}:2480"
     depends_on:
       nexus:
@@ -75,7 +77,7 @@ services:
     logging:
       <<: *logging
     entrypoint: ["bash", "-c", 
-      "java -cp $NEXUS_HOME/system/com/h2database/h2/*/h2*.jar org.h2.tools.Server -web -webPort 2480 -webAllowOthers -ifExists -properties /opt/sonatype/nexus/etc/h2db/"
+      "java -cp $$NEXUS_HOME/system/com/h2database/h2/*/h2*.jar org.h2.tools.Server -web -webPort 2480 -webAllowOthers -webExternalNames $$DBCONSOLE_NAMES -ifExists -properties /opt/sonatype/nexus/etc/h2db/"
     ]
 
 networks:
