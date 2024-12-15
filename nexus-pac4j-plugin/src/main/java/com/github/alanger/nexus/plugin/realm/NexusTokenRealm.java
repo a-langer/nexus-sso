@@ -28,6 +28,7 @@ import com.google.common.base.Preconditions;
  * {@code nx-apikey-all} required), however, the tokens themselves apply to all types of repositories
  * 
  * @see https://help.sonatype.com/en/user-tokens.html
+ * @see org.sonatype.nexus.security.token.BearerTokenRealm
  */
 @Singleton
 @Named(NexusTokenRealm.NAME)

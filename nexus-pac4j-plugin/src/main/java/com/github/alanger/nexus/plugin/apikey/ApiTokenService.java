@@ -71,6 +71,7 @@ public class ApiTokenService extends ComponentSupport {
 
     public Optional<ApiKey> findApiKey(String domain, UsernamePasswordToken token, boolean domainAsLogin) {
         String username = token.getUsername();
+        Optional<ApiKey> key = Optional.empty();
 
         if (username != null) {
             ClassLoader oldTccl = Thread.currentThread().getContextClassLoader();
@@ -78,7 +79,6 @@ public class ApiTokenService extends ComponentSupport {
             try {
                 // FIX ClassNotFoundException: com.github.alanger.nexus.plugin.realm.Pac4jPrincipalName not found by org.hibernate.validator
                 Thread.currentThread().setContextClassLoader(ApiTokenService.class.getClassLoader());
-                Optional<ApiKey> key = null;
 
                 // Domain as login for "DockerToken:XXXXX" if org.sonatype.nexus.security.authc.NexusApiKeyAuthenticationToken
                 if (domainAsLogin) {
@@ -102,7 +102,7 @@ public class ApiTokenService extends ComponentSupport {
             }
         }
 
-        return Optional.empty();
+        return key;
     }
 
     public Optional<ApiKey> findApiKey(UsernamePasswordToken token, boolean domainAsLogin) {
@@ -130,7 +130,7 @@ public class ApiTokenService extends ComponentSupport {
         }
 
         // Get via SQL if not present
-        if (apiKey == null || !apiKey.isPresent()) {
+        if (!apiKey.isPresent()) {
             apiKey = getApiKeyFromDatabase(domain, principals);
         }
 
