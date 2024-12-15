@@ -8,6 +8,7 @@ function log() {
     echo "$msg" >> "${2:-$logFile}" && echo "$1";
 }
 
+# Only for migration from legacy OrientDB to H2DB https://help.sonatype.com/en/download.html#download-sonatype-nexus-repository-database-migrator
 if [[ ! -f "/nexus-data/db/nexus.mv.db" && ! -z $(find /nexus-data/db -path "/*/database.ocf") ]]; then
 
   # Docs https://help.sonatype.com/en/orient-3-70-java-8-or-11.html
@@ -39,7 +40,7 @@ if [[ ! -f "/nexus-data/db/nexus.mv.db" && ! -z $(find /nexus-data/db -path "/*/
     java -Xmx512m -jar /opt/sonatype/nexus/lib/support/nexus-orient-console.jar \
       "CONNECT PLOCAL:/nexus-data/db/${dbName} admin admin; backup database ./${fileName}.bak -compressionLevel=3 -bufferSize=16384;" > ./${fileName}.log
     if [ $? -ne 0 ]; then
-        log "Error ${$?}" $logFile; exit $?;
+      log "Error ${$?}" $logFile; exit $?;
     fi
   done
 

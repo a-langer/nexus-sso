@@ -2,6 +2,8 @@
 
 Since version [`3.70.1-java11-ubi`][0] your need migrate from legacy [OrientDB][1] to [H2DB][2]. Don't worry, this version make migration automatically, just update the image version and run the container (see [migrator.sh](../nexus-docker/migrator.sh) for more information).
 
+> **WARN**: Versions [`3.71.0`](https://help.sonatype.com/en/download.html#download-sonatype-nexus-repository-database-migrator) and above of the Database Migrator utility only support migrating between `H2` and `PostgreSQL`.
+
 Of course, you can perform the migration yourself following the instructions below:
 
 1. [Sonatype Nexus Repository 3.70.0 was the final release to include our legacy OrientDB](https://help.sonatype.com/en/upgrading-to-nexus-repository-3-71-0-and-beyond.html).

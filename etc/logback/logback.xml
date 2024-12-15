@@ -185,8 +185,6 @@
   <!-- <logger name="com.github.alanger.nexus.plugin.rest.NugetApiKeyResource" level="TRACE" /> -->
   <!-- <logger name="com.github.alanger.nexus.plugin.apikey.ApiTokenService" level="TRACE" /> -->
   <!-- <logger name="org.sonatype.nexus.internal.security.apikey.ApiKeyStoreImpl" level="TRACE" /> -->
-  <!-- <logger name="org.sonatype.nexus.internal.security.apikey.OrientApiKeyEntityAdapter" level="TRACE" /> -->
-  <!-- <logger name="org.sonatype.nexus.internal.security.apikey.orient.OrientApiKeyStore" level="TRACE" /> -->
   <!-- <logger name="org.sonatype.nexus.security.authc.FirstSuccessfulModularRealmAuthenticator" level="TRACE" /> -->
   <!-- <logger name="org.sonatype.nexus.security.token.BearerTokenRealm" level="TRACE" /> -->
 
@@ -196,7 +194,6 @@
   <logger name="org.sonatype.nexus.extender.NexusContextListener" level="INFO" />
   <!-- <logger name="org.sonatype.nexus.extender.NexusBundleTracker" level="INFO" /> -->
   <logger name="org.sonatype.nexus.rapture.internal.RaptureWebResourceBundle" level="INFO" />
-  <logger name="com.orientechnologies.orient.core.storage.impl.local.paginated.OLocalPaginatedStorage" level="INFO" />
 
   <include file="${karaf.data}/etc/logback/logback-overrides.xml" optional="true"/>
   <include file="${karaf.data}/etc/logback/logback-tasklogfile-appender-override.xml" optional="true"/>
