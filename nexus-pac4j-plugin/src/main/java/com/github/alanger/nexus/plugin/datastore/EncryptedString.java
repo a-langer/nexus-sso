@@ -2,8 +2,8 @@ package com.github.alanger.nexus.plugin.datastore;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.sonatype.nexus.crypto.PbeCipherFactory;
-import org.sonatype.nexus.crypto.PbeCipherFactory.PbeCipher;
+import org.sonatype.nexus.crypto.LegacyCipherFactory; // since 3.75.1
+import org.sonatype.nexus.crypto.LegacyCipherFactory.PbeCipher; // since 3.75.1
 import com.fasterxml.jackson.core.Base64Variant;
 import com.fasterxml.jackson.core.Base64Variants;
 
@@ -15,7 +15,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @see org.sonatype.nexus.datastore.mybatis.MyBatisDataStore#prepare
  * @see org.sonatype.nexus.datastore.mybatis.handlers.EncryptedStringTypeHandler
  * @see org.sonatype.nexus.datastore.mybatis.MyBatisCipher
- * @see org.sonatype.nexus.internal.security.apikey.ApiKeyTokenTypeHandler
+ * 
+ * @see org.sonatype.nexus.crypto.secrets.EncryptDecryptService
+ * @see org.sonatype.nexus.crypto.internal.PbeCipherFactory
+ * @see org.sonatype.nexus.crypto.internal.PbeCipherFactory.PbeCipher
  */
 @Named
 public class EncryptedString {
@@ -26,7 +29,7 @@ public class EncryptedString {
     private final PbeCipher databaseCipher;
 
     @Inject
-    public EncryptedString(final PbeCipherFactory pbeCipherFactory,
+    public EncryptedString(final LegacyCipherFactory pbeCipherFactory,
             @Named("${nexus.mybatis.cipher.password:-changeme}") final String password,
             @Named("${nexus.mybatis.cipher.salt:-changeme}") final String salt,
             @Named("${nexus.mybatis.cipher.iv:-0123456789ABCDEF}") final String iv) throws Exception {
