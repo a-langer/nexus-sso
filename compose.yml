@@ -69,9 +69,6 @@ services:
     ports:
       # H2 web console: http://localhost:2480 -> jdbc:h2:tcp://nexus:2424/nexus -> empty login/pass
       - "${DBCONSOLE_HTTP_PORT:-2480}:2480"
-    depends_on:
-      nexus:
-        condition: service_healthy
     profiles:
       - debug
     logging:
