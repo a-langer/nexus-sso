@@ -3,7 +3,6 @@ package com.github.alanger.nexus.plugin.realm;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.sql.DataSource;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -170,48 +169,6 @@ public class NexusTokenRealm extends NexusPac4jRealm {
      */
     public void setDomainAsLogin(boolean domainAsLogin) {
         this.domainAsLogin = domainAsLogin;
-    }
-
-    /** @deprecated Since 3.70.1-02 and will be removed */
-    @Deprecated(since = "3.70.1-02", forRemoval = true)
-    public void setDataSource(DataSource dataSource) {
-        logger.warn("Property 'dataSource' has been deprecated since 3.70.1-02 and will be removed in next release");
-    }
-
-    /** @deprecated Since 3.70.1-02 and will be removed */
-    @Deprecated(since = "3.70.1-02", forRemoval = true)
-    public void setSkipIfNullAttribute(boolean skipIfNullAttribute) {
-        logger.warn("Property 'skipIfNullAttribute' has been deprecated since 3.70.1-02 and will be removed in next release");
-    }
-
-    /** @deprecated Since 3.70.1-02 and will be removed */
-    @Deprecated(since = "3.70.1-02", forRemoval = true)
-    public void setPrincipalNameAttribute(String principalNameAttribute) {
-        logger.warn("Property 'principalNameAttribute' has been deprecated since 3.70.1-02 and will be removed in next release");
-    }
-
-    /** @deprecated Since 3.70.1-02 and will be removed */
-    @Deprecated(since = "3.70.1-02", forRemoval = true)
-    public void setFindByPassword(boolean findByPassword) {
-        logger.warn("Property 'findByPassword' has been deprecated since 3.70.1-02 and will be removed in next release");
-    }
-
-    /** @deprecated Since 3.70.1-02 and will be removed */
-    @Deprecated(since = "3.70.1-02", forRemoval = true)
-    public void setPrincipalNameQuery(String principalNameQuery) {
-        logger.warn("Property 'principalNameQuery' has been deprecated since 3.70.1-02 and will be removed in next release");
-    }
-
-    /** @deprecated Since 3.70.1-02 and will be removed */
-    @Deprecated(since = "3.70.1-02", forRemoval = true)
-    public void setAuthenticationQuery(String authenticationQuery) {
-        logger.warn("Property 'authenticationQuery' has been deprecated since 3.70.1-02 and will be removed in next release");
-    }
-
-    /** @deprecated Since 3.70.1-02 and will be removed */
-    @Deprecated(since = "3.70.1-02", forRemoval = true)
-    public void setUserRolesQuery(String userRolesQuery) {
-        logger.warn("Property 'userRolesQuer' has been deprecated since 3.70.1-02 and will be removed in next release");
     }
 
 }
