@@ -85,6 +85,9 @@ public class Init extends StateGuardLifecycleSupport {
             log.trace("groovyClass: {}", groovyClass.getCanonicalName());
 
             groovyClass.getDeclaredConstructor(ServletContext.class).newInstance(servletContext);
+        } catch (Exception e) {
+            log.error("Init doStart() error", e);
+            throw e;
         } finally {
             Thread.currentThread().setContextClassLoader(oldTccl);
         }
