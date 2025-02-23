@@ -5,11 +5,11 @@
 # docker rmi $(docker images -f "dangling=true" -q)
 # docker run --user=0:0 --rm -it -p 8081:8081/tcp sonatype/nexus3:3.70.1-java11-ubi /bin/bash
 
-ARG NEXUS_BASE_IMAGE="sonatype/nexus3:3.70.1-java11-ubi"
+ARG NEXUS_BASE_IMAGE="sonatype/nexus3:3.75.1-java17-ubi"
 FROM $NEXUS_BASE_IMAGE
 USER root
 
-ARG NEXUS_PLUGIN_VERSION="3.70.1-02"
+ARG NEXUS_PLUGIN_VERSION="3.75.1-01"
 ENV PLUG_VERSION="${NEXUS_PLUGIN_VERSION}"
 ENV NEXUS_PLUGINS="${NEXUS_HOME}/system"
 
@@ -41,9 +41,9 @@ RUN chown nexus:nexus -R /opt/sonatype/nexus/etc/sso/
 # RUN echo "reference\:file\:org/sonatype/nexus/plugins/nexus-repository-ansiblegalaxy/${ANSIBLEGALAXY_VERSION}/nexus-repository-ansiblegalaxy-${ANSIBLEGALAXY_VERSION}.jar = 200" >> /opt/sonatype/nexus/etc/karaf/startup.properties
 
 # Add nexus-db-migrator.jar, see https://help.sonatype.com/en/sonatype-nexus-repository-3-71-0-release-notes.html
-COPY nexus-docker/target/nexus-db-migrator-*.jar ${NEXUS_HOME}
-COPY nexus-docker/migrator.sh ${NEXUS_HOME}
-CMD [ "/opt/sonatype/nexus/migrator.sh" ]
+# COPY nexus-docker/target/nexus-db-migrator-*.jar ${NEXUS_HOME}
+# COPY nexus-docker/migrator.sh ${NEXUS_HOME}
+# CMD [ "/opt/sonatype/nexus/migrator.sh" ]
 
 ENV INSTALL4J_ADD_VM_PARAMS="-Xms512m -Xmx2048m -Djava.util.prefs.userRoot=/nexus-data/javaprefs"
 

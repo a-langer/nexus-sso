@@ -7,15 +7,15 @@
     <parent>
         <groupId>com.github.a-langer</groupId>
         <artifactId>nexus-sso</artifactId>
-        <version>3.70.1</version>
+        <version>3.75.1</version>
         <relativePath>..</relativePath>
     </parent>
     <artifactId>nexus-docker</artifactId>
     <packaging>pom</packaging>
 
     <properties>
-        <nexus.base.image>sonatype/nexus3:${nexus.base.version}-java11-ubi</nexus.base.image>
-        <docker.image>ghcr.io/a-langer/nexus-sso:${project.version}-java11-ubi</docker.image>
+        <nexus.base.image>sonatype/nexus3:${nexus.base.version}-java17-ubi</nexus.base.image>
+        <docker.image>ghcr.io/a-langer/nexus-sso:${project.version}-java17-ubi</docker.image>
         <!-- <ansiblegalaxy.version>0.3.2-fixed</ansiblegalaxy.version> -->
         <ansiblegalaxy.version>0.3.3</ansiblegalaxy.version>
     </properties>
@@ -69,7 +69,7 @@
                         <artifactId>maven-antrun-plugin</artifactId>
                         <version>3.1.0</version>
                         <executions>
-                            <execution>
+                            <!-- <execution>
                                 <id>get-migrator-utility</id>
                                 <phase>install</phase>
                                 <goals>
@@ -78,10 +78,10 @@
                                 <configuration>
                                     <target description="Get Database Migrator Utility">
                                         <echo>Download nexus-db-migrator, see https://help.sonatype.com/en/orientdb-downloads.html</echo>
-                                        <get src="https://download.sonatype.com/nexus/nxrm3-migrator/nexus-db-migrator-3.70.3-01.jar" dest="target" skipexisting="true" />
+                                        <get src="https://download.sonatype.com/nexus/nxrm3-migrator/nexus-db-migrator-3.70.4-02.jar" dest="target" skipexisting="true" />
                                     </target>
                                 </configuration>
-                            </execution>
+                            </execution> -->
                             <execution>
                                 <id>docker-prepare</id>
                                 <phase>install</phase>

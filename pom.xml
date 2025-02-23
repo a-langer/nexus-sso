@@ -4,7 +4,7 @@
     <groupId>com.github.a-langer</groupId>
     <artifactId>nexus-sso</artifactId>
     <packaging>pom</packaging>
-    <version>3.70.1</version>
+    <version>3.75.1</version>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Single Sign-On patch for Nexus OSS</description>
 
@@ -14,7 +14,7 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <nexus.base.version>${project.version}</nexus.base.version>
-        <nexus.extension.version>02</nexus.extension.version>
+        <nexus.extension.version>01</nexus.extension.version>
         <nexus.plugin.version>${nexus.base.version}-${nexus.extension.version}</nexus.plugin.version>
     </properties>
 
