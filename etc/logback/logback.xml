@@ -159,6 +159,9 @@
   <!-- <logger name="com.github.alanger.nexus.bootstrap.EchoRealm" level="TRACE" /> -->
   <!-- <logger name="com.github.alanger.nexus.bootstrap.QuotaFilter" level="TRACE" /> -->
 
+  <!-- <logger name="com.sonatype.nexus.risk.riskondisk.MaliciousRiskRegistriesCacheHelper" level="TRACE" /> -->
+  <!-- <logger name="com.sonatype.nexus.risk.riskondisk.MaliciousRiskOnDiskCacheHelper" level="TRACE" /> -->
+
   <!-- SAML debug -->
   <!-- <logger name="com.github.alanger.nexus.plugin.Pac4jCallbackLogic" level="TRACE" /> -->
   <!-- <logger name="org.pac4j.jee.filter.SecurityFilter" level="TRACE" /> -->
@@ -184,6 +187,8 @@
   <!-- <logger name="com.sonatype.nexus.repository.nuget.internal.rest.NugetApiKeyResource" level="TRACE" /> -->
   <!-- <logger name="com.github.alanger.nexus.plugin.rest.NugetApiKeyResource" level="TRACE" /> -->
   <!-- <logger name="com.github.alanger.nexus.plugin.apikey.ApiTokenService" level="TRACE" /> -->
+  <!-- <logger name="com.github.alanger.nexus.plugin.apikey.ApiKeySanitizer" level="TRACE" /> -->
+  <!-- <logger name="org.sonatype.nexus.internal.security.apikey.upgrade.ApiKeyToSecretsTask" level="TRACE" /> -->
   <!-- <logger name="org.sonatype.nexus.internal.security.apikey.ApiKeyStoreImpl" level="TRACE" /> -->
   <!-- <logger name="org.sonatype.nexus.security.authc.FirstSuccessfulModularRealmAuthenticator" level="TRACE" /> -->
   <!-- <logger name="org.sonatype.nexus.security.token.BearerTokenRealm" level="TRACE" /> -->
