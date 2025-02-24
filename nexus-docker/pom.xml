@@ -110,7 +110,7 @@
                                         <echo>Set size?tag=${image.tag} to README.md</echo>
                                         <replaceregexp file="${maven.multiModuleProjectDirectory}/README.md" byline="true"
                                             match=".*/a-langer/nexus-sso/size\?tag=(.*)"
-                                            replace='[![image-size](https://ghcr-badge.deta.dev/a-langer/nexus-sso/size?tag=${image.tag})][0]' />
+                                            replace='[![image-size](https://ghcr-badge.egpl.dev/a-langer/nexus-sso/size?tag=${image.tag})][0]' />
 
                                         <echo>Set ANSIBLEGALAXY_VERSION="${ansiblegalaxy.version}" to Dockerfile</echo>
                                         <replaceregexp file="${maven.multiModuleProjectDirectory}/Dockerfile" byline="true"
